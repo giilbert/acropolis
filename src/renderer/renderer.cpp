@@ -1,12 +1,27 @@
 #include "renderer.h"
-#include <GLFW/glfw3.h>
 
-Renderer::Renderer()
+void glfwError(int code, const char *err)
 {
-    std::cout << "Constructor!\n";
+    std::cout << err << "\n";
+    glfwTerminate();
 }
 
-void Renderer::draw()
+Renderer::Renderer(GLFWwindow *window)
 {
-    std::cout << "draw\n";
+    glfwMakeContextCurrent(window);
+    glewInit();
+    glfwSetErrorCallback(glfwError);
+
+    glClearColor(0.1, 0.1, 0.1, 0.1);
+    glEnable(GL_CULL_FACE);
+}
+
+void Renderer::render(GLFWwindow *window)
+{
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, nullptr);
+
+    glfwSwapBuffers(window);
+    glfwPollEvents();
 }

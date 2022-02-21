@@ -7,6 +7,10 @@ add_executable(
   
   src/main.cpp
   src/renderer/renderer.cpp
+  src/renderer/shader.cpp
+  src/renderer/vbo.cpp
+  src/renderer/3d/mesh.cpp
+  src/utils/logger.cpp
 )
 
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake ${CMAKE_MODULE_PATH})

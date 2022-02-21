@@ -1,4 +1,4 @@
-const static float vertices[72] = {
+float vertexData[] = {
     1, 1, 1,
     1, 1, -1,
     1, -1, 1,
@@ -29,7 +29,7 @@ const static float vertices[72] = {
     1, -1, -1,
     -1, -1, -1};
 
-const static int indices[36] = {
+unsigned int indexData[] = {
     0,
     2,
     1,
@@ -73,7 +73,7 @@ const static int indices[36] = {
     21,
 };
 
-const static float normals[72] = {
+float normalsData[] = {
     0, 0, 1,
     0, 0, 1,
     0, 0, 1,
