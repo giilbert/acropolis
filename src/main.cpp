@@ -20,44 +20,6 @@
 
 using namespace std::chrono;
 
-char *vertexSource =
-    "#version 330\n"
-    "layout(location = 0) in vec3 vertexPosition;\n"
-    "layout(location = 1) in vec3 normal;\n"
-    "uniform mat4 projectionMatrix;\n"
-    "uniform mat4 viewMatrix;\n"
-    "out vec3 vNormal;\n"
-    "void main()\n"
-    "{\n"
-    "   gl_Position = projectionMatrix * viewMatrix * vec4(vertexPosition, 1.0);\n"
-    "   vNormal = normal;\n"
-    "}\n";
-
-char *fragmentSource =
-    "#version 330\n"
-    "precision mediump float;\n"
-    "in vec3 vNormal;\n"
-    "uniform float time;\n"
-    "float bias = -0.3;\n"
-    "float PI = 3.1415926535;\n"
-    "vec3 hsb2rgb( in vec3 c ){\n"
-    "   vec3 rgb = clamp(abs(mod(c.x*6.0+vec3(0.0,4.0,2.0),\n"
-    "                        6.0)-3.0)-1.0,\n"
-    "                0.0,\n"
-    "                1.0 );\n"
-    "   rgb = rgb*rgb*(3.0-2.0*rgb);\n"
-    "   return c.z * mix(vec3(1.0), rgb, c.y);\n"
-    "}\n"
-    "void main()\n"
-    "{\n"
-    "   vec3 normal = normalize(vNormal);\n"
-    "   float light = dot(normal, vec3(0, 1, 0.5));\n"
-    "   light += 1.0 / (light + 1.8) - 0.2;\n"
-    "   light = clamp(light, 0.3, 1.0);\n"
-    "   gl_FragColor = vec4(hsb2rgb(vec3(time / 10.0, 0.7, 0.66)), 1.0);\n"
-    "   gl_FragColor.rgb *= light;\n"
-    "}\n";
-
 void glfwWindowResize(GLFWwindow *window)
 {
     int x, y;
@@ -102,13 +64,11 @@ int main(void)
 
     Mesh3D mesh(vertices, indices, normals);
 
-    std::vector<char *>
-        uniforms = {"projectionMatrix", "viewMatrix", "time"};
+    std::vector<char *> uniforms = {"projectionMatrix", "viewMatrix", "time"};
 
     // compile shaders
-    Shader shader = Shader(vertexSource, fragmentSource, uniforms);
+    Shader shader = Shader::loadFromFiles("res/shaders/basic.vert", "res/shaders/basic.frag", uniforms);
     shader.bind();
-    unsigned int program = shader.program;
 
     // set uniform locations
     glm::mat4 projectionMatrix = glm::perspective(glm::pi<float>() * 0.25f, 640.0f / 480.0f, 0.1f, 1000.0f);
@@ -128,8 +88,6 @@ int main(void)
         shader.setFloat(2, time);
 
         renderer.render(window);
-
-        // draws
 
         time = glfwGetTime();
     }

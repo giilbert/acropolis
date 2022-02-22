@@ -1,9 +1,7 @@
 #include "mesh.h"
-#include <iostream>
 
 Mesh3D::Mesh3D(std::vector<float> vertices, std::vector<unsigned int> indices, std::vector<float> normals)
 {
-    std::cout << vertices.size() * sizeof(float) << "\n";
     glGenVertexArrays(1, &vaoId);
     glBindVertexArray(vaoId);
 

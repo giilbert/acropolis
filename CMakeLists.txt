@@ -13,6 +13,12 @@ add_executable(
   src/utils/logger.cpp
 )
 
+file(GLOB GLSL_FILES
+  "src/shaders/*.vert"
+  "src/shaders/*.frag"
+)
+file(COPY ${GLSL_FILES} DESTINATION res/shader)
+
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake ${CMAKE_MODULE_PATH})
 
 include_directories(${CMAKE_SOURCE_DIR}/thirdparty/glfw/include)

@@ -24,16 +24,19 @@ unsigned int compileShader(int type, const char *source)
     return shader;
 }
 
-Shader::Shader(char *vertexSource, char *fragmentSource, std::vector<char *> uniforms)
+Shader::Shader(std::string vertexSource, std::string fragmentSource, std::vector<char *> uniforms)
 {
-    unsigned int vertexShader = compileShader(GL_VERTEX_SHADER, vertexSource);
-    unsigned int fragmentShader = compileShader(GL_FRAGMENT_SHADER, fragmentSource);
+    // creates individual shaders
+    unsigned int vertexShader = compileShader(GL_VERTEX_SHADER, vertexSource.c_str());
+    unsigned int fragmentShader = compileShader(GL_FRAGMENT_SHADER, fragmentSource.c_str());
 
+    // attach and link the shaders
     unsigned int program = glCreateProgram();
     glAttachShader(program, vertexShader);
     glAttachShader(program, fragmentShader);
     glLinkProgram(program);
 
+    // free up memory
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
 
@@ -45,6 +48,24 @@ Shader::Shader(char *vertexSource, char *fragmentSource, std::vector<char *> uni
     {
         uniformLocations[i] = glGetUniformLocation(program, uniforms[i]);
     }
+}
+
+// utility function to read a file to string
+std::string readFileToString(std::string path)
+{
+    std::ifstream t(path);
+    std::ostringstream sstr;
+    sstr << t.rdbuf();
+    return sstr.str();
+}
+
+Shader Shader::loadFromFiles(std::string vertexPath, std::string fragmentPath, std::vector<char *> uniforms)
+{
+    // loads the shaders into strings
+    std::string vertexSource = readFileToString(vertexPath);
+    std::string fragmentSource = readFileToString(fragmentPath);
+
+    return Shader(vertexSource, fragmentSource, uniforms);
 }
 
 void Shader::bind()

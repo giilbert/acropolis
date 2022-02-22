@@ -4,12 +4,15 @@
 #include <iostream>
 #include <vector>
 #include <map>
+#include <fstream>
+#include <sstream>
 #include "../utils/logger.h"
 
 class Shader
 {
 public:
-    Shader(char *vertexSource, char *fragmentSource, std::vector<char *> uniforms);
+    Shader(std::string vertexSource, std::string fragmentSource, std::vector<char *> uniforms);
+    static Shader loadFromFiles(std::string vertexPath, std::string fragmentPath, std::vector<char *> uniforms);
 
     void bind();
 
