@@ -12,6 +12,8 @@ class Shader
 {
 public:
     Shader(std::string vertexSource, std::string fragmentSource, std::vector<char *> uniforms);
+    ~Shader();
+
     static Shader loadFromFiles(std::string vertexPath, std::string fragmentPath, std::vector<char *> uniforms);
 
     void bind();

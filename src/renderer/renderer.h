@@ -6,8 +6,7 @@
 class Renderer
 {
 public:
-    Renderer(GLFWwindow *window);
+    Renderer();
 
-    void ready();
     void render(GLFWwindow *window);
 };

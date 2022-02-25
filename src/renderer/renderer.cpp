@@ -1,20 +1,6 @@
 #include "renderer.h"
 
-void glfwError(int code, const char *err)
-{
-    std::cout << err << "\n";
-    glfwTerminate();
-}
-
-Renderer::Renderer(GLFWwindow *window)
-{
-    glfwMakeContextCurrent(window);
-    glewInit();
-    glfwSetErrorCallback(glfwError);
-
-    glClearColor(0.1, 0.1, 0.1, 0.1);
-    glEnable(GL_CULL_FACE);
-}
+Renderer::Renderer(){};
 
 void Renderer::render(GLFWwindow *window)
 {

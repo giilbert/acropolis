@@ -50,6 +50,11 @@ Shader::Shader(std::string vertexSource, std::string fragmentSource, std::vector
     }
 }
 
+Shader::~Shader()
+{
+    glDeleteProgram(program);
+}
+
 // utility function to read a file to string
 std::string readFileToString(std::string path)
 {

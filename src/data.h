@@ -1,4 +1,6 @@
-float vertexData[] = {
+#pragma once
+
+static float vertexData[] = {
     1, 1, 1,
     1, 1, -1,
     1, -1, 1,
@@ -29,7 +31,7 @@ float vertexData[] = {
     1, -1, -1,
     -1, -1, -1};
 
-unsigned int indexData[] = {
+static unsigned int indexData[] = {
     0,
     2,
     1,
@@ -73,7 +75,7 @@ unsigned int indexData[] = {
     21,
 };
 
-float normalsData[] = {
+static float normalsData[] = {
     0, 0, 1,
     0, 0, 1,
     0, 0, 1,
