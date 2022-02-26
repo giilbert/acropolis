@@ -13,32 +13,36 @@
 #include <chrono>
 #include <vector>
 
-#include "../data.h"
-#include "../renderer/renderer.h"
-#include "../renderer/shader.h"
-#include "../renderer/vbo.h"
-#include "../utils/logger.h"
-#include "../renderer/3d/mesh.h"
+#include "data.h"
+#include "renderer/renderer.h"
+#include "renderer/shader.h"
+#include "renderer/vbo.h"
+#include "utils/logger.h"
+#include "renderer/3d/mesh.h"
 #include "window.h"
 
-class Game
+namespace giz
 {
-protected:
-    Game();
-    static Game *singleton;
+    class Game
+    {
+    protected:
+        Game();
+        static Game *singleton;
 
-public:
-    // singletons should not be cloneable
-    Game(Game &other) = delete;
-    // singletons should not be assignable
-    void operator=(const Game &) = delete;
-    // getter method for the Game singleton
-    static Game *instance();
+    public:
+        // singletons should not be cloneable
+        Game(Game &other) = delete;
+        // singletons should not be assignable
+        void operator=(const Game &) = delete;
+        // getter method for the Game singleton
+        static Game *instance();
 
-    Renderer mainRenderer;
-    Window gameWindow;
+        Renderer mainRenderer;
+        Window gameWindow;
+        // time in seconds passed since init() was called
+        float time;
 
-    void
-    init();
-    void update();
-};
+        void init();
+        void update();
+    };
+}

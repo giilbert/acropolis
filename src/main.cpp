@@ -3,8 +3,8 @@
 
 int main(void)
 {
-    logger::logInfo("Hello from giz!");
-    Game::instance()->init();
+    giz::logger::logInfo("Hello from giz!");
+    giz::Game::instance()->init();
 
     return 0;
 }

@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.22.0)
 
 project(giz)
 
+include_directories(${CMAKE_SOURCE_DIR}/src)
+
 add_executable(
   giz
   

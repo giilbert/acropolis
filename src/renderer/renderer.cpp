@@ -1,13 +1,16 @@
 #include "renderer.h"
 
-Renderer::Renderer(){};
-
-void Renderer::render(GLFWwindow *window)
+namespace giz
 {
-    glClear(GL_COLOR_BUFFER_BIT);
+    Renderer::Renderer(){};
 
-    glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, nullptr);
+    void Renderer::render(GLFWwindow *window)
+    {
+        glClear(GL_COLOR_BUFFER_BIT);
 
-    glfwSwapBuffers(window);
-    glfwPollEvents();
+        glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, nullptr);
+
+        glfwSwapBuffers(window);
+        glfwPollEvents();
+    }
 }

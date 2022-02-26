@@ -14,33 +14,36 @@ void glfwError(int code, const char *err)
     glfwTerminate();
 }
 
-Window::Window()
+namespace giz
 {
-}
-
-void Window::init()
-{
-    if (!glfwInit())
+    Window::Window()
     {
-        logger::logError("GLFW failed to init");
-        exit(-1);
     }
 
-    // create window
-    window = glfwCreateWindow(640, 480, "dd", nullptr, nullptr);
-    glfwSetWindowRefreshCallback(window, glfwWindowResize);
-
-    if (!window)
+    void Window::init()
     {
-        logger::logError("Window failed to create");
-        glfwTerminate();
-        exit(-1);
+        if (!glfwInit())
+        {
+            logger::logError("GLFW failed to init");
+            exit(-1);
+        }
+
+        // create window
+        window = glfwCreateWindow(640, 480, "dd", nullptr, nullptr);
+        glfwSetWindowRefreshCallback(window, glfwWindowResize);
+
+        if (!window)
+        {
+            logger::logError("Window failed to create");
+            glfwTerminate();
+            exit(-1);
+        }
+
+        glfwMakeContextCurrent(window);
+        glewInit();
+        glfwSetErrorCallback(glfwError);
+
+        glClearColor(0.1, 0.1, 0.1, 0.1);
+        glEnable(GL_CULL_FACE);
     }
-
-    glfwMakeContextCurrent(window);
-    glewInit();
-    glfwSetErrorCallback(glfwError);
-
-    glClearColor(0.1, 0.1, 0.1, 0.1);
-    glEnable(GL_CULL_FACE);
 }

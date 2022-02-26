@@ -3,10 +3,13 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
-class Renderer
+namespace giz
 {
-public:
-    Renderer();
+    class Renderer
+    {
+    public:
+        Renderer();
 
-    void render(GLFWwindow *window);
-};
+        void render(GLFWwindow *window);
+    };
+}

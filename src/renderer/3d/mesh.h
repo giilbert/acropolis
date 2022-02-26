@@ -3,9 +3,12 @@
 #include <GLFW/glfw3.h>
 #include <vector>
 
-class Mesh3D
+namespace giz
 {
-public:
-    Mesh3D(std::vector<float> vertices, std::vector<unsigned int> indices, std::vector<float> normals);
-    unsigned int vaoId;
-};
+    class Mesh3D
+    {
+    public:
+        Mesh3D(std::vector<float> vertices, std::vector<unsigned int> indices, std::vector<float> normals);
+        unsigned int vaoId;
+    };
+}
