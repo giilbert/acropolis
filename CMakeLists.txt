@@ -8,13 +8,13 @@ add_executable(
   giz
   
   src/main.cpp
-  src/core/game.cpp
-  src/core/window.cpp
+  src/core/Game.cpp
+  src/core/Window.cpp
   
-  src/renderer/renderer.cpp
-  src/renderer/shader.cpp
-  src/renderer/vbo.cpp
-  src/renderer/3d/mesh.cpp
+  src/renderer/Renderer.cpp
+  src/renderer/Shader.cpp
+  src/renderer/VBO.cpp
+  src/renderer/3d/Mesh.cpp
   src/utils/assert.cpp
   src/utils/logger.cpp
 )

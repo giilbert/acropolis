@@ -1,4 +1,4 @@
-#include "shader.h"
+#include "Shader.h"
 
 const int aVertexPositionLocation = 0;
 const int aNormalLocation = 1;

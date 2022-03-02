@@ -1,4 +1,4 @@
-#include "core/game.h"
+#include "core/Game.h"
 #include "utils/logger.h"
 
 int main(void)

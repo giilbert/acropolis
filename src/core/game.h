@@ -14,12 +14,12 @@
 #include <vector>
 
 #include "data.h"
-#include "renderer/renderer.h"
-#include "renderer/shader.h"
-#include "renderer/vbo.h"
+#include "renderer/Renderer.h"
+#include "renderer/Shader.h"
+#include "renderer/VBO.h"
 #include "utils/logger.h"
-#include "renderer/3d/mesh.h"
-#include "window.h"
+#include "renderer/3d/Mesh.h"
+#include "Window.h"
 
 namespace giz
 {
