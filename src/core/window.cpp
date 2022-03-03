@@ -39,6 +39,29 @@ namespace giz
             exit(-1);
         }
 
+        glfwSetWindowSizeCallback(
+            window, [](GLFWwindow *window, int width, int height)
+            { glViewport(0, 0, width, height); Game::instance()->onResize(width, height); });
+
+        glfwSetCursorPosCallback(
+            window, [](GLFWwindow *window, double x, double y)
+            { Game::instance()->onCursorMove(x, y); });
+
+        glfwSetKeyCallback(
+            window, [](GLFWwindow *window, int key, int scancode, int action, int mod)
+            { 
+                switch (action) {
+                case GLFW_PRESS:
+                    Game::instance()->onKeyPress(key, scancode, mod);
+                    break;
+                case GLFW_RELEASE:
+                    Game::instance()->onKeyRelease(key, scancode, mod);
+                    break;
+                // TODO: GLFW_REPEAT?
+            } });
+
+        // TODO: JOYSTICK & other event callbacks
+
         glfwMakeContextCurrent(window);
         glewInit();
         glfwSetErrorCallback(glfwError);

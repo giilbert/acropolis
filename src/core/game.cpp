@@ -18,12 +18,17 @@ namespace giz
         return singleton;
     }
 
+    void Game::onResize(int width, int height)
+    {
+        std::cout << width << height << std::endl;
+    }
+
     void Game::init()
     {
         // std::cout << window << std::endl;
 
-        gameWindow = Window();
-        gameWindow.init();
+        gameWindow = new Window();
+        gameWindow->init();
 
         Renderer renderer = Renderer();
 
@@ -40,12 +45,17 @@ namespace giz
         shader.bind();
 
         // set uniforms
-        glm::mat4 projectionMatrix = glm::perspective(glm::pi<float>() * 0.25f, 640.0f / 480.0f, 0.1f, 1000.0f);
-        shader.setMatrix4x4(0, &projectionMatrix[0][0]);
+        // glm::mat4 projectionMatrix = glm::perspective(glm::pi<float>() * 0.25f, 640.0f / 480.0f, 0.1f, 1000.0f);
+        // shader.setMatrix4x4(0, &projectionMatrix[0][0]);
 
         glBindVertexArray(mesh.vaoId);
-        while (!glfwWindowShouldClose(gameWindow.window))
+        while (!glfwWindowShouldClose(gameWindow->window))
         {
+            int width, height;
+            glfwGetWindowSize(gameWindow->window, &width, &height);
+            glm::mat4 projectionMatrix = glm::perspective(glm::pi<float>() * 0.25f, (float)width / (float)height, 0.1f, 1000.0f);
+            shader.setMatrix4x4(0, &projectionMatrix[0][0]);
+
             glm::mat4 viewMatrix = glm::lookAt(
                 glm::vec3(sin(time) * 7, cos(time) * 7, cos(time) * 7),
                 glm::vec3(0, 0, 0),
@@ -54,17 +64,37 @@ namespace giz
             shader.setMatrix4x4(1, &viewMatrix[0][0]);
             shader.setFloat(2, time);
 
-            renderer.render(gameWindow.window);
+            renderer.render(gameWindow->window);
+
+            if (keysPressed[GLFW_KEY_ESCAPE] == true)
+            {
+                giz::logger::logInfo("Escape pressed, gracefully exiting");
+                glfwSetWindowShouldClose(gameWindow->window, 1);
+            }
 
             time = glfwGetTime();
         }
-
-        giz::logger::logInfo("end");
 
         glfwTerminate();
     }
 
     void Game::update()
     {
+    }
+
+    void Game::onCursorMove(double x, double y)
+    {
+        mousePosition.x = x;
+        mousePosition.y = y;
+    }
+
+    void Game::onKeyPress(int key, int scancode, int action)
+    {
+        keysPressed[key] = true;
+    }
+
+    void Game::onKeyRelease(int key, int scancode, int action)
+    {
+        keysPressed[key] = false;
     }
 }

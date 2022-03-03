@@ -12,6 +12,7 @@
 #include <iostream>
 #include <chrono>
 #include <vector>
+#include <map>
 
 #include "data.h"
 #include "renderer/Renderer.h"
@@ -19,10 +20,11 @@
 #include "renderer/VBO.h"
 #include "utils/logger.h"
 #include "renderer/3d/Mesh.h"
-#include "Window.h"
+#include "core/Window.h"
 
 namespace giz
 {
+    class Window;
     class Game
     {
     protected:
@@ -38,11 +40,23 @@ namespace giz
         static Game *instance();
 
         Renderer mainRenderer;
-        Window gameWindow;
-        // time in seconds passed since init() was called
-        float time;
+        Window *gameWindow;
+
+        // window events
+        void onResize(int width, int height);
+        void onCursorMove(double x, double y);
+        void onKeyPress(int key, int scancode, int action);
+        void onKeyRelease(int key, int scancode, int action);
 
         void init();
         void update();
+
+    private:
+        // time in seconds passed since init() was called
+        float time;
+
+        // events
+        glm::dvec2 mousePosition;
+        std::map<int, bool> keysPressed;
     };
 }
