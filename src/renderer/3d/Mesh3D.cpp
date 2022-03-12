@@ -1,7 +1,11 @@
-#include "Mesh.h"
-
+#include "Mesh3D.h"
+#include <iostream>
 namespace giz
 {
+    Mesh3D::~Mesh3D()
+    {
+    }
+
     Mesh3D::Mesh3D(std::vector<float> vertices, std::vector<unsigned int> indices, std::vector<float> normals)
     {
         glGenVertexArrays(1, &vaoId);
@@ -29,7 +33,10 @@ namespace giz
         glBindBuffer(GL_ARRAY_BUFFER, normalBuffer);
         glEnableVertexAttribArray(1);
         glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(normals[0]) * 3, 0);
+    }
 
-        glBindVertexArray(NULL);
+    void Mesh3D::draw()
+    {
+        glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, nullptr);
     }
 }

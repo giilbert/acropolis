@@ -26,6 +26,9 @@ unsigned int compileShader(int type, const char *source)
 
 namespace giz
 {
+    // default constructor
+    Shader::Shader() {}
+
     Shader::Shader(std::string vertexSource, std::string fragmentSource, std::vector<char *> uniforms)
     {
         // creates individual shaders
@@ -66,13 +69,13 @@ namespace giz
         return sstr.str();
     }
 
-    Shader Shader::loadFromFiles(std::string vertexPath, std::string fragmentPath, std::vector<char *> uniforms)
+    Shader *Shader::loadFromFiles(std::string vertexPath, std::string fragmentPath, std::vector<char *> uniforms)
     {
         // loads the shaders into strings
         std::string vertexSource = readFileToString(vertexPath);
         std::string fragmentSource = readFileToString(fragmentPath);
 
-        return Shader(vertexSource, fragmentSource, uniforms);
+        return new Shader(vertexSource, fragmentSource, uniforms);
     }
 
     void Shader::bind()

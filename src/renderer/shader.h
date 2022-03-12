@@ -1,4 +1,5 @@
 #pragma once
+#define GLEW_STATIC
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
@@ -13,10 +14,11 @@ namespace giz
     class Shader
     {
     public:
+        Shader();
         Shader(std::string vertexSource, std::string fragmentSource, std::vector<char *> uniforms);
         ~Shader();
 
-        static Shader loadFromFiles(std::string vertexPath, std::string fragmentPath, std::vector<char *> uniforms);
+        static Shader *loadFromFiles(std::string vertexPath, std::string fragmentPath, std::vector<char *> uniforms);
 
         void bind();
 

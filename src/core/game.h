@@ -1,25 +1,13 @@
 #pragma once
-#define GLEW_STATIC
-
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
-
-#include <glm/mat4x4.hpp>
-#include <glm/ext/matrix_transform.hpp>  // glm::translate, glm::rotate, glm::scale
-#include <glm/ext/matrix_clip_space.hpp> // glm::perspective
-#include <glm/ext/scalar_constants.hpp>  // glm::pi
 
 #include <iostream>
 #include <chrono>
 #include <vector>
 #include <map>
 
-#include "data.h"
-#include "renderer/Renderer.h"
-#include "renderer/Shader.h"
-#include "renderer/VBO.h"
+#include "ecs/components/Mesh.h"
+#include "ecs/systems/RenderSystem.h"
 #include "utils/logger.h"
-#include "renderer/3d/Mesh.h"
 #include "core/Window.h"
 
 namespace giz
@@ -39,7 +27,6 @@ namespace giz
         // getter method for the Game singleton
         static Game *instance();
 
-        Renderer mainRenderer;
         Window *gameWindow;
 
         // window events

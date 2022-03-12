@@ -10,11 +10,16 @@ add_executable(
   src/main.cpp
   src/core/Game.cpp
   src/core/Window.cpp
+
+  src/ecs/Entity.cpp
+  src/ecs/components/BaseComponent.cpp
+  src/ecs/components/Mesh.cpp
+  src/ecs/systems/RenderSystem.cpp
+  src/ecs/Transform.cpp
   
-  src/renderer/Renderer.cpp
   src/renderer/Shader.cpp
   src/renderer/VBO.cpp
-  src/renderer/3d/Mesh.cpp
+  src/renderer/3d/Mesh3D.cpp
   src/utils/assert.cpp
   src/utils/logger.cpp
 )
