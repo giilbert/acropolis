@@ -29,4 +29,15 @@ namespace giz
         component->init();
         components.push_back(component);
     }
+
+    void Entity::updateComponents()
+    {
+        for (auto component : components)
+        {
+            if (component->requiresUpdate)
+            {
+                component->update();
+            }
+        }
+    }
 }

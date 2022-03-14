@@ -18,3 +18,7 @@ void Mesh::init()
     mesh->entity = entity;
     systems::RenderSystem::instance()->renderables.push_back(mesh);
 }
+
+void Mesh::update()
+{
+}

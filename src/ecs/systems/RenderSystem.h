@@ -13,6 +13,11 @@
 
 namespace giz
 {
+    namespace component
+    {
+        class Camera;
+    }
+
     namespace systems
     {
         class RenderSystem
@@ -22,6 +27,7 @@ namespace giz
             // also init
             RenderSystem();
             static RenderSystem *singleton;
+            component::Camera *currentCamera = nullptr;
 
         public:
             // singletons should not be cloneable
@@ -35,6 +41,9 @@ namespace giz
             Shader *meshShader;
 
             void render();
+            void onWindowSizeChange(int width, int height);
+
+            void setCurrentCamera(component::Camera *camera);
         };
     }
 }

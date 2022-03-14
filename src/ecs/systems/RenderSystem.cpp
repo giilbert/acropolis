@@ -34,15 +34,8 @@ void RenderSystem::render()
     double time = glfwGetTime();
     meshShader->setFloat(3, time);
 
-    glm::mat4 projectionMatrix = glm::perspective(glm::pi<float>() * 0.25f, (float)640 / (float)480, 0.1f, 1000.0f);
-    meshShader->setMatrix4x4(0, &projectionMatrix[0][0]);
-
-    glm::mat4 viewMatrix = glm::lookAt(
-        glm::vec3(5, 5, 5),
-        glm::vec3(0, 0, 0),
-        glm::vec3(0, 1, 0));
-
-    meshShader->setMatrix4x4(1, &viewMatrix[0][0]);
+    meshShader->setMatrix4x4(0, &(currentCamera->projectionMatrix[0][0]));
+    meshShader->setMatrix4x4(1, &(currentCamera->entity->transform.toMatrix()[0][0]));
 
     for (auto renderable : renderables)
     {
@@ -50,4 +43,16 @@ void RenderSystem::render()
         meshShader->setMatrix4x4(2, &renderable->entity->transform.toMatrix()[0][0]);
         renderable->draw();
     }
+}
+
+void RenderSystem::onWindowSizeChange(int width, int height)
+{
+    currentCamera->update();
+}
+
+void RenderSystem::setCurrentCamera(component::Camera *camera)
+{
+    currentCamera = camera;
+    meshShader->setMatrix4x4(0, &(camera->projectionMatrix[0][0]));
+    meshShader->setMatrix4x4(1, &(camera->entity->transform.toMatrix()[0][0]));
 }

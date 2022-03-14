@@ -6,6 +6,7 @@
 #include <map>
 
 #include "ecs/components/Mesh.h"
+#include "ecs/components/Camera.h"
 #include "ecs/systems/RenderSystem.h"
 #include "utils/logger.h"
 #include "core/Window.h"

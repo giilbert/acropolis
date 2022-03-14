@@ -16,5 +16,8 @@ namespace giz
         GLFWwindow *window;
         void makeContextCurrent();
         void init();
+
+        int width;
+        int height;
     };
 }

@@ -25,6 +25,7 @@ namespace giz
             std::vector<float> normals;
 
             virtual void init();
+            virtual void update();
         };
     }
 }

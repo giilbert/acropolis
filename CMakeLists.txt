@@ -14,6 +14,8 @@ add_executable(
   src/ecs/Entity.cpp
   src/ecs/components/BaseComponent.cpp
   src/ecs/components/Mesh.cpp
+  src/ecs/components/Camera.cpp
+
   src/ecs/systems/RenderSystem.cpp
   src/ecs/Transform.cpp
   

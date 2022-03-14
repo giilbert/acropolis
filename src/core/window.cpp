@@ -19,7 +19,7 @@ namespace giz
     Window::Window()
     {
     }
-
+    // TODO: init with width and height
     void Window::init()
     {
         if (!glfwInit())
@@ -30,6 +30,8 @@ namespace giz
 
         // create window
         window = glfwCreateWindow(640, 480, "dd", nullptr, nullptr);
+        width = 640;
+        height = 480;
         glfwSetWindowRefreshCallback(window, glfwWindowResize);
 
         if (!window)
@@ -41,7 +43,9 @@ namespace giz
 
         glfwSetWindowSizeCallback(
             window, [](GLFWwindow *window, int width, int height)
-            { glViewport(0, 0, width, height); Game::instance()->onResize(width, height); });
+            {
+                glViewport(0, 0, width, height);
+                Game::instance()->onResize(width, height); });
 
         glfwSetCursorPosCallback(
             window, [](GLFWwindow *window, double x, double y)

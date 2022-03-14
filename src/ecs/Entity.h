@@ -18,5 +18,6 @@ namespace giz
         std::vector<component::Base *> components;
 
         void addComponent(component::Base *component);
+        void updateComponents();
     };
 }

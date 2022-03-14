@@ -20,11 +20,14 @@ namespace giz
 
     void Game::onResize(int width, int height)
     {
-        std::cout << width << height << std::endl;
+        gameWindow->width = width;
+        gameWindow->height = height;
+        systems::RenderSystem::instance()->onWindowSizeChange(width, height);
     }
 
     void Game::init()
     {
+        using component::Camera;
         using component::Mesh;
 
         gameWindow = new Window();
@@ -41,11 +44,23 @@ namespace giz
         auto meshOne = new Mesh(vertices, indices, normals);
         entityOne->addComponent(meshOne);
 
+        auto entityTwo = std::make_unique<Entity>();
+        entityTwo->transform.position.z = -10;
+
+        auto cameraOne = new Camera();
+        entityTwo->addComponent(cameraOne);
+        cameraOne->makeCurrent();
+
         glClearColor(0.1, 0.1, 0.1, 1.0);
+
+        float x = 0;
 
         while (!glfwWindowShouldClose(gameWindow->window))
         {
+            x += 0.001;
             update();
+            entityTwo->transform.rotation = glm::quat(glm::vec3(0, x, 0));
+            entityTwo->updateComponents();
         }
 
         glfwTerminate();
