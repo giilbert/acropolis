@@ -12,8 +12,8 @@ Transform::Transform()
 glm::mat4 Transform::toMatrix()
 {
     glm::mat4 transform = glm::mat4(1.0);
-    transform = glm::translate(transform, position);
     transform *= glm::toMat4(rotation);
+    transform = glm::translate(transform, position);
     transform = glm::scale(transform, scale);
 
     return transform;

@@ -51,6 +51,12 @@ namespace giz
         entityTwo->addComponent(cameraOne);
         cameraOne->makeCurrent();
 
+        auto entityThree = std::make_unique<Entity>();
+        auto meshThree = new Mesh(vertices, indices, normals);
+        entityThree->addComponent(meshThree);
+        entityThree->transform.position.x = 3;
+        entityThree->transform.position.z = 3;
+
         glClearColor(0.1, 0.1, 0.1, 1.0);
 
         float x = 0;
@@ -60,6 +66,8 @@ namespace giz
             x += 0.001;
             update();
             entityTwo->transform.rotation = glm::quat(glm::vec3(0, x, 0));
+            entityTwo->transform.position.z = x;
+
             entityTwo->updateComponents();
         }
 
