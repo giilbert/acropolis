@@ -16,7 +16,6 @@ Camera::~Camera()
 
 void Camera::init()
 {
-    std::cout << entity->transform.position.x;
     update();
 }
 

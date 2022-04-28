@@ -9,7 +9,6 @@ Mesh::Mesh(std::vector<float> vertices, std::vector<unsigned int> indices, std::
 
 Mesh::~Mesh()
 {
-    logger::logInfo("Mesh component destructor called");
     delete mesh;
 }
 

@@ -7,7 +7,9 @@
 
 #include "ecs/components/Mesh.h"
 #include "ecs/components/Camera.h"
+#include "ecs/components/Behavior.h"
 #include "ecs/systems/RenderSystem.h"
+#include "ecs/systems/ScriptingSystem.h"
 #include "utils/logger.h"
 #include "core/Window.h"
 

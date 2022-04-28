@@ -14,6 +14,8 @@ namespace giz
 
         Transform transform;
 
+        int id = 12;
+
         std::vector<Entity> children;
         std::vector<component::Base *> components;
 

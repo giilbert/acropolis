@@ -8,7 +8,6 @@ namespace giz
     {
         Base::~Base()
         {
-            logger::logInfo("Base component destructor called");
         }
     }
 }

@@ -1,12 +1,13 @@
 #pragma once
 #include <iostream>
+#include <string>
 
 namespace giz
 {
     namespace logger
     {
-        void logInfo(char *string);
-        void logWarning(char *string);
-        void logError(char *string);
+        void logInfo(std::string string);
+        void logWarning(std::string string);
+        void logError(std::string string);
     };
 }

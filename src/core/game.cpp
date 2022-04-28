@@ -27,6 +27,7 @@ namespace giz
 
     void Game::init()
     {
+        using component::Behavior;
         using component::Camera;
         using component::Mesh;
 
@@ -35,27 +36,29 @@ namespace giz
 
         // init beforehand
         systems::RenderSystem::instance();
+        systems::ScriptingSystem::instance();
 
         std::vector<float> vertices(vertexData, vertexData + sizeof(vertexData) / sizeof(vertexData[0]));
         std::vector<unsigned int> indices(indexData, indexData + sizeof(indexData) / sizeof(indexData[0]));
         std::vector<float> normals(normalsData, normalsData + sizeof(normalsData) / sizeof(normalsData[0]));
 
-        auto entityOne = std::make_unique<Entity>();
+        auto entityOne = new Entity();
         auto meshOne = new Mesh(vertices, indices, normals);
         entityOne->addComponent(meshOne);
 
-        auto entityTwo = std::make_unique<Entity>();
+        auto entityTwo = new Entity();
         entityTwo->transform.position.z = -10;
-
         auto cameraOne = new Camera();
         entityTwo->addComponent(cameraOne);
         cameraOne->makeCurrent();
 
-        auto entityThree = std::make_unique<Entity>();
-        auto meshThree = new Mesh(vertices, indices, normals);
-        entityThree->addComponent(meshThree);
-        entityThree->transform.position.x = 3;
-        entityThree->transform.position.z = 3;
+        // load script file
+        std::ifstream stream("test.js");
+        std::ostringstream sstr;
+        sstr << stream.rdbuf();
+
+        auto behaviorOne = new Behavior(sstr.str());
+        entityOne->addComponent(behaviorOne);
 
         glClearColor(0.1, 0.1, 0.1, 1.0);
 
@@ -65,17 +68,21 @@ namespace giz
         {
             x += 0.001;
             update();
-            entityTwo->transform.rotation = glm::quat(glm::vec3(0, x, 0));
-            entityTwo->transform.position.z = x;
 
             entityTwo->updateComponents();
         }
 
         glfwTerminate();
+
+        delete entityOne;
+        delete entityTwo;
+
+        systems::ScriptingSystem::destroy();
     }
 
     void Game::update()
     {
+        systems::ScriptingSystem::instance()->updateAll();
         systems::RenderSystem::instance()->render();
 
         if (keysPressed[GLFW_KEY_ESCAPE] == true)

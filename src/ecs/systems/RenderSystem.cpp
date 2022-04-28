@@ -39,7 +39,7 @@ void RenderSystem::render()
 
     for (auto renderable : renderables)
     {
-        renderable->entity->transform.position.y = glm::sin(time);
+        // std::cout << renderable->entity->transform.position.y << "\n";
         meshShader->setMatrix4x4(2, &renderable->entity->transform.toMatrix()[0][0]);
         renderable->draw();
     }
