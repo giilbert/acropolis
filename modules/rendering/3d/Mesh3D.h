@@ -3,7 +3,7 @@
 #include <GLFW/glfw3.h>
 #include <vector>
 
-#include "renderer/Renderable.h"
+#include "rendering/Renderable.h"
 
 namespace giz
 {
@@ -12,7 +12,7 @@ namespace giz
     public:
         Mesh3D(std::vector<float> vertices, std::vector<unsigned int> indices, std::vector<float> normals);
         ~Mesh3D();
-        
+
         unsigned int vaoId;
 
         virtual void draw();

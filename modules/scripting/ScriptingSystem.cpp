@@ -1,5 +1,5 @@
 #include "ecs/systems/ScriptingSystem.h"
-#include "ecs/components/Behavior.h"
+#include "scripting/components/Behavior.h"
 #include <iostream>
 #include <chrono>
 #include "utils/profile.h"

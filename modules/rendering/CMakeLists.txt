@@ -1,0 +1,10 @@
+target_sources(
+  giz
+  PRIVATE
+  3d/Mesh3D.cpp
+  components/Camera.cpp
+  components/Mesh.cpp
+  RenderSystem.cpp
+  Shader.cpp
+  VBO.cpp
+)

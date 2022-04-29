@@ -5,9 +5,9 @@
 #include <vector>
 #include <map>
 
-#include "ecs/components/Mesh.h"
-#include "ecs/components/Camera.h"
-#include "ecs/components/Behavior.h"
+#include "rendering/components/Mesh.h"
+#include "rendering/components/Camera.h"
+#include "scripting/components/Behavior.h"
 #include "ecs/systems/RenderSystem.h"
 #include "ecs/systems/ScriptingSystem.h"
 #include "utils/logger.h"

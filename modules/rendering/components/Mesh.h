@@ -2,7 +2,7 @@
 
 #include "ecs/systems/RenderSystem.h"
 #include "ecs/components/BaseComponent.h"
-#include "renderer/3d/Mesh3D.h"
+#include "rendering/3d/Mesh3D.h"
 #include "GL/glew.h"
 #include "GLFW/glfw3.h"
 #include "data.h"

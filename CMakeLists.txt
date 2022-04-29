@@ -4,10 +4,9 @@ project(giz)
 cmake_policy(SET CMP0091 NEW)
 set(CMAKE_CXX_STANDARD 17)
 
-include_directories(${CMAKE_SOURCE_DIR}/src)
+include_directories(${CMAKE_SOURCE_DIR}/modules)
 
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake ${CMAKE_MODULE_PATH})
-
 
 add_definitions(-D_ITERATOR_DEBUG_LEVEL=0)
 add_definitions(-DV8_COMPRESS_POINTERS)
@@ -15,34 +14,21 @@ add_definitions(-DV8_COMPRESS_POINTERS)
 add_executable(
   giz
   
-  src/main.cpp
-  src/core/Game.cpp
-  src/core/Window.cpp
-
-  src/ecs/Entity.cpp
-  src/ecs/components/BaseComponent.cpp
-  src/ecs/components/Behavior.cpp
-  src/ecs/components/Mesh.cpp
-  src/ecs/components/Camera.cpp
-
-  src/ecs/systems/RenderSystem.cpp
-  src/ecs/systems/ScriptingSystem.cpp
-  src/ecs/Transform.cpp
-  
-  src/renderer/Shader.cpp
-  src/renderer/VBO.cpp
-  src/renderer/3d/Mesh3D.cpp
-  src/utils/assert.cpp
-  src/utils/logger.cpp
-  src/utils/profile.cpp
+  modules/main.cpp
 )
+
+add_subdirectory(modules/core)
+add_subdirectory(modules/ecs)
+add_subdirectory(modules/rendering)
+add_subdirectory(modules/scripting)
+add_subdirectory(modules/utils)
 
 set_property(TARGET giz PROPERTY
              MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 
 file(GLOB GLSL_FILES
-  "src/shaders/*.vert"
-  "src/shaders/*.frag"
+  "modules/shaders/*.vert"
+  "modules/shaders/*.frag"
 )
 file(COPY ${GLSL_FILES} DESTINATION res/shader)
 

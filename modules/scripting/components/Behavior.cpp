@@ -1,4 +1,4 @@
-#include "ecs/components/Behavior.h"
+#include "scripting/components/Behavior.h"
 
 using giz::component::Behavior;
 

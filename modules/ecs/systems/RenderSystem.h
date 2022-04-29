@@ -7,8 +7,8 @@
 #include <glm/ext/matrix_clip_space.hpp> // glm::perspective
 #include <glm/ext/scalar_constants.hpp>  // glm::pi
 
-#include "renderer/Renderable.h"
-#include "renderer/Shader.h"
+#include "rendering/Renderable.h"
+#include "rendering/Shader.h"
 #include "core/Game.h"
 
 namespace giz
