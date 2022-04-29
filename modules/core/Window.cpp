@@ -67,7 +67,13 @@ namespace giz
         // TODO: JOYSTICK & other event callbacks
 
         glfwMakeContextCurrent(window);
-        glewInit();
+
+        if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+        {
+            std::cout << "Failed to initialize OpenGL context" << std::endl;
+            exit(-1);
+        }
+
         glfwSetErrorCallback(glfwError);
 
         glClearColor(0.1, 0.1, 0.1, 0.1);

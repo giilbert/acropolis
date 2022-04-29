@@ -1,4 +1,4 @@
-#include "ecs/components/Mesh.h"
+#include "rendering/components/Mesh.h"
 
 using giz::component::Mesh;
 

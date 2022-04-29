@@ -7,6 +7,7 @@ set(CMAKE_CXX_STANDARD 17)
 include_directories(${CMAKE_SOURCE_DIR}/modules)
 
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake ${CMAKE_MODULE_PATH})
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /MTd")
 
 add_definitions(-D_ITERATOR_DEBUG_LEVEL=0)
 add_definitions(-DV8_COMPRESS_POINTERS)
@@ -34,25 +35,27 @@ file(COPY ${GLSL_FILES} DESTINATION res/shader)
 
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake ${CMAKE_MODULE_PATH})
 
-# glfw3
-include_directories(${CMAKE_SOURCE_DIR}/thirdparty/glfw/include)
-find_package(glfw3 3.3 REQUIRED)
-target_link_libraries(giz ${CMAKE_SOURCE_DIR}/${GLFW_LIBRARY}/glfw3_mt.lib)
+set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
+set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 
-# glew
-include_directories(${CMAKE_SOURCE_DIR}/thirdparty/glew/include)
-find_package(glew 3.3 REQUIRED)
-target_link_libraries(giz ${CMAKE_SOURCE_DIR}/${GLEW_LIBRARY}/glew32s.lib)
+add_subdirectory(${CMAKE_SOURCE_DIR}/dep/glfw)
+add_subdirectory(${CMAKE_SOURCE_DIR}/dep/glad)
+add_subdirectory(${CMAKE_SOURCE_DIR}/dep/glm)
+
+TARGET_LINK_LIBRARIES(giz glfw)
+TARGET_LINK_LIBRARIES(giz glad)
+TARGET_LINK_LIBRARIES(giz glm)
 
 # v8
-include_directories(${CMAKE_SOURCE_DIR}/thirdparty/v8/include)
+include_directories(${CMAKE_SOURCE_DIR}/dep/v8/include)
 find_package(v8 9.0 REQUIRED)
 target_link_libraries(giz ${CMAKE_SOURCE_DIR}/${V8_LIBRARY}/v8_monolith.lib dbghelp.lib Winmm.lib)
 
-#include glm
-include_directories(${CMAKE_SOURCE_DIR}/thirdparty)
-
+# TODO: investiagate why these are happening
 target_link_options(giz PUBLIC "/ignore:4099")
+target_link_options(giz PUBLIC "/ignore:4217")
+target_link_options(giz PUBLIC "/ignore:4098")
 
 find_package(OpenGL REQUIRED)
 target_link_libraries(giz OpenGL::GL)

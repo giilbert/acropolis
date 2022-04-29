@@ -1,4 +1,4 @@
-#include "ecs/components/Camera.h"
+#include "rendering/components/Camera.h"
 #include "ecs/Entity.h"
 
 #include <iostream>
