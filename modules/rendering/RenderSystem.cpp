@@ -1,5 +1,13 @@
 #include "ecs/systems/RenderSystem.h"
 
+const char *meshVertexSource = {
+#include "generated/rendering/shaders/basic.vert"
+};
+
+const char *meshFragmentSource = {
+#include "generated/rendering/shaders/basic.frag"
+};
+
 using giz::Shader;
 using giz::systems::RenderSystem;
 
@@ -11,7 +19,8 @@ RenderSystem::RenderSystem()
     std::vector<char *> uniforms = {"projectionMatrix", "viewMatrix", "modelMatrix", "time"};
 
     // compile shaders
-    meshShader = Shader::loadFromFiles("res/shaders/basic.vert", "res/shaders/basic.frag", uniforms);
+    meshShader = new Shader(meshVertexSource, meshFragmentSource, uniforms);
+    // meshShader = Shader::loadFromFiles("res/shaders/basic.vert", "res/shaders/basic.frag", uniforms);
     meshShader->bind();
 }
 
@@ -28,7 +37,7 @@ RenderSystem *RenderSystem::instance()
 // renders everything
 void RenderSystem::render()
 {
-    // meshShader.bind();
+    meshShader->bind();
     glClear(GL_COLOR_BUFFER_BIT);
 
     double time = glfwGetTime();

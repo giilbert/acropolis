@@ -1,0 +1,6 @@
+{
+  "transformIncludes": [
+    "shaders/basic.vert",
+    "shaders/basic.frag"
+  ]
+}

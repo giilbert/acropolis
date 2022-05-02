@@ -1,4 +1,4 @@
-#version 330
+R"(#version 330
 precision mediump float;
 in vec3 vNormal;
 uniform float time;
@@ -13,8 +13,8 @@ void main()
 {
   vec3 normal = normalize(vNormal);
   float light = dot(normal, vec3(0, 1, 0.5));
-  light += 1.0 / (light + 1.8) - 0.2;
+  light += 1.0 / (light) - 0.2;
   light = clamp(light, 0.3, 1.0);
   gl_FragColor = vec4(hsb2rgb(vec3(time / 10.0, 0.7, 0.66)), 1.0);
   gl_FragColor.rgb *= light;
-};
+};)"
