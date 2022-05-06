@@ -20,53 +20,53 @@ namespace giz
     {
     }
     // TODO: init with width and height
-    void Window::init()
+    void Window::Init()
     {
         if (!glfwInit())
         {
-            logger::logError("GLFW failed to init");
+            logger::Error("GLFW failed to init");
             exit(-1);
         }
 
         // create window
-        window = glfwCreateWindow(640, 480, "dd", nullptr, nullptr);
-        width = 640;
-        height = 480;
-        glfwSetWindowRefreshCallback(window, glfwWindowResize);
+        m_Window = glfwCreateWindow(640, 480, "dd", nullptr, nullptr);
+        m_Width = 640;
+        m_Height = 480;
+        glfwSetWindowRefreshCallback(m_Window, glfwWindowResize);
 
-        if (!window)
+        if (!m_Window)
         {
-            logger::logError("Window failed to create");
+            logger::Error("Window failed to create");
             glfwTerminate();
             exit(-1);
         }
 
         glfwSetWindowSizeCallback(
-            window, [](GLFWwindow *window, int width, int height)
+            m_Window, [](GLFWwindow *window, int width, int height)
             {
                 glViewport(0, 0, width, height);
-                Game::instance()->onResize(width, height); });
+                Game::Instance()->OnResize(width, height); });
 
         glfwSetCursorPosCallback(
-            window, [](GLFWwindow *window, double x, double y)
-            { Game::instance()->onCursorMove(x, y); });
+            m_Window, [](GLFWwindow *window, double x, double y)
+            { Game::Instance()->OnCursorMove(x, y); });
 
         glfwSetKeyCallback(
-            window, [](GLFWwindow *window, int key, int scancode, int action, int mod)
+            m_Window, [](GLFWwindow *window, int key, int scancode, int action, int mod)
             { 
                 switch (action) {
                 case GLFW_PRESS:
-                    Game::instance()->onKeyPress(key, scancode, mod);
+                    Game::Instance()->OnKeyPress(key, scancode, mod);
                     break;
                 case GLFW_RELEASE:
-                    Game::instance()->onKeyRelease(key, scancode, mod);
+                    Game::Instance()->onKeyRelease(key, scancode, mod);
                     break;
                 // TODO: GLFW_REPEAT?
             } });
 
         // TODO: JOYSTICK & other event callbacks
 
-        glfwMakeContextCurrent(window);
+        glfwMakeContextCurrent(m_Window);
 
         if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
         {

@@ -1,10 +1,10 @@
 #include "core/Game.h"
 #include "utils/logger.h"
 
-int main(void)
+int main()
 {
-    giz::logger::logInfo("Hello from giz!");
-    giz::Game::instance()->init();
+    giz::logger::Info("Hello from giz!");
+    giz::Game::Instance()->Init();
 
     return 0;
 }

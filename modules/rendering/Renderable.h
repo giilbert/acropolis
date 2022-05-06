@@ -7,7 +7,7 @@ namespace giz
     class Renderable
     {
     public:
-        Entity *entity;
-        virtual void draw() = 0;
+        Entity *m_Entity;
+        virtual void Draw() = 0;
     };
 }

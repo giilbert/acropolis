@@ -28,25 +28,25 @@ namespace giz
         // singletons should not be assignable
         void operator=(const Game &) = delete;
         // getter method for the Game singleton
-        static Game *instance();
+        static Game *Instance();
 
-        Window *gameWindow;
+        Window *m_GameWindow;
 
         // window events
-        void onResize(int width, int height);
-        void onCursorMove(double x, double y);
-        void onKeyPress(int key, int scancode, int action);
+        void OnResize(int width, int height);
+        void OnCursorMove(double x, double y);
+        void OnKeyPress(int key, int scancode, int action);
         void onKeyRelease(int key, int scancode, int action);
 
-        void init();
-        void update();
+        void Init();
+        void Update();
 
     private:
         // time in seconds passed since init() was called
-        float time;
+        float m_Time;
 
         // events
-        glm::dvec2 mousePosition;
-        std::map<int, bool> keysPressed;
+        glm::dvec2 m_MousePosition;
+        std::map<int, bool> m_KeysPressed;
     };
 }

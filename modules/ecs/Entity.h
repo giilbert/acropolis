@@ -12,14 +12,14 @@ namespace giz
         Entity();
         ~Entity();
 
-        Transform transform;
+        Transform m_Transform;
 
-        int id = 12;
+        int m_Id = 12;
 
-        std::vector<Entity> children;
-        std::vector<component::Base *> components;
+        std::vector<Entity> m_Children;
+        std::vector<component::Base *> m_Components;
 
-        void addComponent(component::Base *component);
-        void updateComponents();
+        void AddComponent(component::Base *component);
+        void UpdateComponents();
     };
 }

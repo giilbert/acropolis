@@ -4,18 +4,18 @@ namespace giz
 {
     namespace profile
     {
-        void start()
+        void Start()
         {
-            giz::profile::startTime = std::chrono::high_resolution_clock::now();
+            giz::profile::m_StartTime = std::chrono::high_resolution_clock::now();
         }
 
-        void end(const char *description)
+        void End(const char *description)
         {
             using milli = std::chrono::milliseconds;
             using nano = std::chrono::nanoseconds;
 
             auto endTime = std::chrono::high_resolution_clock::now();
-            auto difference = endTime - giz::profile::startTime;
+            auto difference = endTime - giz::profile::m_StartTime;
 
             std::cout << description
                       << " took "

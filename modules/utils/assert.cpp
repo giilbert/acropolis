@@ -3,5 +3,5 @@
 void ASSERT_IF(bool condition, char *message)
 {
     if (condition)
-        giz::logger::logError(message);
+        giz::logger::Error(message);
 }

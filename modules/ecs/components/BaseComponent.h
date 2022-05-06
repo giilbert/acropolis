@@ -10,16 +10,16 @@ namespace giz
         public:
             virtual ~Base() = 0;
             // the instance of an entity which the component belongs to
-            Entity *entity;
+            Entity *m_Entity;
 
             // whether or not to also update the component when the entity changes
-            bool requiresUpdate = false;
+            bool m_RequiresUpdate = false;
 
             // register with systems, etc
-            virtual void init() = 0;
+            virtual void Init() = 0;
 
             // called when entity changes
-            virtual void update() = 0;
+            virtual void Update() = 0;
         };
     }
 }

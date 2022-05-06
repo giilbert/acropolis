@@ -36,30 +36,30 @@ Local<Context> createGlobalContext(Isolate *isolate)
 
 ScriptingSystem::ScriptingSystem()
 {
-    platform = platform::NewDefaultPlatform();
+    m_Platform = platform::NewDefaultPlatform();
 
-    V8::InitializePlatform(platform.get());
+    V8::InitializePlatform(m_Platform.get());
     V8::Initialize();
     // create an isolate and make it current
-    create_params.array_buffer_allocator =
+    m_CreateParams.array_buffer_allocator =
         v8::ArrayBuffer::Allocator::NewDefaultAllocator();
-    isolate = v8::Isolate::New(create_params);
-    isolate->Enter();
+    m_Isolate = v8::Isolate::New(m_CreateParams);
+    m_Isolate->Enter();
 
-    v8::HandleScope handle_scope(isolate);
-    Local<Context> context = createGlobalContext(isolate);
+    v8::HandleScope handle_scope(m_Isolate);
+    Local<Context> context = createGlobalContext(m_Isolate);
 
     // create es modules used for imports
-    createSyntheticModules(context);
+    CreateSyntheticModules(context);
 
-    globalContext.Reset(isolate, context);
+    m_GlobalContext.Reset(m_Isolate, context);
 }
 
-void ScriptingSystem::destroy()
+void ScriptingSystem::Destroy()
 {
 
-    auto isolate = ScriptingSystem::instance()->isolate;
-    auto createParams = ScriptingSystem::instance()->create_params;
+    auto isolate = ScriptingSystem::Instance()->m_Isolate;
+    auto createParams = ScriptingSystem::Instance()->m_CreateParams;
 
     // dispose persistent handles
     // ScriptingSystem::instance()->globalContext.Reset();
@@ -161,7 +161,7 @@ void behaviorConstructor(const FunctionCallbackInfo<Value> &info)
 
     if (entity->IsNullOrUndefined())
     {
-        giz::logger::logError("pass an entity into super");
+        giz::logger::Error("pass an entity into super");
         return;
     }
 
@@ -202,7 +202,7 @@ void getEntityTransform(Local<String> property,
     Local<Object> instance = transformTemplate->NewInstance(context).ToLocalChecked();
     instance->SetInternalField(0, External::New(isolate, &transform));
 
-    instance->Set(context, String::NewFromUtf8(isolate, "position").ToLocalChecked(), wrapVector3(transform.position));
+    instance->Set(context, String::NewFromUtf8(isolate, "position").ToLocalChecked(), wrapVector3(transform.m_Position));
 
     info.GetReturnValue().Set(instance);
 }
@@ -258,12 +258,12 @@ void getTime(const FunctionCallbackInfo<Value> &info)
     info.GetReturnValue().Set(glfwGetTime());
 }
 
-void ScriptingSystem::createSyntheticModules(Local<Context> context)
+void ScriptingSystem::CreateSyntheticModules(Local<Context> context)
 {
     Local<Module> ecsModule = Module::CreateSyntheticModule(
-        isolate,
-        String::NewFromUtf8(isolate, "@giz/ecs").ToLocalChecked(),
-        {String::NewFromUtf8(isolate, "Behavior").ToLocalChecked()},
+        m_Isolate,
+        String::NewFromUtf8(m_Isolate, "@giz/ecs").ToLocalChecked(),
+        {String::NewFromUtf8(m_Isolate, "Behavior").ToLocalChecked()},
         [](Local<Context> context, Local<Module> module) -> MaybeLocal<Value>
         {
             auto isolate = context->GetIsolate();
@@ -275,12 +275,12 @@ void ScriptingSystem::createSyntheticModules(Local<Context> context)
 
             return MaybeLocal<Value>(True(isolate));
         });
-    ecsModule->InstantiateModule(context, ScriptingSystem::moduleResolutionCallback);
+    ecsModule->InstantiateModule(context, ScriptingSystem::ModuleResolutionCallback);
 
     Local<Module> gameModule = Module::CreateSyntheticModule(
-        isolate,
-        String::NewFromUtf8(isolate, "@giz/game").ToLocalChecked(),
-        {String::NewFromUtf8(isolate, "now").ToLocalChecked()},
+        m_Isolate,
+        String::NewFromUtf8(m_Isolate, "@giz/game").ToLocalChecked(),
+        {String::NewFromUtf8(m_Isolate, "now").ToLocalChecked()},
         [](Local<Context> context, Local<Module> module) -> MaybeLocal<Value>
         {
             auto isolate = context->GetIsolate();
@@ -292,23 +292,23 @@ void ScriptingSystem::createSyntheticModules(Local<Context> context)
 
             return MaybeLocal<Value>(True(isolate));
         });
-    gameModule->InstantiateModule(context, ScriptingSystem::moduleResolutionCallback);
+    gameModule->InstantiateModule(context, ScriptingSystem::ModuleResolutionCallback);
 
     Global<Module> *globalEcsModule = new Global<Module>();
-    globalEcsModule->Reset(isolate, ecsModule);
+    globalEcsModule->Reset(m_Isolate, ecsModule);
 
     Global<Module> *globalGameModule = new Global<Module>();
-    globalGameModule->Reset(isolate, gameModule);
+    globalGameModule->Reset(m_Isolate, gameModule);
 
-    modules["@giz/ecs"] = globalEcsModule;
-    modules["@giz/game"] = globalGameModule;
+    m_Modules["@giz/ecs"] = globalEcsModule;
+    m_Modules["@giz/game"] = globalGameModule;
 }
 
-MaybeLocal<Module> ScriptingSystem::moduleResolutionCallback(Local<Context> context, Local<String> specifier,
+MaybeLocal<Module> ScriptingSystem::ModuleResolutionCallback(Local<Context> context, Local<String> specifier,
                                                              Local<FixedArray> import_assertions, Local<Module> referrer)
 {
     auto isolate = context->GetIsolate();
-    auto modules = ScriptingSystem::instance()->modules;
+    auto modules = ScriptingSystem::Instance()->m_Modules;
     String::Utf8Value val(context->GetIsolate(), specifier);
     std::string request(*val, val.length());
 
@@ -319,55 +319,55 @@ MaybeLocal<Module> ScriptingSystem::moduleResolutionCallback(Local<Context> cont
     catch (const std::out_of_range &e)
     {
         // TODO: better error handling
-        logger::logError("Module " + request + " not found.  Crashing ..");
+        logger::Error("Module " + request + " not found.  Crashing ..");
     }
 
     return MaybeLocal<Module>();
 }
 
-void ScriptingSystem::attachScript(giz::component::Behavior *behavior)
+void ScriptingSystem::AttachScript(giz::component::Behavior *behavior)
 {
-    int scriptId = currentId;
-    currentId += 1;
+    int scriptId = m_CurrentId;
+    m_CurrentId += 1;
     // set the id of the behavior
-    behavior->id = scriptId;
+    behavior->m_Id = scriptId;
     // keep track of it in the map
-    attachedBehaviors[scriptId] = behavior;
+    m_AttachedBehaviors[scriptId] = behavior;
 
     // create contexts and scopes
-    v8::HandleScope handle_scope(isolate);
-    v8::Local<Context> context = Local<Context>::New(isolate, globalContext);
+    v8::HandleScope handle_scope(m_Isolate);
+    v8::Local<Context> context = Local<Context>::New(m_Isolate, m_GlobalContext);
     Context::Scope contextScope(context);
 
     // create origin info for the script
-    ScriptOrigin origin(String::NewFromUtf8(isolate, "test").ToLocalChecked(), // specifier
-                        Integer::New(isolate, 0),                              // line offset
-                        Integer::New(isolate, 0),                              // column offset
-                        False(isolate),                                        // is cross origin
-                        Integer::New(isolate, scriptId),                       // script id
-                        Local<Value>(),                                        // source map URL
-                        True(isolate),                                         // is opaque
-                        False(isolate),                                        // is WASM
-                        True(isolate));                                        // is ES6 module
+    ScriptOrigin origin(String::NewFromUtf8(m_Isolate, "test").ToLocalChecked(), // specifier
+                        Integer::New(m_Isolate, 0),                              // line offset
+                        Integer::New(m_Isolate, 0),                              // column offset
+                        False(m_Isolate),                                        // is cross origin
+                        Integer::New(m_Isolate, scriptId),                       // script id
+                        Local<Value>(),                                          // source map URL
+                        True(m_Isolate),                                         // is opaque
+                        False(m_Isolate),                                        // is WASM
+                        True(m_Isolate));                                        // is ES6 module
 
     // compile the script
     // TODO: cache the compiled scripts so no need to recompile every time a script component is instantiated
     Local<String> scriptSourceRaw =
         String::NewFromUtf8(
-            isolate, behavior->source.c_str(),
+            m_Isolate, behavior->m_Source.c_str(),
             NewStringType::kNormal)
             .ToLocalChecked();
     ScriptCompiler::Source source(scriptSourceRaw, origin);
-    Local<Module> module = ScriptCompiler::CompileModule(isolate, &source).ToLocalChecked();
+    Local<Module> module = ScriptCompiler::CompileModule(m_Isolate, &source).ToLocalChecked();
 
     // resolve modules in the script
-    module->InstantiateModule(context, ScriptingSystem::moduleResolutionCallback);
+    module->InstantiateModule(context, ScriptingSystem::ModuleResolutionCallback);
 
     Local<Value> returnValue = module->Evaluate(context).ToLocalChecked();
     Local<Object> returnedBehavior = returnValue->ToObject(context).ToLocalChecked();
 
     Local<Value> arguments[1];
-    arguments[0] = wrapEntity(*behavior->entity);
+    arguments[0] = wrapEntity(*behavior->m_Entity);
 
     // creates an instance of the behavior
     auto instance = returnedBehavior->CallAsConstructor(context, 1, arguments)
@@ -384,23 +384,23 @@ void ScriptingSystem::attachScript(giz::component::Behavior *behavior)
 
     // giz::profile::end("Create entity object");
 
-    behavior->behavior.Reset(isolate, instance);
+    behavior->m_Behavior.Reset(m_Isolate, instance);
 }
 
-void ScriptingSystem::detachScript(giz::component::Behavior *behavior)
+void ScriptingSystem::DetachScript(giz::component::Behavior *behavior)
 {
-    behavior->behavior.Reset();
+    behavior->m_Behavior.Reset();
 }
 
-void ScriptingSystem::updateAll()
+void ScriptingSystem::UpdateAll()
 {
-    HandleScope handleScope(isolate);
-    Local<Context> context = Local<Context>::New(isolate, globalContext);
+    HandleScope handleScope(m_Isolate);
+    Local<Context> context = Local<Context>::New(m_Isolate, m_GlobalContext);
 
-    for (const auto [i, behavior] : attachedBehaviors)
+    for (const auto [i, behavior] : m_AttachedBehaviors)
     {
-        Local<Object> instance = behavior->behavior.Get(isolate);
-        instance->Get(context, String::NewFromUtf8(isolate, "update").ToLocalChecked())
+        Local<Object> instance = behavior->m_Behavior.Get(m_Isolate);
+        instance->Get(context, String::NewFromUtf8(m_Isolate, "update").ToLocalChecked())
             .ToLocalChecked()
             ->ToObject(context)
             .ToLocalChecked()
@@ -408,7 +408,7 @@ void ScriptingSystem::updateAll()
     }
 }
 
-ScriptingSystem *ScriptingSystem::instance()
+ScriptingSystem *ScriptingSystem::Instance()
 {
     if (singleton == nullptr)
     {

@@ -15,12 +15,12 @@ namespace giz
             // by default, the camera is perspective
             Behavior(std::string source);
             virtual Behavior::~Behavior();
-            virtual void init();
-            virtual void update();
+            virtual void Init();
+            virtual void Update();
 
-            std::string source;
-            unsigned int id;
-            v8::Persistent<v8::Object> behavior;
+            std::string m_Source;
+            unsigned int m_Id;
+            v8::Persistent<v8::Object> m_Behavior;
         };
     }
 }

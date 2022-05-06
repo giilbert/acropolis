@@ -17,15 +17,15 @@ namespace giz
             Mesh(std::vector<float> vertices, std::vector<unsigned int> indices, std::vector<float> normals);
             virtual Mesh::~Mesh();
 
-            unsigned int vaoId;
-            Mesh3D *mesh;
+            unsigned int m_VaoId;
+            Mesh3D *m_Mesh;
 
-            std::vector<float> vertices;
-            std::vector<unsigned int> indices;
-            std::vector<float> normals;
+            std::vector<float> m_Vertices;
+            std::vector<unsigned int> m_Indices;
+            std::vector<float> m_Normals;
 
-            virtual void init();
-            virtual void update();
+            virtual void Init();
+            virtual void Update();
         };
     }
 }

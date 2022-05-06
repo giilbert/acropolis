@@ -19,12 +19,12 @@ RenderSystem::RenderSystem()
     std::vector<char *> uniforms = {"projectionMatrix", "viewMatrix", "modelMatrix", "time"};
 
     // compile shaders
-    meshShader = new Shader(meshVertexSource, meshFragmentSource, uniforms);
+    m_MeshShader = new Shader(meshVertexSource, meshFragmentSource, uniforms);
     // meshShader = Shader::loadFromFiles("res/shaders/basic.vert", "res/shaders/basic.frag", uniforms);
-    meshShader->bind();
+    m_MeshShader->Bind();
 }
 
-RenderSystem *RenderSystem::instance()
+RenderSystem *RenderSystem::Instance()
 {
     if (singleton == nullptr)
     {
@@ -35,33 +35,33 @@ RenderSystem *RenderSystem::instance()
 }
 
 // renders everything
-void RenderSystem::render()
+void RenderSystem::Render()
 {
-    meshShader->bind();
+    m_MeshShader->Bind();
     glClear(GL_COLOR_BUFFER_BIT);
 
     double time = glfwGetTime();
-    meshShader->setFloat(3, time);
+    m_MeshShader->SetFloat(3, time);
 
-    meshShader->setMatrix4x4(0, &(currentCamera->projectionMatrix[0][0]));
-    meshShader->setMatrix4x4(1, &(currentCamera->entity->transform.toMatrix()[0][0]));
+    m_MeshShader->SetMatrix4x4(0, &(m_CurrentCamera->m_ProjectionMatrix[0][0]));
+    m_MeshShader->SetMatrix4x4(1, &(m_CurrentCamera->m_Entity->m_Transform.ToMatrix()[0][0]));
 
-    for (auto renderable : renderables)
+    for (auto renderable : m_Renderables)
     {
         // std::cout << renderable->entity->transform.position.y << "\n";
-        meshShader->setMatrix4x4(2, &renderable->entity->transform.toMatrix()[0][0]);
-        renderable->draw();
+        m_MeshShader->SetMatrix4x4(2, &renderable->m_Entity->m_Transform.ToMatrix()[0][0]);
+        renderable->Draw();
     }
 }
 
-void RenderSystem::onWindowSizeChange(int width, int height)
+void RenderSystem::OnWindowSizeChange(int width, int height)
 {
-    currentCamera->update();
+    m_CurrentCamera->Update();
 }
 
-void RenderSystem::setCurrentCamera(component::Camera *camera)
+void RenderSystem::SetCurrentCamera(component::Camera *camera)
 {
-    currentCamera = camera;
-    meshShader->setMatrix4x4(0, &(camera->projectionMatrix[0][0]));
-    meshShader->setMatrix4x4(1, &(camera->entity->transform.toMatrix()[0][0]));
+    m_CurrentCamera = camera;
+    m_MeshShader->SetMatrix4x4(0, &(camera->m_ProjectionMatrix[0][0]));
+    m_MeshShader->SetMatrix4x4(1, &(camera->m_Entity->m_Transform.ToMatrix()[0][0]));
 }

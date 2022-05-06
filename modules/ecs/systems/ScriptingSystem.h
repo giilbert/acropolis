@@ -16,23 +16,23 @@ namespace giz
     {
         class ScriptingSystem
         {
-            std::unique_ptr<v8::Platform> platform;
-            v8::Isolate *isolate;
-            v8::Isolate::CreateParams create_params;
-            v8::Global<v8::Context> globalContext;
+            std::unique_ptr<v8::Platform> m_Platform;
+            v8::Isolate *m_Isolate;
+            v8::Isolate::CreateParams m_CreateParams;
+            v8::Global<v8::Context> m_GlobalContext;
 
-            unsigned int currentId = 0;
-            std::unordered_map<unsigned int, giz::component::Behavior *> attachedBehaviors;
+            unsigned int m_CurrentId = 0;
+            std::unordered_map<unsigned int, giz::component::Behavior *> m_AttachedBehaviors;
 
             // maps a module's name to that module
             // used by the module resolver to resolve modules
-            std::unordered_map<std::string, v8::Global<v8::Module> *> modules;
+            std::unordered_map<std::string, v8::Global<v8::Module> *> m_Modules;
 
-            static v8::MaybeLocal<v8::Module> moduleResolutionCallback(v8::Local<v8::Context> context,
+            static v8::MaybeLocal<v8::Module> ModuleResolutionCallback(v8::Local<v8::Context> context,
                                                                        v8::Local<v8::String> specifier,
                                                                        v8::Local<v8::FixedArray> import_assertions,
                                                                        v8::Local<v8::Module> referrer);
-            void createSyntheticModules(v8::Local<v8::Context> context);
+            void CreateSyntheticModules(v8::Local<v8::Context> context);
 
         protected:
             // also init
@@ -45,14 +45,14 @@ namespace giz
             // singletons should not be assignable
             void operator=(const ScriptingSystem &) = delete;
             // getter method for singleton
-            static ScriptingSystem *instance();
-            static void destroy();
+            static ScriptingSystem *Instance();
+            static void Destroy();
 
-            void updateAll();
+            void UpdateAll();
 
             // assigns and unassign each script an id to track which script goes with which entity
-            void attachScript(giz::component::Behavior *behavior);
-            void detachScript(giz::component::Behavior *behavior);
+            void AttachScript(giz::component::Behavior *behavior);
+            void DetachScript(giz::component::Behavior *behavior);
         };
     }
 }

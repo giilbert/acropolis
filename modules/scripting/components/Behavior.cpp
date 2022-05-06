@@ -6,22 +6,22 @@ using giz::component::Behavior;
 
 Behavior::Behavior(std::string s)
 {
-    source = s;
+    m_Source = s;
 }
 
 Behavior::~Behavior()
 {
-    if (!behavior.IsEmpty())
+    if (!m_Behavior.IsEmpty())
     {
-        behavior.Reset();
+        m_Behavior.Reset();
     }
 }
 
-void Behavior::init()
+void Behavior::Init()
 {
-    giz::systems::ScriptingSystem::instance()->attachScript(this);
+    giz::systems::ScriptingSystem::Instance()->AttachScript(this);
 }
 
-void Behavior::update()
+void Behavior::Update()
 {
 }

@@ -7,28 +7,28 @@ using giz::component::Camera;
 
 Camera::Camera(bool isOrthographic)
 {
-    isPerspective = !isOrthographic;
+    m_IsPerspective = !isOrthographic;
 }
 
 Camera::~Camera()
 {
 }
 
-void Camera::init()
+void Camera::Init()
 {
-    update();
+    Update();
 }
 
-void Camera::update()
+void Camera::Update()
 {
-    Window *window = Game::instance()->gameWindow;
-    float width = window->width;
-    float height = window->height;
+    Window *window = Game::Instance()->m_GameWindow;
+    float width = window->m_Width;
+    float height = window->m_Height;
 
-    projectionMatrix = glm::perspective(glm::pi<float>() * 0.25f, width / height, 0.1f, 1000.0f);
+    m_ProjectionMatrix = glm::perspective(glm::pi<float>() * 0.25f, width / height, 0.1f, 1000.0f);
 }
 
-void Camera::makeCurrent()
+void Camera::MakeCurrent()
 {
-    systems::RenderSystem::instance()->setCurrentCamera(this);
+    systems::RenderSystem::Instance()->SetCurrentCamera(this);
 }

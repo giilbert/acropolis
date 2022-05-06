@@ -4,20 +4,20 @@ using giz::component::Mesh;
 
 Mesh::Mesh(std::vector<float> vertices, std::vector<unsigned int> indices, std::vector<float> normals)
 {
-    mesh = new Mesh3D(vertices, indices, normals);
+    m_Mesh = new Mesh3D(vertices, indices, normals);
 }
 
 Mesh::~Mesh()
 {
-    delete mesh;
+    delete m_Mesh;
 }
 
-void Mesh::init()
+void Mesh::Init()
 {
-    mesh->entity = entity;
-    systems::RenderSystem::instance()->renderables.push_back(mesh);
+    m_Mesh->m_Entity = m_Entity;
+    systems::RenderSystem::Instance()->m_Renderables.push_back(m_Mesh);
 }
 
-void Mesh::update()
+void Mesh::Update()
 {
 }

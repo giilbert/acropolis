@@ -8,7 +8,7 @@ namespace giz
     {
     }
 
-    Game *Game::instance()
+    Game *Game::Instance()
     {
         if (singleton == nullptr)
         {
@@ -18,25 +18,25 @@ namespace giz
         return singleton;
     }
 
-    void Game::onResize(int width, int height)
+    void Game::OnResize(int width, int height)
     {
-        gameWindow->width = width;
-        gameWindow->height = height;
-        systems::RenderSystem::instance()->onWindowSizeChange(width, height);
+        m_GameWindow->m_Width = width;
+        m_GameWindow->m_Height = height;
+        systems::RenderSystem::Instance()->OnWindowSizeChange(width, height);
     }
 
-    void Game::init()
+    void Game::Init()
     {
         using component::Behavior;
         using component::Camera;
         using component::Mesh;
 
-        gameWindow = new Window();
-        gameWindow->init();
+        m_GameWindow = new Window();
+        m_GameWindow->Init();
 
         // init beforehand
-        systems::RenderSystem::instance();
-        systems::ScriptingSystem::instance();
+        systems::RenderSystem::Instance();
+        systems::ScriptingSystem::Instance();
 
         std::vector<float> vertices(vertexData, vertexData + sizeof(vertexData) / sizeof(vertexData[0]));
         std::vector<unsigned int> indices(indexData, indexData + sizeof(indexData) / sizeof(indexData[0]));
@@ -44,13 +44,13 @@ namespace giz
 
         auto entityOne = new Entity();
         auto meshOne = new Mesh(vertices, indices, normals);
-        entityOne->addComponent(meshOne);
+        entityOne->AddComponent(meshOne);
 
         auto entityTwo = new Entity();
-        entityTwo->transform.position.z = -10;
+        entityTwo->m_Transform.m_Position.z = -10;
         auto cameraOne = new Camera();
-        entityTwo->addComponent(cameraOne);
-        cameraOne->makeCurrent();
+        entityTwo->AddComponent(cameraOne);
+        cameraOne->MakeCurrent();
 
         // load script file
         std::ifstream stream("test.js");
@@ -58,18 +58,18 @@ namespace giz
         sstr << stream.rdbuf();
 
         auto behaviorOne = new Behavior(sstr.str());
-        entityOne->addComponent(behaviorOne);
+        entityOne->AddComponent(behaviorOne);
 
         glClearColor(0.1, 0.1, 0.1, 1.0);
 
         float x = 0;
 
-        while (!glfwWindowShouldClose(gameWindow->window))
+        while (!glfwWindowShouldClose(m_GameWindow->m_Window))
         {
             x += 0.001;
-            update();
+            Update();
 
-            entityTwo->updateComponents();
+            entityTwo->UpdateComponents();
         }
 
         glfwTerminate();
@@ -77,39 +77,39 @@ namespace giz
         delete entityOne;
         delete entityTwo;
 
-        systems::ScriptingSystem::destroy();
+        systems::ScriptingSystem::Destroy();
     }
 
-    void Game::update()
+    void Game::Update()
     {
-        systems::ScriptingSystem::instance()->updateAll();
-        systems::RenderSystem::instance()->render();
+        systems::ScriptingSystem::Instance()->UpdateAll();
+        systems::RenderSystem::Instance()->Render();
 
-        if (keysPressed[GLFW_KEY_ESCAPE] == true)
+        if (m_KeysPressed[GLFW_KEY_ESCAPE] == true)
         {
-            giz::logger::logInfo("Escape pressed, gracefully exiting");
-            glfwSetWindowShouldClose(gameWindow->window, 1);
+            giz::logger::Info("Escape pressed, gracefully exiting");
+            glfwSetWindowShouldClose(m_GameWindow->m_Window, 1);
         }
 
-        glfwSwapBuffers(gameWindow->window);
+        glfwSwapBuffers(m_GameWindow->m_Window);
         glfwPollEvents();
 
-        time = glfwGetTime();
+        m_Time = glfwGetTime();
     }
 
-    void Game::onCursorMove(double x, double y)
+    void Game::OnCursorMove(double x, double y)
     {
-        mousePosition.x = x;
-        mousePosition.y = y;
+        m_MousePosition.x = x;
+        m_MousePosition.y = y;
     }
 
-    void Game::onKeyPress(int key, int scancode, int action)
+    void Game::OnKeyPress(int key, int scancode, int action)
     {
-        keysPressed[key] = true;
+        m_KeysPressed[key] = true;
     }
 
     void Game::onKeyRelease(int key, int scancode, int action)
     {
-        keysPressed[key] = false;
+        m_KeysPressed[key] = false;
     }
 }

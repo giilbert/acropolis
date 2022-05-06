@@ -13,11 +13,11 @@ namespace giz
     public:
         Window();
 
-        GLFWwindow *window;
-        void makeContextCurrent();
-        void init();
+        GLFWwindow *m_Window;
+        void MakeContextCurrent();
+        void Init();
 
-        int width;
-        int height;
+        int m_Width;
+        int m_Height;
     };
 }

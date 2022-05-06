@@ -6,8 +6,8 @@ namespace giz
 {
     namespace logger
     {
-        void logInfo(std::string string);
-        void logWarning(std::string string);
-        void logError(std::string string);
+        void Info(std::string string);
+        void Warn(std::string string);
+        void Error(std::string string);
     };
 }

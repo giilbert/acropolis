@@ -18,7 +18,7 @@ unsigned int compileShader(int type, const char *source)
 
     if (length != 0)
     {
-        giz::logger::logError(shaderInfoBuffer);
+        giz::logger::Error(shaderInfoBuffer);
     }
 
     return shader;
@@ -45,19 +45,19 @@ namespace giz
         glDeleteShader(vertexShader);
         glDeleteShader(fragmentShader);
 
-        this->program = program;
+        this->m_Program = program;
 
         // uniforms are inserted based on their order when pushed into the uniforms vector
-        uniformLocations = new int[uniforms.size()];
+        m_UniformLocations = new int[uniforms.size()];
         for (int i = 0; i < uniforms.size(); i++)
         {
-            uniformLocations[i] = glGetUniformLocation(program, uniforms[i]);
+            m_UniformLocations[i] = glGetUniformLocation(program, uniforms[i]);
         }
     }
 
     Shader::~Shader()
     {
-        glDeleteProgram(program);
+        glDeleteProgram(m_Program);
     }
 
     // utility function to read a file to string
@@ -69,7 +69,7 @@ namespace giz
         return sstr.str();
     }
 
-    Shader *Shader::loadFromFiles(std::string vertexPath, std::string fragmentPath, std::vector<char *> uniforms)
+    Shader *Shader::LoadFromFiles(std::string vertexPath, std::string fragmentPath, std::vector<char *> uniforms)
     {
         // loads the shaders into strings
         std::string vertexSource = readFileToString(vertexPath);
@@ -78,19 +78,19 @@ namespace giz
         return new Shader(vertexSource, fragmentSource, uniforms);
     }
 
-    void Shader::bind()
+    void Shader::Bind()
     {
-        glUseProgram(this->program);
+        glUseProgram(this->m_Program);
     }
 
-    void Shader::setFloat(int idx, float value)
+    void Shader::SetFloat(int idx, float value)
     {
         glUniform1f(idx, value);
     }
 
-    void Shader::setMatrix4x4(int idx, float *start)
+    void Shader::SetMatrix4x4(int idx, float *start)
     {
-        glUniformMatrix4fv(uniformLocations[idx], 1, GL_FALSE, start);
+        glUniformMatrix4fv(m_UniformLocations[idx], 1, GL_FALSE, start);
     }
 
 };

@@ -10,10 +10,10 @@ namespace giz
     {
     public:
         Transform();
-        glm::vec3 position;
-        glm::quat rotation;
-        glm::vec3 scale;
+        glm::vec3 m_Position;
+        glm::quat m_Rotation;
+        glm::vec3 m_Scale;
 
-        glm::mat4 toMatrix();
+        glm::mat4 ToMatrix();
     };
 }

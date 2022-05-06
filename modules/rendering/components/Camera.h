@@ -11,19 +11,19 @@ namespace giz
         class Camera : public component::Base
         {
         public:
-            bool requiresUpdate = true;
+            bool m_RequiresUpdate = true;
             // by default, the camera is perspective
             Camera(bool isOrthographic = true);
             virtual Camera::~Camera();
 
-            virtual void init();
-            virtual void update();
+            virtual void Init();
+            virtual void Update();
 
-            glm::mat4 projectionMatrix;
-            void makeCurrent();
+            glm::mat4 m_ProjectionMatrix;
+            void MakeCurrent();
 
         private:
-            bool isPerspective;
+            bool m_IsPerspective;
         };
     }
 }

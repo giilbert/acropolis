@@ -8,8 +8,8 @@ namespace giz
 
     Mesh3D::Mesh3D(std::vector<float> vertices, std::vector<unsigned int> indices, std::vector<float> normals)
     {
-        glGenVertexArrays(1, &vaoId);
-        glBindVertexArray(vaoId);
+        glGenVertexArrays(1, &m_VaoId);
+        glBindVertexArray(m_VaoId);
 
         unsigned int vertexBuffer;
         glGenBuffers(1, &vertexBuffer);
@@ -35,7 +35,7 @@ namespace giz
         glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(normals[0]) * 3, 0);
     }
 
-    void Mesh3D::draw()
+    void Mesh3D::Draw()
     {
         glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, nullptr);
     }

@@ -9,7 +9,7 @@ namespace giz
     class VBO
     {
     public:
-        unsigned int bufferId;
+        unsigned int m_BufferId;
 
         VBO(float data[], unsigned long long size, int bufferType, int usage);
         VBO(int data[], unsigned long long size, int bufferType, int usage);

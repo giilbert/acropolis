@@ -13,8 +13,8 @@ namespace giz
         Mesh3D(std::vector<float> vertices, std::vector<unsigned int> indices, std::vector<float> normals);
         ~Mesh3D();
 
-        unsigned int vaoId;
+        unsigned int m_VaoId;
 
-        virtual void draw();
+        virtual void Draw();
     };
 }

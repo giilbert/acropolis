@@ -6,16 +6,16 @@ namespace giz
     // float implementation
     VBO<float>::VBO(float data[], unsigned long long count, int bufferType, int usage)
     {
-        glGenBuffers(1, &bufferId);
-        glBindBuffer(bufferType, bufferId);
+        glGenBuffers(1, &m_BufferId);
+        glBindBuffer(bufferType, m_BufferId);
         glBufferData(bufferType, count, data, usage);
     }
 
     // int implementation
     VBO<int>::VBO(int data[], unsigned long long count, int bufferType, int usage)
     {
-        glGenBuffers(1, &bufferId);
-        glBindBuffer(bufferType, bufferId);
+        glGenBuffers(1, &m_BufferId);
+        glBindBuffer(bufferType, m_BufferId);
         glBufferData(bufferType, count, data, usage);
     }
 }

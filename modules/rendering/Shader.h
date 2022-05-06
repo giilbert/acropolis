@@ -18,14 +18,14 @@ namespace giz
         Shader(std::string vertexSource, std::string fragmentSource, std::vector<char *> uniforms);
         ~Shader();
 
-        static Shader *loadFromFiles(std::string vertexPath, std::string fragmentPath, std::vector<char *> uniforms);
+        static Shader *LoadFromFiles(std::string vertexPath, std::string fragmentPath, std::vector<char *> uniforms);
 
-        void bind();
+        void Bind();
 
-        void setFloat(int idx, float value);
-        void setMatrix4x4(int idx, float *start);
+        void SetFloat(int idx, float value);
+        void SetMatrix4x4(int idx, float *start);
 
-        unsigned int program;
-        int *uniformLocations;
+        unsigned int m_Program;
+        int *m_UniformLocations;
     };
 }

@@ -6,33 +6,33 @@ namespace giz
 {
     Entity::Entity()
     {
-        transform = Transform();
+        m_Transform = Transform();
     }
 
     Entity::~Entity()
     {
 
-        for (auto component : components)
+        for (auto component : m_Components)
         {
             delete component;
         }
     }
 
-    void Entity::addComponent(component::Base *component)
+    void Entity::AddComponent(component::Base *component)
     {
-        component->entity = this;
+        component->m_Entity = this;
 
-        component->init();
-        components.push_back(component);
+        component->Init();
+        m_Components.push_back(component);
     }
 
-    void Entity::updateComponents()
+    void Entity::UpdateComponents()
     {
-        for (auto component : components)
+        for (auto component : m_Components)
         {
-            if (component->requiresUpdate)
+            if (component->m_RequiresUpdate)
             {
-                component->update();
+                component->Update();
             }
         }
     }

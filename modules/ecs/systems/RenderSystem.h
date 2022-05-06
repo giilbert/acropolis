@@ -27,7 +27,7 @@ namespace giz
             // also init
             RenderSystem();
             static RenderSystem *singleton;
-            component::Camera *currentCamera = nullptr;
+            component::Camera *m_CurrentCamera = nullptr;
 
         public:
             // singletons should not be cloneable
@@ -35,15 +35,15 @@ namespace giz
             // singletons should not be assignable
             void operator=(const RenderSystem &) = delete;
             // getter method for the Game singleton
-            static RenderSystem *instance();
+            static RenderSystem *Instance();
 
-            std::vector<Renderable *> renderables;
-            Shader *meshShader;
+            std::vector<Renderable *> m_Renderables;
+            Shader *m_MeshShader;
 
-            void render();
-            void onWindowSizeChange(int width, int height);
+            void Render();
+            void OnWindowSizeChange(int width, int height);
 
-            void setCurrentCamera(component::Camera *camera);
+            void SetCurrentCamera(component::Camera *camera);
         };
     }
 }
