@@ -22,7 +22,12 @@ namespace giz
     {
         m_GameWindow->m_Width = width;
         m_GameWindow->m_Height = height;
+
+        if (width == 0 || height == 0)
+            return;
+
         systems::RenderSystem::Instance()->OnWindowSizeChange(width, height);
+        Update();
     }
 
     void Game::Init()
