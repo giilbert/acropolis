@@ -47,14 +47,28 @@ namespace giz
         std::vector<unsigned int> indices(indexData, indexData + sizeof(indexData) / sizeof(indexData[0]));
         std::vector<float> normals(normalsData, normalsData + sizeof(normalsData) / sizeof(normalsData[0]));
 
-        auto entityOne = new Entity();
-        auto meshOne = new Mesh(vertices, indices, normals);
-        entityOne->AddComponent(meshOne);
+        auto containerEntity = new Entity();
 
-        auto entityTwo = new Entity();
-        entityTwo->m_Transform.m_Position.z = -10;
+        auto child1 = new Entity();
+        auto meshOne = new Mesh(vertices, indices, normals);
+        child1->AddComponent(meshOne);
+        containerEntity->m_Transform.children.push_back(child1);
+
+        auto child2 = new Entity();
+        child2->m_Transform.m_Scale.y = 3;
+        child2->m_Transform.m_Scale.x = 0.2;
+        child2->m_Transform.m_Scale.x = 0.3;
+        child2->m_Transform.m_Position.x = 2;
+        child2->m_Transform.UpdateTransform();
+        auto meshTwo = new Mesh(vertices, indices, normals);
+        child2->AddComponent(meshTwo);
+        containerEntity->m_Transform.children.push_back(child2);
+
+        auto cameraEntity = new Entity();
+        cameraEntity->m_Transform.m_Position.z = -10;
+        cameraEntity->m_Transform.UpdateTransform();
         auto cameraOne = new Camera();
-        entityTwo->AddComponent(cameraOne);
+        cameraEntity->AddComponent(cameraOne);
         cameraOne->MakeCurrent();
 
         // load script file
@@ -63,7 +77,7 @@ namespace giz
         sstr << stream.rdbuf();
 
         auto behaviorOne = new Behavior(sstr.str());
-        entityOne->AddComponent(behaviorOne);
+        containerEntity->AddComponent(behaviorOne);
 
         glClearColor(0.1, 0.1, 0.1, 1.0);
 
@@ -74,13 +88,13 @@ namespace giz
             x += 0.001;
             Update();
 
-            entityTwo->UpdateComponents();
+            cameraEntity->UpdateComponents();
         }
 
         glfwTerminate();
 
-        delete entityOne;
-        delete entityTwo;
+        delete containerEntity;
+        delete cameraEntity;
 
         systems::ScriptingSystem::Destroy();
     }

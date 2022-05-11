@@ -1,4 +1,5 @@
 #include "ecs/systems/RenderSystem.h"
+#include "ecs/Entity.h"
 
 const char *meshVertexSource = {
 #include "generated/rendering/shaders/basic.vert"
@@ -44,12 +45,12 @@ void RenderSystem::Render()
     m_MeshShader->SetFloat(3, time);
 
     m_MeshShader->SetMatrix4x4(0, &(m_CurrentCamera->m_ProjectionMatrix[0][0]));
-    m_MeshShader->SetMatrix4x4(1, &(m_CurrentCamera->m_Entity->m_Transform.ToMatrix()[0][0]));
+    m_MeshShader->SetMatrix4x4(1, &(m_CurrentCamera->m_Entity->m_Transform.m_Matrix[0][0]));
 
     for (auto renderable : m_Renderables)
     {
         // std::cout << renderable->entity->transform.position.y << "\n";
-        m_MeshShader->SetMatrix4x4(2, &renderable->m_Entity->m_Transform.ToMatrix()[0][0]);
+        m_MeshShader->SetMatrix4x4(2, &renderable->m_Entity->m_Transform.m_Matrix[0][0]);
         renderable->Draw();
     }
 }
@@ -63,5 +64,5 @@ void RenderSystem::SetCurrentCamera(component::Camera *camera)
 {
     m_CurrentCamera = camera;
     m_MeshShader->SetMatrix4x4(0, &(camera->m_ProjectionMatrix[0][0]));
-    m_MeshShader->SetMatrix4x4(1, &(camera->m_Entity->m_Transform.ToMatrix()[0][0]));
+    m_MeshShader->SetMatrix4x4(1, &(camera->m_Entity->m_Transform.m_Matrix[0][0]));
 }

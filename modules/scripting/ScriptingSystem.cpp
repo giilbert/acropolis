@@ -405,6 +405,8 @@ void ScriptingSystem::UpdateAll()
             ->ToObject(context)
             .ToLocalChecked()
             ->CallAsFunction(context, instance, 0, nullptr);
+
+        behavior->m_Entity->m_Transform.UpdateTransform();
     }
 }
 
