@@ -81,11 +81,8 @@ namespace giz
 
         glClearColor(0.1, 0.1, 0.1, 1.0);
 
-        float x = 0;
-
         while (!glfwWindowShouldClose(m_GameWindow->m_Window))
         {
-            x += 0.001;
             Update();
 
             cameraEntity->UpdateComponents();
