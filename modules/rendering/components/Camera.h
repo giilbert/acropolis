@@ -31,7 +31,7 @@ namespace giz
 
         private:
             float m_Size = 10;
-            Projection m_Projection = Projection::Perspective;
+            Projection m_Projection = Projection::Orthographic;
         };
     }
 }

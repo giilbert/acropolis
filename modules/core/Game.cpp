@@ -43,55 +43,56 @@ namespace giz
         systems::RenderSystem::Instance();
         systems::ScriptingSystem::Instance();
 
-        std::vector<float> vertices(vertexData, vertexData + sizeof(vertexData) / sizeof(vertexData[0]));
-        std::vector<unsigned int> indices(indexData, indexData + sizeof(indexData) / sizeof(indexData[0]));
-        std::vector<float> normals(normalsData, normalsData + sizeof(normalsData) / sizeof(normalsData[0]));
+        // std::vector<float> vertices(vertexData, vertexData + sizeof(vertexData) / sizeof(vertexData[0]));
+        // std::vector<unsigned int> indices(indexData, indexData + sizeof(indexData) / sizeof(indexData[0]));
+        // std::vector<float> normals(normalsData, normalsData + sizeof(normalsData) / sizeof(normalsData[0]));
 
-        auto containerEntity = new Entity();
+        // auto containerEntity = new Entity();
 
-        auto child1 = new Entity();
-        auto meshOne = new Mesh(vertices, indices, normals);
-        child1->AddComponent(meshOne);
-        containerEntity->m_Transform.children.push_back(child1);
+        // auto child1 = new Entity();
+        // auto meshOne = new Mesh(vertices, indices, normals);
+        // child1->AddComponent(meshOne);
+        // containerEntity->m_Transform.children.push_back(child1);
 
-        auto child2 = new Entity();
-        child2->m_Transform.m_Scale.y = 3;
-        child2->m_Transform.m_Scale.x = 0.2;
-        child2->m_Transform.m_Scale.x = 0.3;
-        child2->m_Transform.m_Position.x = 2;
-        child2->m_Transform.UpdateTransform();
-        auto meshTwo = new Mesh(vertices, indices, normals);
-        child2->AddComponent(meshTwo);
-        containerEntity->m_Transform.children.push_back(child2);
+        // auto child2 = new Entity();
+        // child2->m_Transform.m_Scale.y = 3;
+        // child2->m_Transform.m_Scale.x = 0.2;
+        // child2->m_Transform.m_Scale.x = 0.3;
+        // child2->m_Transform.m_Position.x = 2;
+        // child2->m_Transform.UpdateTransform();
+        // auto meshTwo = new Mesh(vertices, indices, normals);
+        // child2->AddComponent(meshTwo);
+        // containerEntity->m_Transform.children.push_back(child2);
 
-        auto cameraEntity = new Entity();
-        cameraEntity->m_Transform.m_Position.z = -10;
-        cameraEntity->m_Transform.UpdateTransform();
-        auto cameraOne = new Camera();
-        cameraEntity->AddComponent(cameraOne);
-        cameraOne->MakeCurrent();
+        // auto cameraEntity = new Entity();
+        // cameraEntity->m_Transform.m_Position.z = -10;
+        // cameraEntity->m_Transform.UpdateTransform();
+        // auto cameraOne = new Camera();
+        // cameraEntity->AddComponent(cameraOne);
+        // cameraOne->MakeCurrent();
 
         // load script file
-        std::ifstream stream("test.js");
-        std::ostringstream sstr;
-        sstr << stream.rdbuf();
+        // std::ifstream stream("test.js");
+        // std::ostringstream sstr;
+        // sstr << stream.rdbuf();
 
-        auto behaviorOne = new Behavior(sstr.str());
-        containerEntity->AddComponent(behaviorOne);
+        // auto behaviorOne = new Behavior(sstr.str());
+        // containerEntity->AddComponent(behaviorOne);
 
         glClearColor(0.1, 0.1, 0.1, 1.0);
 
         while (!glfwWindowShouldClose(m_GameWindow->m_Window))
         {
             Update();
-
-            cameraEntity->UpdateComponents();
+            // cameraEntity->m_Transform.m_Position.x += 0.001f;
+            // cameraEntity->m_Transform.UpdateTransform();
+            // cameraEntity->UpdateComponents();
         }
 
         glfwTerminate();
 
-        delete containerEntity;
-        delete cameraEntity;
+        // delete containerEntity;
+        // delete cameraEntity;
 
         systems::ScriptingSystem::Destroy();
     }

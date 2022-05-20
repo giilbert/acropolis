@@ -10,6 +10,7 @@
 #include "rendering/Renderable.h"
 #include "rendering/Shader.h"
 #include "core/Game.h"
+#include "rendering/2d/SpriteBatch.h"
 
 namespace giz
 {
@@ -38,7 +39,9 @@ namespace giz
             static RenderSystem *Instance();
 
             std::vector<Renderable *> m_Renderables;
+            std::vector<SpriteBatch *> m_SpriteBatches;
             Shader *m_MeshShader;
+            Shader *m_SpriteShader;
 
             void Render();
             void OnWindowSizeChange(int width, int height);
