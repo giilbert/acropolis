@@ -48,7 +48,7 @@ RenderSystem *RenderSystem::Instance()
 // renders everything
 void RenderSystem::Render()
 {
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // m_MeshShader->Bind();
 
@@ -66,8 +66,10 @@ void RenderSystem::Render()
     // }
 
     m_SpriteShader->Bind();
-    // m_SpriteShader->SetMatrix4x4(0, &(m_CurrentCamera->m_ProjectionMatrix[0][0]));
-    // m_SpriteShader->SetMatrix4x4(1, &(m_CurrentCamera->m_Entity->m_Transform.m_Matrix[0][0]));
+    double time = glfwGetTime();
+    m_MeshShader->SetFloat(2, time);
+    m_SpriteShader->SetMatrix4x4(0, &(m_CurrentCamera->m_ProjectionMatrix[0][0]));
+    m_SpriteShader->SetMatrix4x4(1, &(m_CurrentCamera->m_Entity->m_Transform.m_Matrix[0][0]));
 
     for (auto batch : m_SpriteBatches)
     {

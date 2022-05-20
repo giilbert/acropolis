@@ -27,13 +27,13 @@ void Camera::Update()
     if (m_Projection == Projection::Perspective)
     {
         // perspective
-        m_ProjectionMatrix = glm::perspective(glm::pi<float>() * 0.25f, width / height, 0.1f, 1000.0f);
+        m_ProjectionMatrix = glm::perspective(glm::pi<float>() * 0.25f, width / height, 0.01f, 1000.0f);
     }
     else
     {
         float aspectRatio = width / height;
         // orthographic
-        m_ProjectionMatrix = glm::ortho(-m_Size * aspectRatio, m_Size * aspectRatio, -m_Size, m_Size, 0.1f, 1000.0f);
+        m_ProjectionMatrix = glm::ortho(-m_Size * aspectRatio, m_Size * aspectRatio, -m_Size, m_Size, 0.0f, 1000.0f);
     }
 }
 

@@ -64,12 +64,12 @@ namespace giz
         // child2->AddComponent(meshTwo);
         // containerEntity->m_Transform.children.push_back(child2);
 
-        // auto cameraEntity = new Entity();
-        // cameraEntity->m_Transform.m_Position.z = -10;
-        // cameraEntity->m_Transform.UpdateTransform();
-        // auto cameraOne = new Camera();
-        // cameraEntity->AddComponent(cameraOne);
-        // cameraOne->MakeCurrent();
+        auto cameraEntity = new Entity();
+        cameraEntity->m_Transform.m_Position.z = -10;
+        cameraEntity->m_Transform.UpdateTransform();
+        auto cameraOne = new Camera();
+        cameraEntity->AddComponent(cameraOne);
+        cameraOne->MakeCurrent();
 
         // load script file
         // std::ifstream stream("test.js");
@@ -84,15 +84,15 @@ namespace giz
         while (!glfwWindowShouldClose(m_GameWindow->m_Window))
         {
             Update();
-            // cameraEntity->m_Transform.m_Position.x += 0.001f;
-            // cameraEntity->m_Transform.UpdateTransform();
-            // cameraEntity->UpdateComponents();
+            cameraEntity->m_Transform.m_Position.x += 0.001f;
+            cameraEntity->m_Transform.UpdateTransform();
+            cameraEntity->UpdateComponents();
         }
 
         glfwTerminate();
 
         // delete containerEntity;
-        // delete cameraEntity;
+        delete cameraEntity;
 
         systems::ScriptingSystem::Destroy();
     }
