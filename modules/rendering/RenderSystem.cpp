@@ -50,24 +50,21 @@ void RenderSystem::Render()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    // m_MeshShader->Bind();
+    m_MeshShader->Bind();
 
-    // double time = glfwGetTime();
-    // m_MeshShader->SetFloat(3, time);
+    double time = glfwGetTime();
+    m_MeshShader->SetFloat(3, time);
+    m_MeshShader->SetMatrix4x4(0, &(m_CurrentCamera->m_ProjectionMatrix[0][0]));
+    m_MeshShader->SetMatrix4x4(1, &(m_CurrentCamera->m_Entity->m_Transform.m_Matrix[0][0]));
 
-    // m_MeshShader->SetMatrix4x4(0, &(m_CurrentCamera->m_ProjectionMatrix[0][0]));
-    // m_MeshShader->SetMatrix4x4(1, &(m_CurrentCamera->m_Entity->m_Transform.m_Matrix[0][0]));
-
-    // for (auto renderable : m_Renderables)
-    // {
-    //     // std::cout << renderable->entity->transform.position.y << "\n";
-    //     m_MeshShader->SetMatrix4x4(2, &renderable->m_Entity->m_Transform.m_Matrix[0][0]);
-    //     renderable->Draw()
-    // }
+    for (auto renderable : m_Renderables)
+    {
+        m_MeshShader->SetMatrix4x4(2, &renderable->m_Entity->m_Transform.m_Matrix[0][0]);
+        renderable->Draw();
+    }
 
     m_SpriteShader->Bind();
-    double time = glfwGetTime();
-    m_MeshShader->SetFloat(2, time);
+    m_SpriteShader->SetFloat(2, time);
     m_SpriteShader->SetMatrix4x4(0, &(m_CurrentCamera->m_ProjectionMatrix[0][0]));
     m_SpriteShader->SetMatrix4x4(1, &(m_CurrentCamera->m_Entity->m_Transform.m_Matrix[0][0]));
 
