@@ -9,6 +9,7 @@
 
 #include "rendering/Renderable.h"
 #include "rendering/Shader.h"
+#include "rendering/components/Sprite.h"
 #include "core/Game.h"
 #include "rendering/2d/SpriteBatch.h"
 
@@ -47,6 +48,7 @@ namespace giz
             void OnWindowSizeChange(int width, int height);
 
             void SetCurrentCamera(component::Camera *camera);
+            void AddSprite(component::Sprite *sprite);
         };
     }
 }

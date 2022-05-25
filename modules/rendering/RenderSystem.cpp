@@ -64,9 +64,9 @@ void RenderSystem::Render()
     }
 
     m_SpriteShader->Bind();
-    m_SpriteShader->SetFloat(2, time);
+    // m_SpriteShader->SetFloat(2, time);
     m_SpriteShader->SetMatrix4x4(0, &(m_CurrentCamera->m_ProjectionMatrix[0][0]));
-    m_SpriteShader->SetMatrix4x4(1, &(m_CurrentCamera->m_Entity->m_Transform.m_Matrix[0][0]));
+    // m_SpriteShader->SetMatrix4x4(1, &(m_CurrentCamera->m_Entity->m_Transform.m_Matrix[0][0]));
 
     for (auto batch : m_SpriteBatches)
     {
@@ -83,4 +83,10 @@ void RenderSystem::OnWindowSizeChange(int width, int height)
 void RenderSystem::SetCurrentCamera(component::Camera *camera)
 {
     m_CurrentCamera = camera;
+}
+
+void RenderSystem::AddSprite(component::Sprite *sprite)
+{
+    // TODO: overflow - create a new batch
+    m_SpriteBatches.back()->AddSprite(sprite);
 }

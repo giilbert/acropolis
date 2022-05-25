@@ -30,10 +30,7 @@ namespace giz
     {
         for (auto component : m_Components)
         {
-            if (component->m_RequiresUpdate)
-            {
-                component->Update();
-            }
+            component->Update();
         }
     }
 }

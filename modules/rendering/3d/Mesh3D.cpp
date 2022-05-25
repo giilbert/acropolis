@@ -37,6 +37,7 @@ namespace giz
 
     void Mesh3D::Draw()
     {
+        glBindVertexArray(m_VaoId);
         glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, nullptr);
     }
 }
