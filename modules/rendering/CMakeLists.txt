@@ -2,8 +2,10 @@ target_sources(
   giz
   PRIVATE
   3d/Mesh3D.cpp
+  2d/SpriteBatch.cpp
   components/Camera.cpp
   components/Mesh.cpp
+  components/Sprite.cpp
   RenderSystem.cpp
   Shader.cpp
   VBO.cpp

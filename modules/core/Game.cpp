@@ -1,4 +1,5 @@
 #include "Game.h"
+#include "rendering/components/Sprite.h"
 
 namespace giz
 {
@@ -35,6 +36,7 @@ namespace giz
         using component::Behavior;
         using component::Camera;
         using component::Mesh;
+        using component::Sprite;
 
         m_GameWindow = new Window();
         m_GameWindow->Init();
@@ -55,14 +57,16 @@ namespace giz
         containerEntity->m_Transform.children.push_back(child1);
 
         auto child2 = new Entity();
-        child2->m_Transform.m_Scale.y = 3;
-        child2->m_Transform.m_Scale.x = 0.2;
-        child2->m_Transform.m_Scale.x = 0.3;
-        child2->m_Transform.m_Position.x = 2;
+        auto spriteOne = new Sprite();
+        child2->AddComponent(spriteOne);
         child2->m_Transform.UpdateTransform();
-        auto meshTwo = new Mesh(vertices, indices, normals);
-        child2->AddComponent(meshTwo);
-        containerEntity->m_Transform.children.push_back(child2);
+        child2->UpdateComponents();
+
+        auto spriteEntity2 = new Entity();
+        auto sprite2 = new Sprite();
+        spriteEntity2->AddComponent(sprite2);
+        spriteEntity2->m_Transform.UpdateTransform();
+        spriteEntity2->UpdateComponents();
 
         auto cameraEntity = new Entity();
         cameraEntity->m_Transform.m_Position.z = -10;
@@ -85,6 +89,17 @@ namespace giz
         {
             Update();
 
+            spriteEntity2->m_Transform.m_Position.x += 0.001;
+            spriteEntity2->m_Transform.UpdateTransform();
+            spriteEntity2->UpdateComponents();
+
+            child2->m_Transform.m_Position.x -= 0.001;
+            child2->m_Transform.UpdateTransform();
+            child2->UpdateComponents();
+
+            cameraEntity->m_Transform.m_Position.x -= 0.001;
+            cameraEntity->m_Transform.m_Position.y -= 0.001;
+            cameraEntity->m_Transform.UpdateTransform();
             cameraEntity->UpdateComponents();
         }
 

@@ -60,24 +60,6 @@ namespace giz
         glDeleteProgram(m_Program);
     }
 
-    // utility function to read a file to string
-    std::string readFileToString(std::string path)
-    {
-        std::ifstream t(path);
-        std::ostringstream sstr;
-        sstr << t.rdbuf();
-        return sstr.str();
-    }
-
-    Shader *Shader::LoadFromFiles(std::string vertexPath, std::string fragmentPath, std::vector<char *> uniforms)
-    {
-        // loads the shaders into strings
-        std::string vertexSource = readFileToString(vertexPath);
-        std::string fragmentSource = readFileToString(fragmentPath);
-
-        return new Shader(vertexSource, fragmentSource, uniforms);
-    }
-
     void Shader::Bind()
     {
         glUseProgram(this->m_Program);
