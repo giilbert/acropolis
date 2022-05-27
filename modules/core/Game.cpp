@@ -96,6 +96,11 @@ namespace giz
             child2->m_Transform.m_Position.x -= 0.001;
             child2->m_Transform.UpdateTransform();
             child2->UpdateComponents();
+
+            cameraEntity->m_Transform.m_Position.x -= 0.001;
+            cameraEntity->m_Transform.m_Position.y -= 0.001;
+            cameraEntity->m_Transform.UpdateTransform();
+            cameraEntity->UpdateComponents();
         }
 
         glfwTerminate();

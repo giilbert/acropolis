@@ -66,7 +66,7 @@ void RenderSystem::Render()
     m_SpriteShader->Bind();
     // m_SpriteShader->SetFloat(2, time);
     m_SpriteShader->SetMatrix4x4(0, &(m_CurrentCamera->m_ProjectionMatrix[0][0]));
-    // m_SpriteShader->SetMatrix4x4(1, &(m_CurrentCamera->m_Entity->m_Transform.m_Matrix[0][0]));
+    m_SpriteShader->SetMatrix4x4(1, &(m_CurrentCamera->m_Entity->m_Transform.m_Matrix[0][0]));
 
     for (auto batch : m_SpriteBatches)
     {
