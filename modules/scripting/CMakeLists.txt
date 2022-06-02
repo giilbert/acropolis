@@ -3,4 +3,5 @@ target_sources(
   PRIVATE
   components/Behavior.cpp
   ScriptingSystem.cpp
+  ObjectTemplateBuilder.cpp
 )

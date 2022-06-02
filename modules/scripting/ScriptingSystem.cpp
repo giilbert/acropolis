@@ -3,8 +3,11 @@
 #include <iostream>
 #include <chrono>
 #include "utils/profile.h"
+#include "scripting/ObjectTemplateBuilder.h"
 
+// TODO: this
 using namespace v8;
+using giz::scripting::ObjectTemplateBuilder;
 using giz::systems::ScriptingSystem;
 
 ScriptingSystem *ScriptingSystem::singleton = nullptr;
@@ -134,15 +137,15 @@ Local<Object> wrapVector3(glm::vec3 &vector)
     auto context = isolate->GetCurrentContext();
     EscapableHandleScope handleScope(isolate);
 
-    Local<ObjectTemplate> vectorTemplate = ObjectTemplate::New(isolate);
-    vectorTemplate->SetInternalFieldCount(1);
+    ObjectTemplateBuilder builder;
+    Local<ObjectTemplate> vectorTemplate =
+        builder
+            .SetPropertyImpl("x", getVectorX, setVectorX)
+            .SetPropertyImpl("y", getVectorY, setVectorY)
+            .SetPropertyImpl("z", getVectorZ, setVectorZ)
+            .Build();
 
-    vectorTemplate->SetAccessor(String::NewFromUtf8(isolate, "x").ToLocalChecked(),
-                                getVectorX, setVectorX);
-    vectorTemplate->SetAccessor(String::NewFromUtf8(isolate, "y").ToLocalChecked(),
-                                getVectorY, setVectorY);
-    vectorTemplate->SetAccessor(String::NewFromUtf8(isolate, "z").ToLocalChecked(),
-                                getVectorZ, setVectorZ);
+    vectorTemplate->SetInternalFieldCount(1);
 
     Local<Object> instance = vectorTemplate->NewInstance(context).ToLocalChecked();
     instance->SetInternalField(0, External::New(isolate, &vector));

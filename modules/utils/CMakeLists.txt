@@ -5,4 +5,5 @@ target_sources(
   assert.cpp
   logger.cpp
   profile.cpp
+  string.cpp
 )
