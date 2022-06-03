@@ -4,9 +4,11 @@
 #include <chrono>
 #include "utils/profile.h"
 #include "scripting/ObjectTemplateBuilder.h"
+#include "scripting/api/Vector3Api.h"
 
 // TODO: this
 using namespace v8;
+using namespace giz::scripting::api;
 using giz::scripting::ObjectTemplateBuilder;
 using giz::systems::ScriptingSystem;
 
@@ -52,6 +54,8 @@ ScriptingSystem::ScriptingSystem()
     v8::HandleScope handle_scope(m_Isolate);
     Local<Context> context = createGlobalContext(m_Isolate);
 
+    initVector3Template();
+
     // create es modules used for imports
     CreateSyntheticModules(context);
 
@@ -79,79 +83,6 @@ void ScriptingSystem::Destroy()
 // TODO: clean up
 
 // VECTOR 3
-
-void getVectorX(Local<String> property,
-                const PropertyCallbackInfo<Value> &info)
-{
-    Local<External> wrap = Local<External>::Cast(info.Holder()->GetInternalField(0));
-    glm::vec3 vectorValue = *static_cast<glm::vec3 *>(wrap->Value());
-    info.GetReturnValue().Set(vectorValue.x);
-}
-
-void setVectorX(Local<String> property, Local<Value> value,
-                const PropertyCallbackInfo<void> &info)
-{
-    auto context = Isolate::GetCurrent()->GetCurrentContext();
-    Local<External> wrap = Local<External>::Cast(info.Holder()->GetInternalField(0));
-    float newValue = value->NumberValue(context).ToChecked();
-    static_cast<glm::vec3 *>(wrap->Value())->x = newValue;
-}
-
-void getVectorY(Local<String> property,
-                const PropertyCallbackInfo<Value> &info)
-{
-    Local<External> wrap = Local<External>::Cast(info.Holder()->GetInternalField(0));
-    glm::vec3 vectorValue = *static_cast<glm::vec3 *>(wrap->Value());
-    info.GetReturnValue().Set(vectorValue.y);
-}
-
-void setVectorY(Local<String> property, Local<Value> value,
-                const PropertyCallbackInfo<void> &info)
-{
-    auto context = Isolate::GetCurrent()->GetCurrentContext();
-    Local<External> wrap = Local<External>::Cast(info.Holder()->GetInternalField(0));
-    float newValue = value->NumberValue(context).ToChecked();
-    static_cast<glm::vec3 *>(wrap->Value())->y = newValue;
-}
-
-void getVectorZ(Local<String> property,
-                const PropertyCallbackInfo<Value> &info)
-{
-    Local<External> wrap = Local<External>::Cast(info.Holder()->GetInternalField(0));
-    glm::vec3 vectorValue = *static_cast<glm::vec3 *>(wrap->Value());
-    info.GetReturnValue().Set(vectorValue.z);
-}
-
-void setVectorZ(Local<String> property, Local<Value> value,
-                const PropertyCallbackInfo<void> &info)
-{
-    auto context = Isolate::GetCurrent()->GetCurrentContext();
-    Local<External> wrap = Local<External>::Cast(info.Holder()->GetInternalField(0));
-    float newValue = value->NumberValue(context).ToChecked();
-    static_cast<glm::vec3 *>(wrap->Value())->z = newValue;
-}
-
-Local<Object> wrapVector3(glm::vec3 &vector)
-{
-    auto isolate = Isolate::GetCurrent();
-    auto context = isolate->GetCurrentContext();
-    EscapableHandleScope handleScope(isolate);
-
-    ObjectTemplateBuilder builder;
-    Local<ObjectTemplate> vectorTemplate =
-        builder
-            .SetPropertyImpl("x", getVectorX, setVectorX)
-            .SetPropertyImpl("y", getVectorY, setVectorY)
-            .SetPropertyImpl("z", getVectorZ, setVectorZ)
-            .Build();
-
-    vectorTemplate->SetInternalFieldCount(1);
-
-    Local<Object> instance = vectorTemplate->NewInstance(context).ToLocalChecked();
-    instance->SetInternalField(0, External::New(isolate, &vector));
-
-    return handleScope.Escape(instance);
-}
 
 // END VECTOR3
 
