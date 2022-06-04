@@ -86,6 +86,11 @@ namespace giz
                 vector3Template = Global<ObjectTemplate>(Isolate::GetCurrent(), vectorTemplate);
             }
 
+            void destroyVector3Template()
+            {
+                vector3Template.Reset();
+            }
+
             Local<Object> wrapVector3(glm::vec3 &vector)
             {
                 Isolate *isolate = Isolate::GetCurrent();

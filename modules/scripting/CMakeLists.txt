@@ -4,6 +4,7 @@ target_sources(
   components/Behavior.cpp
   ScriptingSystem.cpp
   ObjectTemplateBuilder.cpp
+  FunctionTemplateBuilder.cpp
 
   api/Vector3Api.cpp
 )

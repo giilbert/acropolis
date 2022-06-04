@@ -5,10 +5,12 @@
 #include "utils/profile.h"
 #include "scripting/ObjectTemplateBuilder.h"
 #include "scripting/api/Vector3Api.h"
+#include "scripting/FunctionTemplateBuilder.h"
 
 // TODO: this
 using namespace v8;
 using namespace giz::scripting::api;
+using giz::scripting::FunctionTemplateBuilder;
 using giz::scripting::ObjectTemplateBuilder;
 using giz::systems::ScriptingSystem;
 
@@ -64,6 +66,7 @@ ScriptingSystem::ScriptingSystem()
 
 void ScriptingSystem::Destroy()
 {
+    destroyVector3Template();
 
     auto isolate = ScriptingSystem::Instance()->m_Isolate;
     auto createParams = ScriptingSystem::Instance()->m_CreateParams;
@@ -201,11 +204,13 @@ void ScriptingSystem::CreateSyntheticModules(Local<Context> context)
         [](Local<Context> context, Local<Module> module) -> MaybeLocal<Value>
         {
             auto isolate = context->GetIsolate();
-            auto behavior = Function::New(context, behaviorConstructor).ToLocalChecked();
+            FunctionTemplateBuilder builder;
+            builder
+                .SetConstructor(behaviorConstructor);
 
             module->SetSyntheticModuleExport(
                 String::NewFromUtf8(isolate, "Behavior").ToLocalChecked(),
-                behavior);
+                builder.BuildFunction());
 
             return MaybeLocal<Value>(True(isolate));
         });
@@ -328,6 +333,7 @@ void ScriptingSystem::DetachScript(giz::component::Behavior *behavior)
 
 void ScriptingSystem::UpdateAll()
 {
+    giz::profile::Start();
     HandleScope handleScope(m_Isolate);
     Local<Context> context = Local<Context>::New(m_Isolate, m_GlobalContext);
 
@@ -342,6 +348,8 @@ void ScriptingSystem::UpdateAll()
 
         behavior->m_Entity->m_Transform.UpdateTransform();
     }
+
+    giz::profile::End("ScriptingSystem::UpdateAll");
 }
 
 ScriptingSystem *ScriptingSystem::Instance()

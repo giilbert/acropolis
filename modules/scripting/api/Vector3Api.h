@@ -8,6 +8,7 @@ namespace giz
         namespace api
         {
             void initVector3Template();
+            void destroyVector3Template();
             v8::Local<v8::Object> wrapVector3(glm::vec3 &vector);
         }
     }
