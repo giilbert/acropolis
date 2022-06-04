@@ -4,6 +4,7 @@
 #include <libplatform/libplatform.h>
 #include <vector>
 #include <unordered_map>
+#include "scripting/api/Vector3Api.h"
 
 namespace giz
 {
@@ -16,6 +17,8 @@ namespace giz
     {
         class ScriptingSystem
         {
+            giz::scripting::api::Vector3 vector3Api_;
+
             std::unique_ptr<v8::Platform> m_Platform;
             v8::Isolate *m_Isolate;
             v8::Isolate::CreateParams m_CreateParams;

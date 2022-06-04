@@ -4,7 +4,6 @@
 #include <chrono>
 #include "utils/profile.h"
 #include "scripting/ObjectTemplateBuilder.h"
-#include "scripting/api/Vector3Api.h"
 #include "scripting/FunctionTemplateBuilder.h"
 
 // TODO: this
@@ -56,7 +55,7 @@ ScriptingSystem::ScriptingSystem()
     v8::HandleScope handle_scope(m_Isolate);
     Local<Context> context = createGlobalContext(m_Isolate);
 
-    initVector3Template();
+    vector3Api_.Init();
 
     // create es modules used for imports
     CreateSyntheticModules(context);
@@ -66,10 +65,11 @@ ScriptingSystem::ScriptingSystem()
 
 void ScriptingSystem::Destroy()
 {
-    destroyVector3Template();
+    auto instance = ScriptingSystem::Instance();
+    instance->vector3Api_.Destroy();
 
-    auto isolate = ScriptingSystem::Instance()->m_Isolate;
-    auto createParams = ScriptingSystem::Instance()->m_CreateParams;
+    auto isolate = instance->m_Isolate;
+    auto createParams = instance->m_CreateParams;
 
     // dispose persistent handles
     // ScriptingSystem::instance()->globalContext.Reset();
@@ -139,7 +139,10 @@ void getEntityTransform(Local<String> property,
     Local<Object> instance = transformTemplate->NewInstance(context).ToLocalChecked();
     instance->SetInternalField(0, External::New(isolate, &transform));
 
-    instance->Set(context, String::NewFromUtf8(isolate, "position").ToLocalChecked(), wrapVector3(transform.m_Position));
+    instance->Set(
+        context,
+        String::NewFromUtf8(isolate, "position").ToLocalChecked(),
+        Vector3::Wrap(transform.m_Position));
 
     info.GetReturnValue().Set(instance);
 }

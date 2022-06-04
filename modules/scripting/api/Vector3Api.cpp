@@ -1,6 +1,7 @@
 #include "Vector3Api.h"
 #include "scripting/ObjectTemplateBuilder.h"
 
+using namespace giz::scripting;
 using v8::Context;
 using v8::EscapableHandleScope;
 using v8::External;
@@ -12,6 +13,8 @@ using v8::ObjectTemplate;
 using v8::PropertyCallbackInfo;
 using v8::String;
 using v8::Value;
+
+Global<ObjectTemplate> api::Vector3::m_Template;
 
 void getVectorX(Local<String> property,
                 const PropertyCallbackInfo<Value> &info)
@@ -64,46 +67,35 @@ void setVectorZ(Local<String> property, Local<Value> value,
     static_cast<glm::vec3 *>(wrap->Value())->z = newValue;
 }
 
-namespace giz
+void api::Vector3::Init()
 {
-    namespace scripting
-    {
-        namespace api
-        {
-            static Global<ObjectTemplate> vector3Template;
+    ObjectTemplateBuilder builder;
+    Local<ObjectTemplate> vectorTemplate =
+        builder
+            .SetPropertyImpl("x", getVectorX, setVectorX)
+            .SetPropertyImpl("y", getVectorY, setVectorY)
+            .SetPropertyImpl("z", getVectorZ, setVectorZ)
+            .Build();
+    vectorTemplate->SetInternalFieldCount(1);
 
-            void initVector3Template()
-            {
-                ObjectTemplateBuilder builder;
-                Local<ObjectTemplate> vectorTemplate =
-                    builder
-                        .SetPropertyImpl("x", getVectorX, setVectorX)
-                        .SetPropertyImpl("y", getVectorY, setVectorY)
-                        .SetPropertyImpl("z", getVectorZ, setVectorZ)
-                        .Build();
-                vectorTemplate->SetInternalFieldCount(1);
+    m_Template = Global<ObjectTemplate>(Isolate::GetCurrent(), vectorTemplate);
+}
 
-                vector3Template = Global<ObjectTemplate>(Isolate::GetCurrent(), vectorTemplate);
-            }
+void api::Vector3::Destroy()
+{
+    m_Template.Reset();
+}
 
-            void destroyVector3Template()
-            {
-                vector3Template.Reset();
-            }
+Local<Object> api::Vector3::Wrap(glm::vec3 &vector)
+{
+    Isolate *isolate = Isolate::GetCurrent();
+    Local<Context> context = isolate->GetCurrentContext();
+    EscapableHandleScope handleScope(isolate);
 
-            Local<Object> wrapVector3(glm::vec3 &vector)
-            {
-                Isolate *isolate = Isolate::GetCurrent();
-                Local<Context> context = isolate->GetCurrentContext();
-                EscapableHandleScope handleScope(isolate);
+    Local<Object> instance = m_Template.Get(isolate)
+                                 ->NewInstance(context)
+                                 .ToLocalChecked();
+    instance->SetInternalField(0, External::New(isolate, &vector));
 
-                Local<Object> instance = vector3Template.Get(isolate)
-                                             ->NewInstance(context)
-                                             .ToLocalChecked();
-                instance->SetInternalField(0, External::New(isolate, &vector));
-
-                return handleScope.Escape(instance);
-            }
-        }
-    }
+    return handleScope.Escape(instance);
 }
