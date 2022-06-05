@@ -15,6 +15,11 @@ Behavior::~Behavior()
     {
         m_Behavior.Reset();
     }
+
+    if (!m_UpdateFunction.IsEmpty())
+    {
+        m_UpdateFunction.Reset();
+    }
 }
 
 void Behavior::Init()

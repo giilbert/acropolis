@@ -21,6 +21,7 @@ namespace giz
             std::string m_Source;
             unsigned int m_Id;
             v8::Persistent<v8::Object> m_Behavior;
+            v8::Persistent<v8::Object> m_UpdateFunction;
         };
     }
 }

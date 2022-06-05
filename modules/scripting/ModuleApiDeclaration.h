@@ -3,6 +3,7 @@
 #include "v8.h"
 #include "scripting/api/BehaviorApi.h"
 #include "scripting/api/Vector3Api.h"
+#include "scripting/api/EntityApi.h"
 
 namespace giz
 {
@@ -18,6 +19,7 @@ namespace giz
         private:
             giz::scripting::api::Behavior behaviorApi_;
             giz::scripting::api::Vector3 vector3Api_;
+            giz::scripting::api::Entity entityApi_;
         };
     }
 }

@@ -77,3 +77,72 @@ if sys.argv[1] == "run":
 
 if sys.argv[1] == "generate":
     gen_include()
+
+if sys.argv[1] == "gen-api":
+    name = input("Name: ")
+
+    # create header file
+    with open(f"modules/scripting/api/{name}Api.h", "w") as header:
+        header.write(f"""
+#pragma once
+
+#include "v8.h"
+
+namespace giz
+{{
+    namespace scripting
+    {{
+        namespace api
+        {{
+            class {name}
+            {{
+            public:
+                // creates templates
+                void Init();
+                // destroys templates
+                void Destroy();
+                // static v8::Local<v8::Object> Wrap(giz::component::{name} &placeholder);
+                static v8::Local<v8::Value> GetModuleApi();
+                static v8::Global<v8::ObjectTemplate> m_ObjectTemplate;
+                static v8::Global<v8::FunctionTemplate> m_FunctionTemplate;
+            }};
+        }}
+    }}
+}}
+""")
+
+    with open(f"modules/scripting/api/{name}Api.cpp", "w") as source:
+        source.write(f"""
+#include "scripting/api/{name}Api.h"
+#include "scripting/FunctionTemplateBuilder.h"
+#include "utils/string.h"
+
+using namespace giz::scripting;
+using v8::Context;
+using v8::FunctionCallbackInfo;
+using v8::FunctionTemplate;
+using v8::Global;
+using v8::Isolate;
+using v8::Local;
+using v8::ObjectTemplate;
+using v8::Value;
+
+Global<ObjectTemplate> api::{name}::m_ObjectTemplate;
+Global<FunctionTemplate> api::{name}::m_FunctionTemplate;
+
+void api::{name}::Init()
+{{
+}}
+
+void api::{name}::Destroy()
+{{
+    m_FunctionTemplate.Reset();
+    m_ObjectTemplate.Reset();
+}}
+
+Local<Value> api::{name}::GetModuleApi()
+{{
+    Isolate *isolate = Isolate::GetCurrent();
+    Local<Context> context = isolate->GetCurrentContext();
+}}
+""")

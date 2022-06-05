@@ -3,13 +3,15 @@
 #include <iostream>
 #include <chrono>
 #include "utils/profile.h"
+#include "utils/string.h"
 #include "scripting/ObjectTemplateBuilder.h"
 #include "scripting/FunctionTemplateBuilder.h"
 #include "scripting/ModuleApiDeclaration.h"
+#include "scripting/api/EntityApi.h"
 
 // TODO: this
 using namespace v8;
-using namespace giz::scripting::api;
+using namespace giz::scripting;
 using giz::scripting::FunctionTemplateBuilder;
 using giz::scripting::ModuleApiDeclaration;
 using giz::scripting::ObjectTemplateBuilder;
@@ -87,114 +89,6 @@ void ScriptingSystem::Destroy()
 
 // TODO: refactor into seperate files
 // TODO: clean up
-
-// VECTOR 3
-
-// END VECTOR3
-
-// void behaviorConstructor(const FunctionCallbackInfo<Value> &info)
-// {
-//     auto isolate = info.GetIsolate();
-//     auto context = isolate->GetCurrentContext();
-//     auto object = info.This();
-//     auto entity = info[0];
-
-//     if (entity->IsNullOrUndefined())
-//     {
-//         giz::logger::Error("pass an entity into super");
-//         return;
-//     }
-
-//     object->Set(context, String::NewFromUtf8(isolate, "entity").ToLocalChecked(), entity);
-
-//     // now set a bunch of aliases
-//     auto transform = entity
-//                          ->ToObject(context)
-//                          .ToLocalChecked()
-//                          ->Get(context, String::NewFromUtf8(isolate, "transform").ToLocalChecked())
-//                          .ToLocalChecked();
-//     auto position = transform
-//                         ->ToObject(context)
-//                         .ToLocalChecked()
-//                         ->Get(context, String::NewFromUtf8(isolate, "position").ToLocalChecked())
-//                         .ToLocalChecked();
-//     object->Set(context, String::NewFromUtf8(isolate, "transform").ToLocalChecked(), transform);
-//     object->Set(context, String::NewFromUtf8(isolate, "position").ToLocalChecked(), position);
-// }
-
-void getEntityTransform(Local<String> property,
-                        const PropertyCallbackInfo<Value> &info)
-{
-    auto isolate = Isolate::GetCurrent();
-    auto context = isolate->GetCurrentContext();
-    Local<Object>
-        self = info.Holder();
-    Local<External> wrap = Local<External>::Cast(self->GetInternalField(0));
-    giz::Transform &transform = *static_cast<giz::Transform *>(wrap->Value());
-
-    // TODO: create templates ahead of time
-
-    // giz::profile::start();
-    Local<ObjectTemplate> transformTemplate = ObjectTemplate::New(isolate);
-    transformTemplate->SetInternalFieldCount(1);
-    // giz::profile::end("accessor");
-
-    Local<Object> instance = transformTemplate->NewInstance(context).ToLocalChecked();
-    instance->SetInternalField(0, External::New(isolate, &transform));
-
-    instance->Set(
-        context,
-        String::NewFromUtf8(isolate, "position").ToLocalChecked(),
-        giz::scripting::api::Vector3::Wrap(transform.m_Position));
-
-    info.GetReturnValue().Set(instance);
-}
-
-void setEntityTransform(v8::Local<v8::String> property, v8::Local<v8::Value> value,
-                        const v8::PropertyCallbackInfo<void> &info)
-{
-    v8::Local<v8::Object> self = info.Holder();
-    v8::Local<v8::External> wrap =
-        v8::Local<v8::External>::Cast(self->GetInternalField(0));
-    void *ptr = wrap->Value();
-
-    String::Utf8Value str(Isolate::GetCurrent(), property);
-
-    // static_cast<giz::Entity *>(ptr)->id = value->Int32Value(Isolate::GetCurrent()->GetCurrentContext()).ToChecked();
-}
-
-// Local<Object> wrapTransform(const giz::Transform &transform)
-// {
-//     auto isolate = Isolate::GetCurrent();
-//     EscapableHandleScope handleScope(isolate);
-//     auto context = isolate->GetCurrentContext();
-//     Local<ObjectTemplate> position = ObjectTemplate::New(isolate);
-
-//     position->SetInternalFieldCount(1);
-//     position->SetAccessor(String::NewFromUtf8(isolate, ""));
-
-//     // TODO: add rotation, scale, etc.
-//     return handleScope.Escape(position);
-// }
-
-Local<Object> wrapEntity(giz::Entity &entity)
-{
-    auto isolate = Isolate::GetCurrent();
-    auto context = isolate->GetCurrentContext();
-    EscapableHandleScope handleScope(isolate);
-
-    Local<ObjectTemplate> entityTemplate = ObjectTemplate::New(isolate);
-    entityTemplate->SetInternalFieldCount(1);
-    entityTemplate->SetAccessor(String::NewFromUtf8(isolate, "transform").ToLocalChecked(),
-                                getEntityTransform, setEntityTransform);
-    // TODO: add more properties of entity
-    // this is just a test
-
-    auto instance = entityTemplate->NewInstance(context).ToLocalChecked();
-    instance->SetInternalField(0, External::New(isolate, &entity));
-
-    return handleScope.Escape(instance);
-}
 
 void getTime(const FunctionCallbackInfo<Value> &info)
 {
@@ -296,24 +190,21 @@ void ScriptingSystem::AttachScript(giz::component::Behavior *behavior)
     Local<Object> returnedBehavior = returnValue->ToObject(context).ToLocalChecked();
 
     Local<Value> arguments[1];
-    arguments[0] = wrapEntity(*behavior->m_Entity);
+    arguments[0] = api::Entity::Wrap(*behavior->m_Entity);
 
     // creates an instance of the behavior
     auto instance = returnedBehavior->CallAsConstructor(context, 1, arguments)
                         .ToLocalChecked()
                         ->ToObject(context)
                         .ToLocalChecked();
-
-    // // calls the update function
-    // instance->Get(context, String::NewFromUtf8(isolate, "update").ToLocalChecked())
-    //     .ToLocalChecked()
-    //     ->ToObject(context)
-    //     .ToLocalChecked()
-    //     ->CallAsFunction(context, instance, 0, nullptr);
-
-    // giz::profile::end("Create entity object");
+    Local<Object> updateFunction =
+        instance->Get(context, toV8String("update"))
+            .ToLocalChecked()
+            ->ToObject(context)
+            .ToLocalChecked();
 
     behavior->m_Behavior.Reset(m_Isolate, instance);
+    behavior->m_UpdateFunction.Reset(m_Isolate, updateFunction);
 }
 
 void ScriptingSystem::DetachScript(giz::component::Behavior *behavior)
@@ -330,12 +221,8 @@ void ScriptingSystem::UpdateAll()
     for (const auto [i, behavior] : m_AttachedBehaviors)
     {
         Local<Object> instance = behavior->m_Behavior.Get(m_Isolate);
-        instance->Get(context, String::NewFromUtf8(m_Isolate, "update").ToLocalChecked())
-            .ToLocalChecked()
-            ->ToObject(context)
-            .ToLocalChecked()
+        behavior->m_UpdateFunction.Get(m_Isolate)
             ->CallAsFunction(context, instance, 0, nullptr);
-
         behavior->m_Entity->m_Transform.UpdateTransform();
     }
 

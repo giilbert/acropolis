@@ -9,4 +9,5 @@ target_sources(
   
   api/Vector3Api.cpp
   api/BehaviorApi.cpp
+  api/EntityApi.cpp
 )

@@ -17,12 +17,14 @@ ModuleApiDeclaration::ModuleApiDeclaration()
 {
     behaviorApi_.Init();
     vector3Api_.Init();
+    entityApi_.Init();
 }
 
 ModuleApiDeclaration::~ModuleApiDeclaration()
 {
     behaviorApi_.Destroy();
     vector3Api_.Destroy();
+    entityApi_.Destroy();
 }
 
 Local<Module> ModuleApiDeclaration::CreateECSModule()
