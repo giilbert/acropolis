@@ -5,11 +5,13 @@
 #include "utils/profile.h"
 #include "scripting/ObjectTemplateBuilder.h"
 #include "scripting/FunctionTemplateBuilder.h"
+#include "scripting/ModuleApiDeclaration.h"
 
 // TODO: this
 using namespace v8;
 using namespace giz::scripting::api;
 using giz::scripting::FunctionTemplateBuilder;
+using giz::scripting::ModuleApiDeclaration;
 using giz::scripting::ObjectTemplateBuilder;
 using giz::systems::ScriptingSystem;
 
@@ -55,7 +57,7 @@ ScriptingSystem::ScriptingSystem()
     v8::HandleScope handle_scope(m_Isolate);
     Local<Context> context = createGlobalContext(m_Isolate);
 
-    vector3Api_.Init();
+    m_ModuleApiDeclaration = new ModuleApiDeclaration();
 
     // create es modules used for imports
     CreateSyntheticModules(context);
@@ -66,7 +68,8 @@ ScriptingSystem::ScriptingSystem()
 void ScriptingSystem::Destroy()
 {
     auto instance = ScriptingSystem::Instance();
-    instance->vector3Api_.Destroy();
+
+    delete instance->m_ModuleApiDeclaration;
 
     auto isolate = instance->m_Isolate;
     auto createParams = instance->m_CreateParams;
@@ -89,35 +92,35 @@ void ScriptingSystem::Destroy()
 
 // END VECTOR3
 
-void behaviorConstructor(const FunctionCallbackInfo<Value> &info)
-{
-    auto isolate = info.GetIsolate();
-    auto context = isolate->GetCurrentContext();
-    auto object = info.This();
-    auto entity = info[0];
+// void behaviorConstructor(const FunctionCallbackInfo<Value> &info)
+// {
+//     auto isolate = info.GetIsolate();
+//     auto context = isolate->GetCurrentContext();
+//     auto object = info.This();
+//     auto entity = info[0];
 
-    if (entity->IsNullOrUndefined())
-    {
-        giz::logger::Error("pass an entity into super");
-        return;
-    }
+//     if (entity->IsNullOrUndefined())
+//     {
+//         giz::logger::Error("pass an entity into super");
+//         return;
+//     }
 
-    object->Set(context, String::NewFromUtf8(isolate, "entity").ToLocalChecked(), entity);
+//     object->Set(context, String::NewFromUtf8(isolate, "entity").ToLocalChecked(), entity);
 
-    // now set a bunch of aliases
-    auto transform = entity
-                         ->ToObject(context)
-                         .ToLocalChecked()
-                         ->Get(context, String::NewFromUtf8(isolate, "transform").ToLocalChecked())
-                         .ToLocalChecked();
-    auto position = transform
-                        ->ToObject(context)
-                        .ToLocalChecked()
-                        ->Get(context, String::NewFromUtf8(isolate, "position").ToLocalChecked())
-                        .ToLocalChecked();
-    object->Set(context, String::NewFromUtf8(isolate, "transform").ToLocalChecked(), transform);
-    object->Set(context, String::NewFromUtf8(isolate, "position").ToLocalChecked(), position);
-}
+//     // now set a bunch of aliases
+//     auto transform = entity
+//                          ->ToObject(context)
+//                          .ToLocalChecked()
+//                          ->Get(context, String::NewFromUtf8(isolate, "transform").ToLocalChecked())
+//                          .ToLocalChecked();
+//     auto position = transform
+//                         ->ToObject(context)
+//                         .ToLocalChecked()
+//                         ->Get(context, String::NewFromUtf8(isolate, "position").ToLocalChecked())
+//                         .ToLocalChecked();
+//     object->Set(context, String::NewFromUtf8(isolate, "transform").ToLocalChecked(), transform);
+//     object->Set(context, String::NewFromUtf8(isolate, "position").ToLocalChecked(), position);
+// }
 
 void getEntityTransform(Local<String> property,
                         const PropertyCallbackInfo<Value> &info)
@@ -142,7 +145,7 @@ void getEntityTransform(Local<String> property,
     instance->Set(
         context,
         String::NewFromUtf8(isolate, "position").ToLocalChecked(),
-        Vector3::Wrap(transform.m_Position));
+        giz::scripting::api::Vector3::Wrap(transform.m_Position));
 
     info.GetReturnValue().Set(instance);
 }
@@ -200,23 +203,7 @@ void getTime(const FunctionCallbackInfo<Value> &info)
 
 void ScriptingSystem::CreateSyntheticModules(Local<Context> context)
 {
-    Local<Module> ecsModule = Module::CreateSyntheticModule(
-        m_Isolate,
-        String::NewFromUtf8(m_Isolate, "@giz/ecs").ToLocalChecked(),
-        {String::NewFromUtf8(m_Isolate, "Behavior").ToLocalChecked()},
-        [](Local<Context> context, Local<Module> module) -> MaybeLocal<Value>
-        {
-            auto isolate = context->GetIsolate();
-            FunctionTemplateBuilder builder;
-            builder
-                .SetConstructor(behaviorConstructor);
-
-            module->SetSyntheticModuleExport(
-                String::NewFromUtf8(isolate, "Behavior").ToLocalChecked(),
-                builder.BuildFunction());
-
-            return MaybeLocal<Value>(True(isolate));
-        });
+    Local<Module> ecsModule = m_ModuleApiDeclaration->CreateECSModule();
     ecsModule->InstantiateModule(context, ScriptingSystem::ModuleResolutionCallback);
 
     Local<Module> gameModule = Module::CreateSyntheticModule(

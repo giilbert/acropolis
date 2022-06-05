@@ -13,12 +13,16 @@ namespace giz
         class Behavior;
     }
 
+    namespace scripting
+    {
+        class ModuleApiDeclaration;
+    }
+
     namespace systems
     {
         class ScriptingSystem
         {
-            giz::scripting::api::Vector3 vector3Api_;
-
+            giz::scripting::ModuleApiDeclaration *m_ModuleApiDeclaration;
             std::unique_ptr<v8::Platform> m_Platform;
             v8::Isolate *m_Isolate;
             v8::Isolate::CreateParams m_CreateParams;
