@@ -1,11 +1,15 @@
 use deno_core::{op, Extension, JsRuntime, RuntimeOptions};
 use serde::Deserialize;
 
+mod core;
+mod rendering;
+use crate::core as giz_core;
+
 #[derive(Deserialize)]
 struct Test {
     a: i32,
     b: i8,
-    c: Option<Box<Test>>
+    c: Option<Box<Test>>,
 }
 
 #[op]
@@ -19,24 +23,26 @@ fn op_test(value: Test) -> Result<i32, deno_core::error::AnyError> {
 }
 
 fn main() {
-  // Build a deno_core::Extension providing custom ops
-  let ext = Extension::builder()
-    .ops(vec![
-      op_test::decl(), 
-    ])
-    .build();
+    let mut app = giz_core::Application::default();
+    app.start();
+}
 
-  // Initialize a runtime instance
-  let mut runtime = JsRuntime::new(RuntimeOptions {
-    extensions: vec![ext],
-    ..Default::default()
-  });
+fn _main() {
+    // Build a deno_core::Extension providing custom ops
+    let ext = Extension::builder().ops(vec![op_test::decl()]).build();
 
-  runtime
-    .execute_script(
-      "<usage>",
-      r#"
+    // Initialize a runtime instance
+    let mut runtime = JsRuntime::new(RuntimeOptions {
+        extensions: vec![ext],
+        ..Default::default()
+    });
 
+    runtime
+        .execute_script(
+            "<usage>",
+            r#"
+
+while (true) {
 Deno.core.print(Deno.core.opSync("op_test", {
     a: 10,
     b: 2.2,
@@ -45,8 +51,8 @@ Deno.core.print(Deno.core.opSync("op_test", {
         b: 4.4
     }
 }) + "\n");
-
+}
 "#,
-    )
-    .unwrap();
+        )
+        .unwrap();
 }

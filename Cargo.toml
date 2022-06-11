@@ -8,3 +8,4 @@ edition = "2021"
 [dependencies]
 deno_core = "0.138.0"
 serde = { version = "1.0", features = ["derive"] }
+glium = "0.31.0"
