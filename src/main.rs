@@ -23,7 +23,7 @@ fn op_test(value: Test) -> Result<i32, deno_core::error::AnyError> {
 }
 
 fn main() {
-    let mut app = giz_core::Application::default();
+    let app = giz_core::Application::default();
     app.start();
 }
 

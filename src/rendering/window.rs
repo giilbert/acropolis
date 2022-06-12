@@ -22,7 +22,6 @@ impl Window {
         // let proxy = event_loop.create_proxy();
 
         event_loop.run(move |ev, _, control_flow| {
-            #[allow(unused)]
             let next_frame_time = std::time::Instant::now()
                 + std::time::Duration::from_nanos(16_666_667);
 
@@ -37,6 +36,22 @@ impl Window {
                                 glutin::event_loop::ControlFlow::Exit;
                             return;
                         }
+
+                        glutin::event::WindowEvent::KeyboardInput {
+                            device_id: _,
+                            input,
+                            is_synthetic: _,
+                        } => {
+                            let keycode = input.virtual_keycode.unwrap();
+
+                            if keycode == glutin::event::VirtualKeyCode::Escape
+                            {
+                                *control_flow =
+                                    glutin::event_loop::ControlFlow::Exit;
+                                return;
+                            }
+                        }
+
                         _ => return,
                     }
                 }

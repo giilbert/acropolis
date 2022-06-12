@@ -9,23 +9,24 @@ pub struct Application {
 }
 
 impl Application {
-    pub fn start(mut self) {
+    pub fn start(self) {
         println!("start");
 
-        let app_mutex = Arc::from(Mutex::new(self));
+        let app_shared = Arc::from(Mutex::new(self));
         let mut threads = vec![];
 
         {
-            let mut app = app_mutex.lock().unwrap();
-            let handle = thread::spawn(move || loop {
-                println!("asdasd");
+            let app = app_shared.clone();
+            let handle = thread::spawn(move || {
+                let mut _app = app.lock().unwrap();
+                // TODO
             });
 
             threads.push(handle);
         }
 
         // rendering must be done in main thread
-        app_mutex.clone().lock().unwrap().rendering.init();
+        app_shared.clone().lock().unwrap().rendering.init();
 
         for handle in threads {
             handle.join().unwrap();
