@@ -1,12 +1,26 @@
-pub trait System {
-    fn new() -> Self;
-    fn init(&mut self);
+use crate::giz_core::Application;
+use std::rc::Rc;
+
+pub struct Entity<'a> {
+    pub components: Vec<Box<dyn Component<'a>>>,
 }
 
-pub trait Component {
-    fn new();
-    fn init(&mut self);
-    fn entity_update(&self);
-    fn update(&self);
-    fn destroy(&mut self);
+impl Entity<'_> {
+    pub fn new() -> Self {
+        Entity { components: vec![] }
+    }
+    fn add_component() {}
+}
+
+pub trait Component<'a> {
+    fn new(app: &Application) -> Self
+    where
+        Self: Sized;
+    fn on_entity_update(&self, app: &Application, entity: &Entity);
+    fn update(&self, app: &Application, entity: &Entity);
+}
+
+pub trait System<'s> {
+    fn new() -> Self;
+    fn add_component(&mut self, component: Rc<dyn Component<'s>>);
 }

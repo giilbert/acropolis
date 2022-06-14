@@ -1,7 +1,10 @@
-pub struct Window {}
+pub struct Window {
+    pub display: glium::Display,
+    event_loop: glium::glutin::event_loop::EventLoop<()>,
+}
 
 impl Window {
-    pub fn init(&self) {
+    pub fn new() -> Self {
         use glium::glutin;
 
         // 1. The **winit::EventsLoop** for handling events.
@@ -19,9 +22,16 @@ impl Window {
         #[allow(unused)]
         let display = glium::Display::new(wb, cb, &event_loop).unwrap();
 
-        // let proxy = event_loop.create_proxy();
+        Self {
+            display,
+            event_loop,
+        }
+    }
 
-        event_loop.run(move |ev, _, control_flow| {
+    pub fn start(self) {
+        use glium::glutin;
+
+        self.event_loop.run(move |ev, _, control_flow| {
             let next_frame_time = std::time::Instant::now()
                 + std::time::Duration::from_nanos(16_666_667);
 
@@ -42,6 +52,10 @@ impl Window {
                             input,
                             is_synthetic: _,
                         } => {
+                            if input.virtual_keycode.is_none() {
+                                return;
+                            }
+
                             let keycode = input.virtual_keycode.unwrap();
 
                             if keycode == glutin::event::VirtualKeyCode::Escape
@@ -58,9 +72,5 @@ impl Window {
                 _ => (),
             }
         });
-    }
-
-    pub fn new() -> Self {
-        return Window {};
     }
 }
