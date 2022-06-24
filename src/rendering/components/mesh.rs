@@ -1,10 +1,13 @@
 use crate::giz_core::{ecs::Component, ecs::Entity, Application};
-use glium::implement_vertex;
+use glium::{implement_vertex, Surface};
 use glium::{index, VertexBuffer};
+use std::rc::Rc;
+use std::cell::Ref;
 
-pub struct Mesh {}
+pub struct Mesh {
+}
 
-impl Component<'_> for Mesh {
+impl<'a> Component<'a> for Mesh {
     fn new(app: &Application) -> Self {
         #[derive(Copy, Clone)]
         struct Vertex {
@@ -32,11 +35,23 @@ impl Component<'_> for Mesh {
         Mesh {}
     }
 
-    fn on_entity_update(&self, app: &Application, entity: &Entity) {
-        todo!()
+    fn on_add(
+        &self,
+        app: &mut Application<'a>,
+        component: Rc<dyn Component<'a>>,
+    ) {
+        let clone = component.clone();
+        app.rendering.components.push(clone);
     }
 
-    fn update(&self, app: &Application, entity: &Entity) {
-        println!("called mesh.update");
+    fn on_entity_update(&self, app: &Application, entity: &Entity) {
+        let mut target = app.rendering.window.display.draw();
+    }
+
+    fn update(&self, app: &mut Application) {
+    }
+
+    fn add_entity(&mut self, entity: Rc<Entity>) {
+        todo!()
     }
 }

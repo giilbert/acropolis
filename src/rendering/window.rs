@@ -1,12 +1,16 @@
+use crate::core::ecs::System;
+use crate::giz_core::Application;
+use glium::glutin::event_loop::EventLoop;
+use std::cell::RefCell;
+use std::rc::Rc;
+
 pub struct Window {
     pub display: glium::Display,
-    event_loop: glium::glutin::event_loop::EventLoop<()>,
+    event_loop: Option<EventLoop<()>>,
 }
 
 impl Window {
     pub fn new() -> Self {
-        use glium::glutin;
-
         // 1. The **winit::EventsLoop** for handling events.
         let event_loop = glium::glutin::event_loop::EventLoop::new();
         // 2. Parameters for building the Window.
@@ -19,58 +23,67 @@ impl Window {
         let cb = glium::glutin::ContextBuilder::new();
         // 4. Build the Display with the given window and OpenGL context parameters and register the
         //    window with the events_loop.
-        #[allow(unused)]
         let display = glium::Display::new(wb, cb, &event_loop).unwrap();
 
         Self {
             display,
-            event_loop,
+            event_loop: Some(event_loop),
         }
     }
 
-    pub fn start(self) {
+    pub fn start(&mut self, app_rc_cell: Rc<RefCell<Application<'static>>>) {
         use glium::glutin;
 
-        self.event_loop.run(move |ev, _, control_flow| {
-            let next_frame_time = std::time::Instant::now()
-                + std::time::Duration::from_nanos(16_666_667);
+        let app_rc = app_rc_cell.clone();
 
-            *control_flow =
-                glutin::event_loop::ControlFlow::WaitUntil(next_frame_time);
+        self.event_loop
+            .take()
+            .unwrap()
+            .run(move |ev, _, control_flow| {
+                let next_frame_time = std::time::Instant::now()
+                    + std::time::Duration::from_nanos(16_666_667);
 
-            match ev {
-                glutin::event::Event::WindowEvent { event, .. } => {
-                    match event {
-                        glutin::event::WindowEvent::CloseRequested => {
-                            *control_flow =
-                                glutin::event_loop::ControlFlow::Exit;
-                            return;
-                        }
+                *control_flow =
+                    glutin::event_loop::ControlFlow::WaitUntil(next_frame_time);
 
-                        glutin::event::WindowEvent::KeyboardInput {
-                            device_id: _,
-                            input,
-                            is_synthetic: _,
-                        } => {
-                            if input.virtual_keycode.is_none() {
-                                return;
-                            }
+                let app_param = unsafe { &mut *app_rc.as_ptr() };
+                let mut app = app_rc.borrow_mut();
+                app.rendering.update(app_param);
 
-                            let keycode = input.virtual_keycode.unwrap();
-
-                            if keycode == glutin::event::VirtualKeyCode::Escape
-                            {
+                match ev {
+                    glutin::event::Event::WindowEvent { event, .. } => {
+                        match event {
+                            glutin::event::WindowEvent::CloseRequested => {
                                 *control_flow =
                                     glutin::event_loop::ControlFlow::Exit;
                                 return;
                             }
-                        }
 
-                        _ => return,
+                            glutin::event::WindowEvent::KeyboardInput {
+                                device_id: _,
+                                input,
+                                is_synthetic: _,
+                            } => {
+                                if input.virtual_keycode.is_none() {
+                                    return;
+                                }
+
+                                let keycode = input.virtual_keycode.unwrap();
+
+                                if keycode
+                                    == glutin::event::VirtualKeyCode::Escape
+                                {
+                                    *control_flow =
+                                        glutin::event_loop::ControlFlow::Exit;
+                                    return;
+                                }
+                            }
+
+                            _ => return,
+                        }
                     }
+                    _ => (),
                 }
-                _ => (),
-            }
-        });
+            });
     }
 }

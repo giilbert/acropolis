@@ -1,8 +1,8 @@
-use crate::giz_core::ecs::Component;
-use crate::giz_core::ecs::System;
+use crate::giz_core::ecs::{Component, System};
+use crate::giz_core::Application;
 use std::rc::Rc;
 pub mod components;
-mod window;
+pub mod window;
 
 pub struct RenderingSystem<'a> {
     pub window: window::Window,
@@ -19,5 +19,11 @@ impl<'s> System<'s> for RenderingSystem<'s> {
 
     fn add_component(&mut self, component: Rc<dyn Component<'s>>) {
         self.components.push(component.clone());
+    }
+
+    fn update(&mut self, app: &mut Application) {
+        for component in self.components.iter_mut() {
+            component.update(app);
+        }
     }
 }
