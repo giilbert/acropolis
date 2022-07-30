@@ -54,7 +54,7 @@ impl Window {
                 }
                 Event::RedrawRequested(_) => {}
                 Event::WindowEvent { ref event, .. } => match event {
-                    WindowEvent::Resized(physical_size) => {}
+                    WindowEvent::Resized(_physical_size) => {}
                     WindowEvent::CloseRequested => {
                         *control_flow = ControlFlow::Exit
                     }
