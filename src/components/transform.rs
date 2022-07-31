@@ -6,9 +6,9 @@ use cgmath::{SquareMatrix, Zero};
 
 #[derive(Component)]
 pub struct Transform {
-    position: Vector3,
-    rotation: Quaternion,
-    scale: Vector3,
+    pub position: Vector3,
+    pub rotation: Quaternion,
+    pub scale: Vector3,
 }
 
 #[derive(Component)]
@@ -19,7 +19,7 @@ pub struct GlobalTransform {
 #[derive(Component)]
 pub struct Parent(pub Entity);
 
-#[derive(Component, Clone)]
+#[derive(Component)]
 pub struct Children(pub Vec<Entity>);
 
 impl Transform {
@@ -47,27 +47,12 @@ impl Transform {
         let local_matrix = self.generate_matrix();
         return local_matrix * parent_matrix;
     }
+}
 
-    //     pub fn update_matrix(&mut self) {
-    //         let matrix = self.generate_matrix();
-    //         self.matrix = matrix;
-    //      }
-
-    pub fn set_position(&mut self, position: Vector3) {
-        self.position = position;
+impl Default for Transform {
+    fn default() -> Transform {
+        Transform::new()
     }
-
-    pub fn get_position(&self) -> Vector3 {
-        self.position
-    }
-
-    //     pub fn set_rotation(&mut self, rotation: Quaternion) {
-    //         self.rotation = rotation;
-    //     }
-
-    //     pub fn set_scale(&mut self, scale: Vector3) {
-    //         self.scale = scale;
-    //     }
 }
 
 impl GlobalTransform {
@@ -83,5 +68,11 @@ impl GlobalTransform {
         parent_matrix: &Matrix4,
     ) -> Matrix4 {
         return local_matrix * parent_matrix;
+    }
+}
+
+impl Default for GlobalTransform {
+    fn default() -> GlobalTransform {
+        GlobalTransform::new()
     }
 }

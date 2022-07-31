@@ -1,25 +1,15 @@
 use bevy_ecs::prelude::*;
 
 use crate::{
-    components::transform::{Children, GlobalTransform, Parent, Transform},
-    lib::application::Name,
+    components::{Children, GlobalTransform, Parent, Transform},
     resources::core::Root,
     utils::types::Matrix4,
 };
 
 pub fn transform_propagate_system(
-    // mut root_query: Query<
-    //     (
-    //         Option<(&Children, Changed<Children>)>,
-    //         &Transform,
-    //         Changed<Transform>,
-    //         Entity,
-    //     ),
-    //     Without<Parent>,
-    // >,
     root: Res<Root>,
     mut changed_local_transform_query: Query<
-        (&Transform, Entity, &Children, Option<&Parent>, &Name),
+        (&Transform, Entity, &Children, Option<&Parent>),
         Changed<Transform>,
     >,
     // mut children_query: Query<&Children, With<Parent>>,
@@ -27,16 +17,16 @@ pub fn transform_propagate_system(
         (&mut GlobalTransform, &Transform),
         // With<Parent>,
     >,
-    children_query: Query<&Children>
+    children_query: Query<&Children>,
 ) {
-    for (transform_component, entity, children, parent, name) in
+    for (transform_component, entity, children, parent) in
         &mut changed_local_transform_query
     {
-        println!(
-            "propagate -- {} -- {:?}",
-            name.0,
-            transform_component.generate_matrix()
-        );
+        // println!(
+        //     "propagate -- {} -- {:?}",
+        //     name.0,
+        //     transform_component.generate_matrix()
+        // );
 
         let parent_entity = match parent {
             Some(parent) => parent.0,
@@ -44,7 +34,9 @@ pub fn transform_propagate_system(
         };
         let parent_transform = global_transform_query
             .get_component::<GlobalTransform>(parent_entity)
-            .expect("every entity requires a parent transform component. not found");
+            .expect(
+                "every entity requires a parent transform component. not found",
+            );
         let matrix = transform_component
             .generate_matrix_parent(&parent_transform.matrix);
 
@@ -76,7 +68,9 @@ fn propagate_children_recursive(
     for child in &children.0 {
         let local_matrix = global_transform_query
             .get_component::<Transform>(*child)
-            .expect("every entity requires a local transform component. not found")
+            .expect(
+                "every entity requires a local transform component. not found",
+            )
             .generate_matrix();
 
         let global_matrix = {
