@@ -19,6 +19,7 @@ impl Window {
         let (window, gl) = unsafe {
             let window = glutin::ContextBuilder::new()
                 .with_vsync(true)
+                .with_double_buffer(Some(true))
                 .build_windowed(window_builder, &event_loop)
                 .expect("unable to create window")
                 .make_current()
@@ -43,18 +44,22 @@ impl Window {
         use glutin::event_loop::ControlFlow;
 
         self.event_loop.run(move |event, _, control_flow| {
-            *control_flow = ControlFlow::Wait;
+            *control_flow = ControlFlow::Poll;
             match event {
                 Event::LoopDestroyed => {
                     return;
                 }
                 Event::MainEventsCleared => {
+                    self.window.window().request_redraw();
+                }
+                Event::RedrawRequested(_) => {
                     update();
                     self.window.swap_buffers().unwrap();
                 }
-                Event::RedrawRequested(_) => {}
                 Event::WindowEvent { ref event, .. } => match event {
-                    WindowEvent::Resized(_physical_size) => {}
+                    WindowEvent::Resized(physical_size) => {
+                        self.window.resize(*physical_size);
+                    }
                     WindowEvent::CloseRequested => {
                         *control_flow = ControlFlow::Exit
                     }

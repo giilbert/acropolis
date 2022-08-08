@@ -1,5 +1,6 @@
 use std::rc::Rc;
 
-pub struct GlResource {
-    pub gl: Rc<glow::Context>,
-}
+use crate::lib::rendering::Material;
+
+pub struct GlResource(pub Rc<glow::Context>);
+pub struct MaterialsResource(pub Vec<Material>);
