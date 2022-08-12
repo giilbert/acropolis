@@ -8,7 +8,7 @@ use fern::colors::{Color, ColoredLevelConfig};
 use lib::application::Application;
 
 fn main() {
-    let mut colors = ColoredLevelConfig::new()
+    let colors = ColoredLevelConfig::new()
         .info(Color::Blue)
         .warn(Color::Yellow)
         .debug(Color::Yellow)

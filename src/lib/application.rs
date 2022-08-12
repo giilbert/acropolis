@@ -8,7 +8,6 @@ use crate::resources::core::Root;
 use crate::resources::rendering::{GlResource, MaterialsResource};
 use crate::systems::rendering::mesh_render_system;
 use crate::systems::transform::transform_propagate_system;
-use bevy_ecs::component::ComponentId;
 use bevy_ecs::{
     prelude::World,
     schedule::{Schedule, SystemStage},
@@ -171,6 +170,11 @@ impl Application {
         let gl = self.window.gl.clone();
 
         let update = move || {
+            // clear screen
+            unsafe {
+                gl.clear(glow::COLOR_BUFFER_BIT);
+            }
+
             self.schedule.run_once(&mut self.world);
         };
 

@@ -11,9 +11,11 @@ pub fn mesh_render_system(
     query: Query<(&Mesh, &GlobalTransform), With<Parent>>,
 ) {
     for material in &materials.0 {
+        material.bind();
+
         for entity in &material.entities {
             let mesh = query.get_component::<Mesh>(*entity).unwrap();
-            mesh.draw(gl.0.as_ref());
+            mesh.draw(&gl);
         }
     }
 }
