@@ -1,6 +1,6 @@
 use std::{ops::Deref, rc::Rc};
 
-use crate::lib::rendering::Material;
+use crate::{lib::rendering::Material, utils::types::Matrix4};
 
 pub struct GlResource(pub Rc<glow::Context>);
 impl Deref for GlResource {
@@ -16,4 +16,9 @@ impl Deref for MaterialsResource {
     fn deref(&self) -> &Self::Target {
         &self.0
     }
+}
+
+pub struct CurrentCameraMatrixResource {
+    pub projection_matrix: Matrix4,
+    pub view_matrix: Matrix4,
 }

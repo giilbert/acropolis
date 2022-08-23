@@ -17,3 +17,4 @@ log = "0.4.17"
 uuid = "1.1.2"
 fern = { version = "0.6.1", features = ["colored"] }
 chrono = "0.4.20"
+lazy_static = "1.4.0"

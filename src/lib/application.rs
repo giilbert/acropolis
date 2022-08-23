@@ -1,21 +1,35 @@
-use std::vec;
+use std::time::Instant;
 
-use crate::components::rendering::Mesh;
+use crate::components::rendering::{Camera, CurrentCameraMarker, Mesh};
 use crate::components::{
     Children, DefaultBundle, GlobalTransform, Name, Parent, Transform,
 };
 use crate::resources::core::Root;
-use crate::resources::rendering::{GlResource, MaterialsResource};
-use crate::systems::rendering::mesh_render_system;
+use crate::resources::rendering::{
+    CurrentCameraMatrixResource, GlResource, MaterialsResource,
+};
+use crate::systems::rendering::{
+    camera_view_matrix_update_system, mesh_render_system,
+};
 use crate::systems::transform::transform_propagate_system;
+use bevy_ecs::query::With;
+use bevy_ecs::system::Query;
 use bevy_ecs::{
     prelude::World,
     schedule::{Schedule, SystemStage},
 };
+use cgmath::Deg;
 
 use super::rendering::{Material, Vertex};
 use super::window::Window;
 use glow::HasContext;
+
+fn test_system(mut query: Query<&mut Transform, With<Camera>>) {
+    for mut transform in &mut query {
+        transform.position.z = -4.0;
+        transform.position.x -= 0.01;
+    }
+}
 
 pub struct Application {
     window: Window,
@@ -35,42 +49,32 @@ impl Application {
             root.insert(Transform::new())
                 .insert(GlobalTransform::new())
                 .insert(Name("root".to_string()))
+                .insert(Children(vec![]))
                 .id()
         };
-        let parent_id = {
-            let mut parent = world.spawn();
-            parent
+        let camera_id = {
+            let mut child = world.spawn();
+            child
                 .insert_bundle(DefaultBundle {
-                    name: Name("parent".to_string()),
+                    name: Name("camera".to_string()),
                     transform: Transform::new(),
                     global_transform: GlobalTransform::new(),
                     children: Children(vec![]),
                     parent: Parent(root_id),
                 })
-                .insert(Mesh::new(window.gl.clone(), vec![], vec![]))
+                .insert(Camera::new_perspective(Deg(60.0), 0.1, 100.0))
+                .insert(CurrentCameraMarker {})
                 .id()
         };
-        let child_id = {
+        let mesh_id = {
             let mut child = world.spawn();
             child
                 .insert_bundle(DefaultBundle {
-                    name: Name("child".to_string()),
+                    name: Name("mesh".to_string()),
                     transform: Transform::new(),
                     global_transform: GlobalTransform::new(),
                     children: Children(vec![]),
-                    parent: Parent(parent_id),
-                })
-                .id()
-        };
-        let child_child_id = {
-            let mut child = world.spawn();
-            child
-                .insert_bundle(DefaultBundle {
-                    name: Name("child of child".to_string()),
-                    transform: Transform::new(),
-                    global_transform: GlobalTransform::new(),
-                    children: Children(vec![]),
-                    parent: Parent(child_id),
+                    parent: Parent(root_id),
                 })
                 .insert(Mesh::new(
                     window.gl.clone(),
@@ -100,16 +104,21 @@ impl Application {
         };
 
         world
-            .get_mut::<Children>(parent_id)
+            .get_mut::<Children>(root_id)
             .unwrap()
             .0
-            .push(child_id);
-        world
-            .get_mut::<Children>(child_id)
-            .unwrap()
-            .0
-            .push(child_child_id);
+            .push(camera_id);
+        world.get_mut::<Children>(root_id).unwrap().0.push(mesh_id);
 
+        // make the camera current
+        let projection_matrix = world.get::<Camera>(camera_id).unwrap().matrix;
+        let view_matrix =
+            world.get::<GlobalTransform>(camera_id).unwrap().matrix;
+
+        world.insert_resource(CurrentCameraMatrixResource {
+            projection_matrix,
+            view_matrix,
+        });
         world.insert_resource(Root::new(root_id));
 
         let mut material = match Material::new(
@@ -117,8 +126,18 @@ impl Application {
             r#"#version 410
         in vec3 aVertexPosition;
 
+        uniform mat4 uModelMatrix;
+        uniform mat4 uViewMatrix;
+        uniform mat4 uProjectionMatrix;
+
         void main() {
-            gl_Position = vec4(aVertexPosition, 1.0);
+            uModelMatrix;
+            gl_Position = uProjectionMatrix * uViewMatrix * mat4(
+                1.0, 0.0, 0.0, 0.0,
+                0.0, 1.0, 0.0, 0.0,
+                0.0, 0.0, 1.0, 0.0,
+                0.0, 0.0, 0.0, 1.0
+            ) * vec4(aVertexPosition, 1.0);
         }
         "#
             .to_string(),
@@ -128,12 +147,12 @@ impl Application {
         out vec4 fragColor;
 
         void main() {
-            fragColor = vec4(1.0, 0.0, 0.0, 1.0);
+            fragColor = vec4(0.0, 1.0, 0.0, 1.0);
         }
         "#
             .to_string(),
             vec!["aVertexPosition"],
-            Vec::<String>::new(),
+            vec!["uProjectionMatrix", "uViewMatrix", "uModelMatrix"],
         ) {
             Ok(material) => material,
             Err(err) => {
@@ -142,15 +161,17 @@ impl Application {
             }
         };
 
-        material.bind_mesh(&mut world, child_child_id);
+        material.bind_mesh(&mut world, mesh_id);
         world.insert_non_send_resource(MaterialsResource(vec![material]));
 
         let mut schedule = Schedule::default();
         schedule.add_stage(
             "update",
             SystemStage::parallel()
+                .with_system(test_system)
                 .with_system(transform_propagate_system)
-                .with_system(mesh_render_system),
+                .with_system(mesh_render_system)
+                .with_system(camera_view_matrix_update_system),
         );
 
         unsafe {
@@ -168,6 +189,7 @@ impl Application {
 
     pub fn run(mut self) {
         let gl = self.window.gl.clone();
+        let mut then = Instant::now();
 
         let update = move || {
             // clear screen
@@ -176,6 +198,11 @@ impl Application {
             }
 
             self.schedule.run_once(&mut self.world);
+
+            let dt = Instant::now().duration_since(then).as_millis();
+            then = Instant::now();
+
+            log::info!("dt: {}ms | fps: {}", dt, 1000.0 / dt as f32);
         };
 
         self.window.run_event_loop(Box::new(update));

@@ -1,7 +1,7 @@
 use std::rc::Rc;
 
 use bevy_ecs::prelude::*;
-use glow::{Context, HasContext, Program, Shader};
+use glow::{Context, HasContext, Program, Shader, UniformLocation};
 use uuid::Uuid;
 
 use crate::components::rendering::Mesh;
@@ -139,7 +139,7 @@ fn get_attributes(
 
 pub struct Uniform {
     pub name: String,
-    pub location: u32,
+    pub location: UniformLocation,
 }
 
 fn get_uniforms(
@@ -152,7 +152,7 @@ fn get_uniforms(
     for name in names {
         let name = name.into();
         let name = name.as_str();
-        let location = unsafe { gl.get_attrib_location(program, name) };
+        let location = unsafe { gl.get_uniform_location(program, name) };
 
         match location {
             None => return Err(format!("Uniform {} not found", name)),

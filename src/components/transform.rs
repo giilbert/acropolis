@@ -31,6 +31,10 @@ impl Transform {
         }
     }
 
+    pub fn set_position(&mut self, translation: Vector3) {
+        self.position = translation;
+    }
+
     pub fn generate_matrix(&self) -> Matrix4 {
         let matrix = Matrix4::from_translation(self.position)
             .mul(Matrix4::from_nonuniform_scale(

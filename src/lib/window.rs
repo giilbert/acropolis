@@ -1,4 +1,13 @@
+use lazy_static::lazy_static;
 use std::rc::Rc;
+use std::sync::RwLock;
+
+use crate::utils::types::Precision;
+
+lazy_static! {
+    pub static ref WINDOW_SIZE: RwLock<(Precision, Precision)> =
+        RwLock::new((900.0, 600.0));
+}
 
 pub struct Window {
     event_loop: glutin::event_loop::EventLoop<()>,
@@ -14,7 +23,7 @@ impl Window {
         let event_loop = glutin::event_loop::EventLoop::new();
         let window_builder = glutin::window::WindowBuilder::new()
             .with_title("giz")
-            .with_inner_size::<LogicalSize<i32>>(LogicalSize::new(1024, 768));
+            .with_inner_size::<LogicalSize<i32>>(LogicalSize::new(900, 600));
 
         let (window, gl) = unsafe {
             let window = glutin::ContextBuilder::new()
@@ -59,6 +68,7 @@ impl Window {
                 Event::WindowEvent { ref event, .. } => match event {
                     WindowEvent::Resized(physical_size) => {
                         self.window.resize(*physical_size);
+                        *WINDOW_SIZE.write().unwrap() = (*physical_size).into();
                     }
                     WindowEvent::CloseRequested => {
                         *control_flow = ControlFlow::Exit

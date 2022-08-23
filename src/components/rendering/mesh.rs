@@ -78,9 +78,7 @@ impl Mesh {
 
     pub fn draw(&self, gl: &Context) {
         unsafe {
-            // log::info!("drawing mesh");
             gl.bind_vertex_array(Some(self.vao));
-            // gl.draw_arrays(glow::TRIANGLES, 0, 3);
             gl.clear_color(1.0, 0.2, 0.3, 1.0);
             gl.clear(glow::COLOR_BUFFER_BIT | glow::DEPTH_BUFFER_BIT);
             gl.draw_elements(
