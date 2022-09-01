@@ -191,6 +191,9 @@ impl Application {
         let gl = self.window.gl.clone();
         let mut then = Instant::now();
 
+        let mut dt_acc = 0.0;
+        let mut dt_count = 0.0;
+
         let update = move || {
             // clear screen
             unsafe {
@@ -199,10 +202,21 @@ impl Application {
 
             self.schedule.run_once(&mut self.world);
 
-            let dt = Instant::now().duration_since(then).as_millis();
-            then = Instant::now();
+            let dt = Instant::now().duration_since(then).as_nanos() as f32
+                / 1_000_000.0;
+            dt_acc += dt as f32;
+            dt_count += 1.0;
 
-            log::info!("dt: {}ms | fps: {}", dt, 1000.0 / dt as f32);
+            if dt_count == 300.0 {
+                let average_dt = dt_acc / dt_count;
+                let average_fps = 1000.0 / average_dt;
+                log::info!("fps: {:.1}", average_fps);
+
+                dt_acc = 0.0;
+                dt_count = 0.0;
+            }
+
+            then = Instant::now();
         };
 
         self.window.run_event_loop(Box::new(update));
