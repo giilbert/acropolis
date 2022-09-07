@@ -10,7 +10,7 @@ glutin = "0.28.0"
 glow = "0.11.2"
 serde = { version = "1.0", features = ["derive"] }
 bevy_ecs = "0.8.0"
-deno_core = "0.138.0"
+deno_core = "0.149.0"
 cgmath = "0.18.0"
 bytemuck = { version = "1.11.0", features = ["derive"] }
 log = "0.4.17"
@@ -18,3 +18,4 @@ uuid = "1.1.2"
 fern = { version = "0.6.1", features = ["colored"] }
 chrono = "0.4.20"
 lazy_static = "1.4.0"
+pollster = "0.2.5"

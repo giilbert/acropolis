@@ -1,8 +1,10 @@
 mod default_bundle;
 mod name;
-mod transform;
 pub mod rendering;
+mod scripting;
+mod transform;
 
 pub use default_bundle::DefaultBundle;
-pub use transform::{Transform, GlobalTransform, Children, Parent};
 pub use name::Name;
+pub use scripting::Behavior;
+pub use transform::{Children, GlobalTransform, Parent, Transform};

@@ -1,7 +1,7 @@
 use bevy_ecs::prelude::*;
 
 use crate::{
-    components::{Children, GlobalTransform, Parent, Transform},
+    components::{Children, GlobalTransform, Name, Parent, Transform},
     resources::core::Root,
     utils::types::Matrix4,
 };
@@ -22,12 +22,6 @@ pub fn transform_propagate_system(
     for (transform_component, entity, children, parent) in
         &mut changed_local_transform_query
     {
-        // println!(
-        //     "propagate -- {} -- {:?}",
-        //     name.0,
-        //     transform_component.generate_matrix()
-        // );
-
         let parent_entity = match parent {
             Some(parent) => parent.0,
             None => root.entity,

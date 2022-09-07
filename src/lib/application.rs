@@ -2,18 +2,20 @@ use std::time::Instant;
 
 use crate::components::rendering::{Camera, CurrentCameraMarker, Mesh};
 use crate::components::{
-    Children, DefaultBundle, GlobalTransform, Name, Parent, Transform,
+    Behavior, Children, DefaultBundle, GlobalTransform, Name, Parent, Transform,
 };
 use crate::resources::core::Root;
 use crate::resources::rendering::{
     CurrentCameraMatrixResource, GlResource, MaterialsResource,
 };
+use crate::resources::scripting::{ScriptingResource, SCRIPTING_WORLD};
 use crate::systems::rendering::{
     camera_view_matrix_update_system, mesh_render_system,
 };
+use crate::systems::scripting::scripting_update_system;
 use crate::systems::transform::transform_propagate_system;
 use bevy_ecs::query::With;
-use bevy_ecs::system::Query;
+use bevy_ecs::system::{IntoExclusiveSystem, Query};
 use bevy_ecs::{
     prelude::World,
     schedule::{Schedule, SystemStage},
@@ -21,20 +23,21 @@ use bevy_ecs::{
 use cgmath::Deg;
 
 use super::rendering::{Material, Vertex};
+use super::scripting::init::init_scripting;
 use super::window::Window;
 use glow::HasContext;
 
 fn test_system(mut query: Query<&mut Transform, With<Camera>>) {
     for mut transform in &mut query {
         transform.position.z = -4.0;
-        transform.position.x -= 0.01;
+        //     transform.position.x -= 0.01;
     }
 }
 
 pub struct Application {
     window: Window,
     pub world: World,
-    schedule: Schedule,
+    runtime_schedule: Schedule,
 }
 
 impl Application {
@@ -43,6 +46,11 @@ impl Application {
 
         let mut world = World::default();
         world.insert_non_send_resource(GlResource(window.gl.clone()));
+        unsafe { SCRIPTING_WORLD = Some(&mut world as *mut _) };
+
+        let scripting_resource = ScriptingResource::new();
+        // init_scripting(&mut scripting_resource);
+        world.insert_non_send_resource(scripting_resource);
 
         let root_id = {
             let mut root = world.spawn();
@@ -100,6 +108,7 @@ impl Application {
                         0, 1, 2, 0, 2, 3,
                     ],
                 ))
+                .insert(Behavior::new("asd".into(), "A".into()))
                 .id()
         };
 
@@ -132,12 +141,7 @@ impl Application {
 
         void main() {
             uModelMatrix;
-            gl_Position = uProjectionMatrix * uViewMatrix * mat4(
-                1.0, 0.0, 0.0, 0.0,
-                0.0, 1.0, 0.0, 0.0,
-                0.0, 0.0, 1.0, 0.0,
-                0.0, 0.0, 0.0, 1.0
-            ) * vec4(aVertexPosition, 1.0);
+            gl_Position = uProjectionMatrix * uViewMatrix * uModelMatrix * vec4(aVertexPosition, 1.0);
         }
         "#
             .to_string(),
@@ -164,8 +168,8 @@ impl Application {
         material.bind_mesh(&mut world, mesh_id);
         world.insert_non_send_resource(MaterialsResource(vec![material]));
 
-        let mut schedule = Schedule::default();
-        schedule.add_stage(
+        let mut runtime_schedule = Schedule::default();
+        runtime_schedule.add_stage(
             "update",
             SystemStage::parallel()
                 .with_system(test_system)
@@ -173,6 +177,15 @@ impl Application {
                 .with_system(mesh_render_system)
                 .with_system(camera_view_matrix_update_system),
         );
+        runtime_schedule.add_stage(
+            "scripting",
+            SystemStage::single(scripting_update_system.exclusive_system()),
+        );
+
+        let mut init_schedule = Schedule::default();
+        init_schedule
+            .add_stage("scripting", SystemStage::single(init_scripting));
+        init_schedule.run_once(&mut world);
 
         unsafe {
             let gl = window.gl.clone();
@@ -183,7 +196,7 @@ impl Application {
         Application {
             window,
             world,
-            schedule,
+            runtime_schedule,
         }
     }
 
@@ -200,7 +213,7 @@ impl Application {
                 gl.clear(glow::COLOR_BUFFER_BIT);
             }
 
-            self.schedule.run_once(&mut self.world);
+            self.runtime_schedule.run_once(&mut self.world);
 
             let dt = Instant::now().duration_since(then).as_nanos() as f32
                 / 1_000_000.0;
