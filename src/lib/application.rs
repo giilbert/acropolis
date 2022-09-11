@@ -1,3 +1,4 @@
+use std::pin::Pin;
 use std::time::Instant;
 
 use crate::components::rendering::{Camera, CurrentCameraMarker, Mesh};
@@ -179,7 +180,8 @@ impl Application {
         );
         runtime_schedule.add_stage(
             "scripting",
-            SystemStage::single(scripting_update_system.exclusive_system()),
+            SystemStage::single_threaded()
+                .with_system(scripting_update_system.exclusive_system()),
         );
 
         let mut init_schedule = Schedule::default();
@@ -201,6 +203,11 @@ impl Application {
     }
 
     pub fn run(mut self) {
+        // bad things will happen if world moves memory locations
+        let mut world = Box::new(self.world);
+        // TODO: make less god awful
+        unsafe { SCRIPTING_WORLD = Some(world.as_mut() as *mut _) };
+
         let gl = self.window.gl.clone();
         let mut then = Instant::now();
 
@@ -213,7 +220,7 @@ impl Application {
                 gl.clear(glow::COLOR_BUFFER_BIT);
             }
 
-            self.runtime_schedule.run_once(&mut self.world);
+            self.runtime_schedule.run_once(world.as_mut());
 
             let dt = Instant::now().duration_since(then).as_nanos() as f32
                 / 1_000_000.0;

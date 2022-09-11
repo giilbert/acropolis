@@ -1,3 +1,6 @@
+// maps an entity id to a behavior
+const behaviors = {};
+
 const Component = {
   Transform: 0,
 };
@@ -59,13 +62,30 @@ class Transform {
   }
 }
 
+function runOnce() {
+  for (behavior of Object.values(behaviors)) {
+    behavior.update();
+  }
+}
+
+const start = Date.now();
+
 class A extends Behavior {
   constructor(entity) {
     super(entity);
+    // this.transform.position = {
+    //   x: 0,
+    //   y: 0,
+    //   z: -10,
+    // };
+    // this.update();
+  }
+
+  update() {
     this.transform.position = {
       x: 0,
       y: 0,
-      z: -10,
+      z: (start - Date.now()) / 500,
     };
   }
 }

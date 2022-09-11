@@ -19,3 +19,6 @@ fern = { version = "0.6.1", features = ["colored"] }
 chrono = "0.4.20"
 lazy_static = "1.4.0"
 pollster = "0.2.5"
+
+[profile.dev]
+opt-level=0
