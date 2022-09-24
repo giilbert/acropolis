@@ -1,14 +1,11 @@
 use bevy_ecs::prelude::Component;
-use cgmath::Rad;
+use cgmath::{Matrix4, Rad};
 
-use crate::{
-    lib::window::WINDOW_SIZE,
-    utils::types::{Matrix4, Precision},
-};
+use crate::lib::window::WINDOW_SIZE;
 
 #[derive(Component)]
 pub struct Camera {
-    pub matrix: Matrix4,
+    pub matrix: Matrix4<f32>,
     pub camera_data: CameraData,
 }
 
@@ -21,17 +18,17 @@ pub enum CameraData {
 }
 
 struct PerspectiveCameraData {
-    fov: Rad<Precision>,
-    aspect_ratio: Precision,
-    near: Precision,
-    far: Precision,
+    fov: Rad<f32>,
+    aspect_ratio: f32,
+    near: f32,
+    far: f32,
 }
 struct OrthographicCameraData {}
 
 impl Camera {
-    pub fn new_perspective<T>(fov: T, near: Precision, far: Precision) -> Camera
+    pub fn new_perspective<T>(fov: T, near: f32, far: f32) -> Camera
     where
-        T: Copy + Into<Rad<Precision>>,
+        T: Copy + Into<Rad<f32>>,
     {
         // create perspective matrix from fov
         let (x, y) = *WINDOW_SIZE.read().unwrap();

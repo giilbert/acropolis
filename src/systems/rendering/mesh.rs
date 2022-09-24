@@ -9,7 +9,6 @@ use crate::{
     resources::rendering::{
         CurrentCameraMatrixResource, GlResource, MaterialsResource,
     },
-    utils::types::Matrix4,
 };
 
 pub fn mesh_render_system(

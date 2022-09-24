@@ -3,8 +3,8 @@ use bevy_ecs::prelude::*;
 use crate::{
     components::{Children, GlobalTransform, Name, Parent, Transform},
     resources::core::Root,
-    utils::types::Matrix4,
 };
+use cgmath::Matrix4;
 
 pub fn transform_propagate_system(
     root: Res<Root>,
@@ -57,7 +57,7 @@ fn propagate_children_recursive(
     >,
     children_query: &Query<&Children>,
     children: &Children,
-    parent_matrix: &Matrix4,
+    parent_matrix: &Matrix4<f32>,
 ) {
     for child in &children.0 {
         let local_matrix = global_transform_query

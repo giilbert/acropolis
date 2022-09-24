@@ -1,21 +1,21 @@
 use std::ops::Mul;
 
-use crate::{lib::scripting::scripting_api::ScriptingApi, utils::types::*};
+use crate::lib::scripting::scripting_api::ScriptingApi;
 use bevy_ecs::prelude::{Component, Entity};
-use cgmath::{SquareMatrix, Zero};
+use cgmath::{Matrix4, Quaternion, SquareMatrix, Vector3, Zero};
 use deno_core::{serde_json, serde_v8::Value};
 use serde::{Deserialize, Serialize};
 
 #[derive(Component)]
 pub struct Transform {
-    pub position: Vector3,
-    pub rotation: Quaternion,
-    pub scale: Vector3,
+    pub position: Vector3<f32>,
+    pub rotation: Quaternion<f32>,
+    pub scale: Vector3<f32>,
 }
 
 #[derive(Component)]
 pub struct GlobalTransform {
-    pub matrix: Matrix4,
+    pub matrix: Matrix4<f32>,
 }
 
 #[derive(Component)]
@@ -33,11 +33,11 @@ impl Transform {
         }
     }
 
-    pub fn set_position(&mut self, translation: Vector3) {
+    pub fn set_position(&mut self, translation: Vector3<f32>) {
         self.position = translation;
     }
 
-    pub fn generate_matrix(&self) -> Matrix4 {
+    pub fn generate_matrix(&self) -> Matrix4<f32> {
         let matrix = Matrix4::from_translation(self.position)
             .mul(Matrix4::from_nonuniform_scale(
                 self.scale.x,
@@ -49,7 +49,10 @@ impl Transform {
         return matrix;
     }
 
-    pub fn generate_matrix_parent(&self, parent_matrix: &Matrix4) -> Matrix4 {
+    pub fn generate_matrix_parent(
+        &self,
+        parent_matrix: &Matrix4<f32>,
+    ) -> Matrix4<f32> {
         let local_matrix = self.generate_matrix();
         return local_matrix * parent_matrix;
     }
@@ -64,15 +67,15 @@ impl Default for Transform {
 impl GlobalTransform {
     pub fn new() -> GlobalTransform {
         GlobalTransform {
-            matrix: Matrix4::identity(),
+            matrix: Matrix4::<f32>::identity(),
         }
     }
 
     pub fn generate_matrix_parent(
         &self,
-        local_matrix: &Matrix4,
-        parent_matrix: &Matrix4,
-    ) -> Matrix4 {
+        local_matrix: &Matrix4<f32>,
+        parent_matrix: &Matrix4<f32>,
+    ) -> Matrix4<f32> {
         return local_matrix * parent_matrix;
     }
 }

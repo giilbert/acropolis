@@ -2,10 +2,8 @@ use lazy_static::lazy_static;
 use std::rc::Rc;
 use std::sync::RwLock;
 
-use crate::utils::types::Precision;
-
 lazy_static! {
-    pub static ref WINDOW_SIZE: RwLock<(Precision, Precision)> =
+    pub static ref WINDOW_SIZE: RwLock<(f32, f32)> =
         RwLock::new((900.0, 600.0));
 }
 
