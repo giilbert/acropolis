@@ -4,13 +4,11 @@ use std::{
     rc::Rc,
 };
 
-use cgmath::Matrix4;
-
 use crate::lib::rendering::State;
 
-pub struct StateResource(pub Rc<RefCell<State>>);
+pub struct StateResource(pub State);
 impl Deref for StateResource {
-    type Target = Rc<RefCell<State>>;
+    type Target = State;
     fn deref(&self) -> &Self::Target {
         &self.0
     }
@@ -19,11 +17,4 @@ impl DerefMut for StateResource {
     fn deref_mut(&mut self) -> &mut Self::Target {
         &mut self.0
     }
-}
-
-// pub struct MaterialsResource(pub Vec<Material>);
-
-pub struct CurrentCameraMatrixResource {
-    pub projection_matrix: Matrix4<f32>,
-    pub view_matrix: Matrix4<f32>,
 }

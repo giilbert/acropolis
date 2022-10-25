@@ -1,9 +1,26 @@
-use std::{rc::Rc, sync::Arc};
+use parking_lot::{Mutex, MutexGuard};
+use std::sync::Arc;
 
-use wgpu::{CommandEncoder, RenderPass};
 use winit::{dpi::PhysicalSize, window::Window};
 
+#[derive(Clone)]
 pub struct State {
+    inner: Arc<Mutex<StateInner>>,
+}
+
+impl State {
+    pub async fn new(window: Window) -> Self {
+        State {
+            inner: Arc::new(Mutex::new(StateInner::new(window).await)),
+        }
+    }
+
+    pub fn lock(&self) -> MutexGuard<StateInner> {
+        self.inner.lock()
+    }
+}
+
+pub struct StateInner {
     pub surface: wgpu::Surface,
     pub device: wgpu::Device,
     pub queue: wgpu::Queue,
@@ -12,8 +29,8 @@ pub struct State {
     pub window: winit::window::Window,
 }
 
-impl State {
-    pub async fn new(window: Window) -> State {
+impl StateInner {
+    async fn new(window: Window) -> Self {
         let size = window.inner_size();
 
         // The instance is a handle to our GPU

@@ -16,7 +16,8 @@ impl Application {
         let mut world = World::new();
         world.insert_non_send_resource(StateResource(window.state.clone()));
 
-        let runtime_schedule = Schedule::default();
+        let mut runtime_schedule = Schedule::default();
+        runtime_schedule.add_stage("render", SystemStage::parallel());
 
         Application {
             window,
@@ -27,6 +28,8 @@ impl Application {
 
     pub fn run(mut self) {
         let state = self.window.state.clone();
-        self.window.run_event_loop(state, || {});
+        self.window.run_event_loop(state, move || {
+            self.runtime_schedule.run(&mut self.world);
+        });
     }
 }

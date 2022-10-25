@@ -1,9 +1,5 @@
 use lazy_static::lazy_static;
-use std::{
-    cell::RefCell,
-    rc::Rc,
-    sync::{Arc, RwLock},
-};
+use std::{cell::RefCell, rc::Rc, sync::RwLock};
 use winit::{
     event::*,
     event_loop::{ControlFlow, EventLoop},
@@ -19,7 +15,7 @@ lazy_static! {
 
 pub struct Window {
     event_loop: EventLoop<()>,
-    pub state: Rc<RefCell<State>>,
+    pub state: State,
 }
 
 impl Window {
@@ -28,19 +24,16 @@ impl Window {
         let window = WindowBuilder::new().build(&event_loop).unwrap();
         let state = State::new(window).await;
 
-        Self {
-            event_loop,
-            state: Rc::new(RefCell::new(state)),
-        }
+        Self { event_loop, state }
     }
 
     pub fn run_event_loop(
         self,
-        state: Rc<RefCell<State>>,
-        mut update: impl FnMut(),
+        state: State,
+        mut update: impl FnMut() + 'static,
     ) {
         self.event_loop.run(move |event, _, control_flow| {
-            let mut state = state.borrow_mut();
+            let mut state = state.lock();
 
             match event {
                 Event::WindowEvent {
@@ -79,25 +72,8 @@ impl Window {
                     if window_id == state.window.id() =>
                 {
                     log::info!("Redraw");
-                    // match state.render() {
-                    //     Ok(_) => {}
-                    //     // Reconfigure the surface if it's lost or outdated
-                    //     Err(
-                    //         wgpu::SurfaceError::Lost
-                    //         | wgpu::SurfaceError::Outdated,
-                    //     ) => {
-                    //         let size = state.size.clone();
-                    //         state.resize(size);
-                    //     }
-                    //     // The system is out of memory, we should probably quit
-                    //     Err(wgpu::SurfaceError::OutOfMemory) => {
-                    //         *control_flow = ControlFlow::Exit
-                    //     }
-
-                    //     Err(wgpu::SurfaceError::Timeout) => {
-                    //         log::warn!("Surface timeout")
-                    //     }
-                    // }
+                    drop(state);
+                    update();
                 }
                 Event::RedrawEventsCleared => {
                     // RedrawRequested will only trigger once, unless we manually

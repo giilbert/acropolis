@@ -20,6 +20,7 @@ pollster = "0.2.5"
 wgpu = "0.13.1"
 winit = "0.27.3"
 anyhow = "1.0.66"
+parking_lot = "0.12.1"
 
 [profile.dev]
 opt-level=0
