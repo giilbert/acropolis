@@ -1,38 +1,7 @@
-use std::time::Instant;
+use crate::resources::rendering::StateResource;
 
-use crate::components::rendering::{Camera, CurrentCameraMarker, Mesh};
-use crate::components::{
-    Behavior, Children, DefaultBundle, GlobalTransform, Name, Parent, Transform,
-};
-use crate::resources::core::Root;
-use crate::resources::rendering::{
-    CurrentCameraMatrixResource, GlResource, MaterialsResource,
-};
-use crate::resources::scripting::{ScriptingResource, SCRIPTING_WORLD};
-use crate::systems::rendering::{
-    camera_view_matrix_update_system, mesh_render_system,
-};
-use crate::systems::scripting::scripting_update_system;
-use crate::systems::transform::transform_propagate_system;
-use bevy_ecs::query::With;
-use bevy_ecs::system::{IntoExclusiveSystem, Query};
-use bevy_ecs::{
-    prelude::World,
-    schedule::{Schedule, SystemStage},
-};
-use cgmath::Deg;
-
-use super::rendering::{Material, Vertex};
-use super::scripting::init::init_scripting;
 use super::window::Window;
-use glow::HasContext;
-
-fn test_system(mut query: Query<&mut Transform, With<Camera>>) {
-    for mut transform in &mut query {
-        transform.position.z = -4.0;
-        //     transform.position.x -= 0.01;
-    }
-}
+use bevy_ecs::prelude::*;
 
 pub struct Application {
     window: Window,
@@ -42,157 +11,12 @@ pub struct Application {
 
 impl Application {
     pub fn new() -> Application {
-        let window = Window::new();
+        let window = pollster::block_on(Window::new());
 
-        let mut world = World::default();
-        world.insert_non_send_resource(GlResource(window.gl.clone()));
-        unsafe { SCRIPTING_WORLD = Some(&mut world as *mut _) };
+        let mut world = World::new();
+        world.insert_non_send_resource(StateResource(window.state.clone()));
 
-        let scripting_resource = ScriptingResource::new();
-        // init_scripting(&mut scripting_resource);
-        world.insert_non_send_resource(scripting_resource);
-
-        let root_id = {
-            let mut root = world.spawn();
-            root.insert(Transform::new())
-                .insert(GlobalTransform::new())
-                .insert(Name("root".to_string()))
-                .insert(Children(vec![]))
-                .id()
-        };
-        let camera_id = {
-            let mut child = world.spawn();
-            child
-                .insert_bundle(DefaultBundle {
-                    name: Name("camera".to_string()),
-                    transform: Transform::new(),
-                    global_transform: GlobalTransform::new(),
-                    children: Children(vec![]),
-                    parent: Parent(root_id),
-                })
-                .insert(Camera::new_perspective(Deg(60.0), 0.1, 100.0))
-                .insert(CurrentCameraMarker {})
-                .id()
-        };
-        let mesh_id = {
-            let mut child = world.spawn();
-            child
-                .insert_bundle(DefaultBundle {
-                    name: Name("mesh".to_string()),
-                    transform: Transform::new(),
-                    global_transform: GlobalTransform::new(),
-                    children: Children(vec![]),
-                    parent: Parent(root_id),
-                })
-                .insert(Mesh::new(
-                    window.gl.clone(),
-                    vec![
-                        // generate vertex positions for a square
-                        Vertex {
-                            position: [1.0, 1.0, 0.0],
-                        },
-                        Vertex {
-                            position: [-1.0, 1.0, 0.0],
-                        },
-                        Vertex {
-                            position: [-1.0, -1.0, 0.0],
-                        },
-                        Vertex {
-                            position: [1.0, -1.0, 0.0],
-                        },
-                    ],
-                    // 1 0
-                    // 2 3
-                    vec![
-                        // generate indices for a square
-                        0, 1, 2, 0, 2, 3,
-                    ],
-                ))
-                .insert(Behavior::new("asd".into(), "A".into()))
-                .id()
-        };
-
-        world
-            .get_mut::<Children>(root_id)
-            .unwrap()
-            .0
-            .push(camera_id);
-        world.get_mut::<Children>(root_id).unwrap().0.push(mesh_id);
-
-        // make the camera current
-        let projection_matrix = world.get::<Camera>(camera_id).unwrap().matrix;
-        let view_matrix =
-            world.get::<GlobalTransform>(camera_id).unwrap().matrix;
-
-        world.insert_resource(CurrentCameraMatrixResource {
-            projection_matrix,
-            view_matrix,
-        });
-        world.insert_resource(Root::new(root_id));
-
-        let mut material = match Material::new(
-            window.gl.clone(),
-            r#"#version 410
-        in vec3 aVertexPosition;
-
-        uniform mat4 uModelMatrix;
-        uniform mat4 uViewMatrix;
-        uniform mat4 uProjectionMatrix;
-
-        void main() {
-            uModelMatrix;
-            gl_Position = uProjectionMatrix * uViewMatrix * uModelMatrix * vec4(aVertexPosition, 1.0);
-        }
-        "#
-            .to_string(),
-            r#"#version 410
-        precision mediump float;
-
-        out vec4 fragColor;
-
-        void main() {
-            fragColor = vec4(0.0, 1.0, 0.0, 1.0);
-        }
-        "#
-            .to_string(),
-            vec!["aVertexPosition"],
-            vec!["uProjectionMatrix", "uViewMatrix", "uModelMatrix"],
-        ) {
-            Ok(material) => material,
-            Err(err) => {
-                log::error!("Material creation error\n{}", err);
-                panic!();
-            }
-        };
-
-        material.bind_mesh(&mut world, mesh_id);
-        world.insert_non_send_resource(MaterialsResource(vec![material]));
-
-        let mut runtime_schedule = Schedule::default();
-        runtime_schedule.add_stage(
-            "update",
-            SystemStage::parallel()
-                .with_system(test_system)
-                .with_system(transform_propagate_system)
-                .with_system(mesh_render_system)
-                .with_system(camera_view_matrix_update_system),
-        );
-        runtime_schedule.add_stage(
-            "scripting",
-            SystemStage::single_threaded()
-                .with_system(scripting_update_system.exclusive_system()),
-        );
-
-        let mut init_schedule = Schedule::default();
-        init_schedule
-            .add_stage("scripting", SystemStage::single(init_scripting));
-        init_schedule.run_once(&mut world);
-
-        unsafe {
-            let gl = window.gl.clone();
-            gl.clear_color(0.1, 0.2, 0.3, 1.0);
-            gl.enable(glow::CULL_FACE);
-        }
+        let runtime_schedule = Schedule::default();
 
         Application {
             window,
@@ -202,42 +26,7 @@ impl Application {
     }
 
     pub fn run(mut self) {
-        // bad things will happen if world moves memory locations
-        let mut world = Box::new(self.world);
-        // TODO: make less god awful
-        unsafe { SCRIPTING_WORLD = Some(world.as_mut() as *mut _) };
-
-        let gl = self.window.gl.clone();
-        let mut then = Instant::now();
-
-        let mut dt_acc = 0.0;
-        let mut dt_count = 0.0;
-
-        let update = move || {
-            // clear screen
-            unsafe {
-                gl.clear(glow::COLOR_BUFFER_BIT);
-            }
-
-            self.runtime_schedule.run_once(world.as_mut());
-
-            let dt = Instant::now().duration_since(then).as_nanos() as f32
-                / 1_000_000.0;
-            dt_acc += dt as f32;
-            dt_count += 1.0;
-
-            if dt_count == 300.0 {
-                let average_dt = dt_acc / dt_count;
-                let average_fps = 1000.0 / average_dt;
-                log::info!("fps: {:.1}", average_fps);
-
-                dt_acc = 0.0;
-                dt_count = 0.0;
-            }
-
-            then = Instant::now();
-        };
-
-        self.window.run_event_loop(Box::new(update));
+        let state = self.window.state.clone();
+        self.window.run_event_loop(state, || {});
     }
 }

@@ -12,11 +12,7 @@ pub fn transform_propagate_system(
         (&Transform, Entity, &Children, Option<&Parent>),
         Changed<Transform>,
     >,
-    // mut children_query: Query<&Children, With<Parent>>,
-    mut global_transform_query: Query<
-        (&mut GlobalTransform, &Transform),
-        // With<Parent>,
-    >,
+    mut global_transform_query: Query<(&mut GlobalTransform, &Transform)>,
     children_query: Query<&Children>,
 ) {
     for (transform_component, entity, children, parent) in
@@ -51,10 +47,7 @@ pub fn transform_propagate_system(
 }
 
 fn propagate_children_recursive(
-    global_transform_query: &mut Query<
-        (&mut GlobalTransform, &Transform),
-        // With<Parent>,
-    >,
+    global_transform_query: &mut Query<(&mut GlobalTransform, &Transform)>,
     children_query: &Query<&Children>,
     children: &Children,
     parent_matrix: &Matrix4<f32>,

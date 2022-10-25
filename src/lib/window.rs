@@ -1,6 +1,16 @@
 use lazy_static::lazy_static;
-use std::rc::Rc;
-use std::sync::RwLock;
+use std::{
+    cell::RefCell,
+    rc::Rc,
+    sync::{Arc, RwLock},
+};
+use winit::{
+    event::*,
+    event_loop::{ControlFlow, EventLoop},
+    window::WindowBuilder,
+};
+
+use super::rendering::State;
 
 lazy_static! {
     pub static ref WINDOW_SIZE: RwLock<(f32, f32)> =
@@ -8,72 +18,93 @@ lazy_static! {
 }
 
 pub struct Window {
-    event_loop: glutin::event_loop::EventLoop<()>,
-    window:
-        glutin::ContextWrapper<glutin::PossiblyCurrent, glutin::window::Window>,
-    pub gl: Rc<glow::Context>,
+    event_loop: EventLoop<()>,
+    pub state: Rc<RefCell<State>>,
 }
 
 impl Window {
-    pub fn new() -> Self {
-        use glutin::dpi::LogicalSize;
-
-        let event_loop = glutin::event_loop::EventLoop::new();
-        let window_builder = glutin::window::WindowBuilder::new()
-            .with_title("giz")
-            .with_inner_size::<LogicalSize<i32>>(LogicalSize::new(900, 600));
-
-        let (window, gl) = unsafe {
-            let window = glutin::ContextBuilder::new()
-                .with_vsync(true)
-                .with_double_buffer(Some(true))
-                .build_windowed(window_builder, &event_loop)
-                .expect("unable to create window")
-                .make_current()
-                .expect("could not make opengl context current");
-
-            let gl: glow::Context = glow::Context::from_loader_function(|s| {
-                window.get_proc_address(s) as *const _
-            });
-
-            (window, gl)
-        };
+    pub async fn new() -> Window {
+        let event_loop = EventLoop::new();
+        let window = WindowBuilder::new().build(&event_loop).unwrap();
+        let state = State::new(window).await;
 
         Self {
             event_loop,
-            window,
-            gl: Rc::new(gl),
+            state: Rc::new(RefCell::new(state)),
         }
     }
 
-    pub fn run_event_loop(self, mut update: Box<dyn FnMut()>) {
-        use glutin::event::{Event, WindowEvent};
-        use glutin::event_loop::ControlFlow;
-
+    pub fn run_event_loop(
+        self,
+        state: Rc<RefCell<State>>,
+        mut update: impl FnMut(),
+    ) {
         self.event_loop.run(move |event, _, control_flow| {
-            *control_flow = ControlFlow::Poll;
+            let mut state = state.borrow_mut();
+
             match event {
-                Event::LoopDestroyed => {
-                    return;
-                }
-                Event::MainEventsCleared => {
-                    self.window.window().request_redraw();
-                }
-                Event::RedrawRequested(_) => {
-                    update();
-                    self.window.swap_buffers().unwrap();
-                }
-                Event::WindowEvent { ref event, .. } => match event {
-                    WindowEvent::Resized(physical_size) => {
-                        self.window.resize(*physical_size);
-                        *WINDOW_SIZE.write().unwrap() = (*physical_size).into();
+                Event::WindowEvent {
+                    ref event,
+                    window_id,
+                } if window_id == state.window.id() => {
+                    if !state.input() {
+                        // UPDATED!
+                        match event {
+                            WindowEvent::CloseRequested
+                            | WindowEvent::KeyboardInput {
+                                input:
+                                    KeyboardInput {
+                                        state: ElementState::Pressed,
+                                        virtual_keycode:
+                                            Some(VirtualKeyCode::Escape),
+                                        ..
+                                    },
+                                ..
+                            } => *control_flow = ControlFlow::Exit,
+                            WindowEvent::Resized(physical_size) => {
+                                state.resize(*physical_size);
+                            }
+                            WindowEvent::ScaleFactorChanged {
+                                new_inner_size,
+                                ..
+                            } => {
+                                // new_inner_size is &&mut so w have to dereference it twice
+                                state.resize(**new_inner_size);
+                            }
+                            _ => {}
+                        }
                     }
-                    WindowEvent::CloseRequested => {
-                        *control_flow = ControlFlow::Exit
-                    }
-                    _ => (),
-                },
-                _ => (),
+                }
+                Event::RedrawRequested(window_id)
+                    if window_id == state.window.id() =>
+                {
+                    log::info!("Redraw");
+                    // match state.render() {
+                    //     Ok(_) => {}
+                    //     // Reconfigure the surface if it's lost or outdated
+                    //     Err(
+                    //         wgpu::SurfaceError::Lost
+                    //         | wgpu::SurfaceError::Outdated,
+                    //     ) => {
+                    //         let size = state.size.clone();
+                    //         state.resize(size);
+                    //     }
+                    //     // The system is out of memory, we should probably quit
+                    //     Err(wgpu::SurfaceError::OutOfMemory) => {
+                    //         *control_flow = ControlFlow::Exit
+                    //     }
+
+                    //     Err(wgpu::SurfaceError::Timeout) => {
+                    //         log::warn!("Surface timeout")
+                    //     }
+                    // }
+                }
+                Event::RedrawEventsCleared => {
+                    // RedrawRequested will only trigger once, unless we manually
+                    // request it.
+                    state.window.request_redraw();
+                }
+                _ => {}
             }
         });
     }

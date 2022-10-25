@@ -1,8 +1,8 @@
-mod components;
+// mod components;
 mod lib;
 mod resources;
-mod systems;
-mod utils;
+// mod systems;
+// mod utils;
 
 use fern::colors::{Color, ColoredLevelConfig};
 use lib::application::Application;
@@ -29,5 +29,6 @@ fn main() {
         .chain(std::io::stdout())
         .apply()
         .unwrap();
+
     Application::new().run();
 }
