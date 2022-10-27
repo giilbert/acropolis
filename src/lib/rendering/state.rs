@@ -18,6 +18,10 @@ impl State {
     pub fn lock(&self) -> MutexGuard<StateInner> {
         self.inner.lock()
     }
+
+    pub fn get_mut(&mut self) -> &mut StateInner {
+        self.inner.get_mut()
+    }
 }
 
 pub struct StateInner {

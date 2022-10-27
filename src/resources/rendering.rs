@@ -4,7 +4,7 @@ use std::{
     rc::Rc,
 };
 
-use crate::lib::rendering::State;
+use crate::lib::rendering::{State, StateInner};
 
 pub struct StateResource(pub State);
 impl Deref for StateResource {
@@ -16,5 +16,10 @@ impl Deref for StateResource {
 impl DerefMut for StateResource {
     fn deref_mut(&mut self) -> &mut Self::Target {
         &mut self.0
+    }
+}
+impl StateResource {
+    pub fn get_mut(&mut self) -> &mut StateInner {
+        self.0.get_mut()
     }
 }
