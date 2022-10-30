@@ -2,7 +2,7 @@ use lazy_static::lazy_static;
 use std::{cell::RefCell, rc::Rc, sync::RwLock};
 use winit::{
     event::*,
-    event_loop::{ControlFlow, EventLoop},
+    event_loop::{ControlFlow, EventLoop, EventLoopBuilder},
     window::WindowBuilder,
 };
 

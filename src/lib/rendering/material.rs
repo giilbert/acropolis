@@ -4,12 +4,11 @@ use crate::lib::rendering::State;
 use wgpu::{ShaderModule, ShaderModuleDescriptor, ShaderSource};
 
 pub struct Material {
-    state: State,
-    module: ShaderModule,
+    pub module: ShaderModule,
 }
 
 impl Material {
-    pub fn new(state: State, source: impl AsRef<str>) -> anyhow::Result<Self> {
+    pub fn new(state: &State, source: impl AsRef<str>) -> anyhow::Result<Self> {
         let module =
             state
                 .lock()
@@ -19,7 +18,7 @@ impl Material {
                     source: ShaderSource::Wgsl(Cow::Borrowed(source.as_ref())),
                 });
 
-        Ok(Self { state, module })
+        Ok(Self { module })
     }
 }
 

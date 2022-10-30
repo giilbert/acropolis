@@ -1,7 +1,7 @@
-// mod components;
+mod components;
 mod lib;
 mod resources;
-// mod systems;
+mod systems;
 // mod utils;
 
 use fern::colors::{Color, ColoredLevelConfig};
@@ -25,7 +25,7 @@ fn main() {
                 message
             ))
         })
-        .level(log::LevelFilter::max())
+        .level(log::LevelFilter::Info)
         .chain(std::io::stdout())
         .apply()
         .unwrap();

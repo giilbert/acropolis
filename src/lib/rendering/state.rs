@@ -18,10 +18,6 @@ impl State {
     pub fn lock(&self) -> MutexGuard<StateInner> {
         self.inner.lock()
     }
-
-    pub fn get_mut(&mut self) -> &mut StateInner {
-        self.inner.get_mut()
-    }
 }
 
 pub struct StateInner {
@@ -31,6 +27,8 @@ pub struct StateInner {
     pub config: wgpu::SurfaceConfiguration,
     pub size: winit::dpi::PhysicalSize<u32>,
     pub window: winit::window::Window,
+    pub encoder: Option<wgpu::CommandEncoder>,
+    pub view: Option<wgpu::TextureView>,
 }
 
 impl StateInner {
@@ -78,6 +76,8 @@ impl StateInner {
             config,
             size,
             window,
+            encoder: None,
+            view: None,
         }
     }
 

@@ -18,8 +18,3 @@ impl DerefMut for StateResource {
         &mut self.0
     }
 }
-impl StateResource {
-    pub fn get_mut(&mut self) -> &mut StateInner {
-        self.0.get_mut()
-    }
-}
