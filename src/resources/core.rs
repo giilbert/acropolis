@@ -1,5 +1,6 @@
-use bevy_ecs::entity::Entity;
+use bevy_ecs::{entity::Entity, system::Resource};
 
+#[derive(Resource)]
 pub struct Root {
     pub entity: Entity,
 }

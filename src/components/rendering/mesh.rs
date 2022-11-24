@@ -1,6 +1,6 @@
 use crate::lib::rendering::{Material, State};
 use bevy_ecs::prelude::Component;
-use wgpu::{util::DeviceExt, Buffer, RenderPipeline};
+use wgpu::{util::DeviceExt, BindGroup, Buffer, RenderPipeline};
 
 #[derive(Component, Debug)]
 pub struct Mesh {
@@ -20,6 +20,22 @@ impl Mesh {
     ) -> Self {
         let state = &state.lock();
 
+        let bind_group_layout = state.device.create_bind_group_layout(
+            &wgpu::BindGroupLayoutDescriptor {
+                label: Some("Mesh Bind Group Layout"),
+                entries: &[wgpu::BindGroupLayoutEntry {
+                    binding: 0,
+                    visibility: wgpu::ShaderStages::all(),
+                    count: None,
+                    ty: wgpu::BindingType::Buffer {
+                        ty: wgpu::BufferBindingType::Uniform,
+                        has_dynamic_offset: false,
+                        min_binding_size: None,
+                    },
+                }],
+            },
+        );
+
         let vertex_buffer = state.device.create_buffer_init(
             &wgpu::util::BufferInitDescriptor {
                 label: Some("Mesh Vertex Buffer"),
@@ -38,10 +54,11 @@ impl Mesh {
         let pipeline_layout = state.device.create_pipeline_layout(
             &wgpu::PipelineLayoutDescriptor {
                 label: Some("Mesh Render Pipeline Layout"),
-                bind_group_layouts: &[],
+                bind_group_layouts: &[&bind_group_layout],
                 push_constant_ranges: &[],
             },
         );
+
         let render_pipeline = state.device.create_render_pipeline(
             &wgpu::RenderPipelineDescriptor {
                 label: Some("Mesh Render Pipeline"),

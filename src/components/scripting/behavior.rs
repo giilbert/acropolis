@@ -27,8 +27,9 @@ impl Behavior {
                 &format!(
                     "{{ let a = new {}(new Entity({})); behaviors[{}] = a; }}",
                     self.class_name,
-                    entity.id(),
-                    entity.id()
+                    // TODO: make more unique
+                    entity.index(),
+                    entity.index()
                 ),
             )
             .expect("Error during script execution");

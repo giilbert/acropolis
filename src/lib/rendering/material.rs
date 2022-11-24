@@ -1,4 +1,4 @@
-use std::{borrow::Cow, cell::RefCell, error::Error, rc::Rc};
+use std::borrow::Cow;
 
 use crate::lib::rendering::State;
 use wgpu::{ShaderModule, ShaderModuleDescriptor, ShaderSource};

@@ -4,8 +4,11 @@ use std::{
     rc::Rc,
 };
 
+use bevy_ecs::system::Resource;
+
 use crate::lib::rendering::{State, StateInner};
 
+#[derive(Resource)]
 pub struct StateResource(pub State);
 impl Deref for StateResource {
     type Target = State;

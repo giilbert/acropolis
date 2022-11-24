@@ -1,11 +1,17 @@
 use crate::{
-    components::rendering::{Mesh, Vertex},
+    components::{
+        rendering::{Camera, CurrentCamera, Mesh, Vertex},
+        DefaultBundle, Name,
+    },
     resources::rendering::StateResource,
-    systems::rendering::mesh_render_system,
+    systems::{
+        rendering::mesh_render_system, transform::transform_propagate_system,
+    },
 };
 
 use super::{rendering::Material, window::Window};
 use bevy_ecs::prelude::*;
+use cgmath::Deg;
 
 const SHADER: &str = r#"
 
@@ -18,12 +24,15 @@ struct VertexOutput {
     @location(0) color: vec3<f32>,
 };
 
+@group(0) @binding(0)
+var<uniform> test: f32;
+
 @vertex
 fn vs_main(
     model: VertexInput,
 ) -> VertexOutput {
     var out: VertexOutput;
-    out.clip_position = vec4<f32>(model.position, 1.0);
+    out.clip_position = vec4<f32>(model.position + vec3<f32>(test), 1.0);
     return out;
 }
 
@@ -31,7 +40,7 @@ fn vs_main(
 
 @fragment
 fn fs_main(in: VertexOutput) -> @location(0) vec4<f32> {
-    return vec4<f32>(1.0, 0.0, 0.0, 1.0);
+    return vec4<f32>(0.3, 0.1, 0.5, 1.0);
 }
 
 "#;
@@ -62,16 +71,24 @@ impl Application {
                 position: [0.5, -0.5, 0.0],
             },
         ];
-
         const INDICES: &[u32] = &[0, 1, 2];
-        world.spawn().insert(Mesh::new(
+
+        let camera =
+            Camera::new_perspective(&state.lock(), Deg(70.0), 0.1, 100.0);
+        world.spawn_empty().insert(Mesh::new(
             &state,
             &material,
             VERTICES.to_vec(),
             INDICES.to_vec(),
         ));
 
+        world.spawn_empty().insert(camera).insert(CurrentCamera);
+
         let mut runtime_schedule = Schedule::default();
+        // runtime_schedule.add_stage(
+        //     "update",
+        //     SystemStage::parallel().with_system(transform_propagate_system),
+        // );
         runtime_schedule.add_stage(
             "render",
             SystemStage::parallel().with_system(mesh_render_system),
@@ -88,25 +105,27 @@ impl Application {
         let state = self.window.state.clone();
 
         self.window.run_event_loop(state.clone(), move || {
-            let mut state_temp = state.lock();
+            let frame = {
+                let mut state = state.lock();
 
-            let frame = state_temp
-                .surface
-                .get_current_texture()
-                .expect("Failed to acquire next swap chain texture");
-            let view = frame
-                .texture
-                .create_view(&wgpu::TextureViewDescriptor::default());
+                let frame = state
+                    .surface
+                    .get_current_texture()
+                    .expect("Failed to acquire next swap chain texture");
+                let view = frame
+                    .texture
+                    .create_view(&wgpu::TextureViewDescriptor::default());
 
-            state_temp.view = Some(view);
-            state_temp.encoder =
-                Some(state_temp.device.create_command_encoder(
+                state.view = Some(view);
+                state.encoder = Some(state.device.create_command_encoder(
                     &wgpu::CommandEncoderDescriptor {
                         label: Some("Command Encoder"),
                     },
                 ));
 
-            drop(state_temp);
+                frame
+            };
+
             self.runtime_schedule.run(&mut self.world);
 
             {
