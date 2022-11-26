@@ -1,8 +1,8 @@
 use lazy_static::lazy_static;
-use std::{cell::RefCell, rc::Rc, sync::RwLock};
+use std::{sync::RwLock, time::Instant};
 use winit::{
     event::*,
-    event_loop::{ControlFlow, EventLoop, EventLoopBuilder},
+    event_loop::{ControlFlow, EventLoop},
     window::WindowBuilder,
 };
 
@@ -32,6 +32,14 @@ impl Window {
         state: State,
         mut update: impl FnMut() + 'static,
     ) {
+        // every 2 seconds at 60fps
+        const PROFILE_NUM_FRAMES: i32 = 2 * 60;
+
+        let mut frames = 0;
+        let mut last_updated = Instant::now();
+
+        let mut mspf_acc = 0;
+
         self.event_loop.run(move |event, _, control_flow| {
             let mut state = state.lock();
 
@@ -71,9 +79,25 @@ impl Window {
                 Event::RedrawRequested(window_id)
                     if window_id == state.window.id() =>
                 {
-                    log::info!("Redraw");
+                    let elapsed = last_updated.elapsed().as_millis();
+                    last_updated = Instant::now();
+
                     drop(state);
                     update();
+
+                    mspf_acc += elapsed;
+                    frames += 1;
+
+                    if frames == PROFILE_NUM_FRAMES {
+                        log::info!(
+                            "mspf avg: {:.03}ms ({} frames)",
+                            mspf_acc as f32 / PROFILE_NUM_FRAMES as f32,
+                            PROFILE_NUM_FRAMES
+                        );
+
+                        frames = 0;
+                        mspf_acc = 0;
+                    }
                 }
                 Event::RedrawEventsCleared => {
                     // RedrawRequested will only trigger once, unless we manually
