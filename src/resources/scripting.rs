@@ -1,15 +1,8 @@
-use std::cell::RefCell;
-
-use bevy_ecs::{component::ComponentId, prelude::*};
-use deno_core::{
-    op, serde_v8::Value, v8::HandleScope, Extension, ExtensionBuilder, JsRealm,
-    JsRuntime, RuntimeOptions,
-};
-use serde::Deserialize;
+use bevy_ecs::prelude::*;
+use deno_core::{op, Extension, JsRuntime, RuntimeOptions};
 
 use crate::{
-    components::{Behavior, Transform},
-    lib::scripting::scripting_api::ScriptingApi,
+    components::Transform, lib::scripting::scripting_api::ScriptingApi,
 };
 
 // TODO: make better & safer

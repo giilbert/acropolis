@@ -3,7 +3,7 @@ use std::ops::Mul;
 use crate::lib::scripting::scripting_api::ScriptingApi;
 use bevy_ecs::prelude::{Component, Entity};
 use cgmath::{Matrix4, Quaternion, SquareMatrix, Vector3, Zero};
-use deno_core::{serde_json, serde_v8::Value};
+use deno_core::serde_json;
 use serde::{Deserialize, Serialize};
 
 #[derive(Component)]

@@ -2,7 +2,7 @@ use bevy_ecs::prelude::*;
 
 use crate::{
     components::{
-        rendering::{Camera, CurrentCameraMarker},
+        rendering::{Camera, CurrentCamera},
         GlobalTransform,
     },
     resources::rendering::CurrentCameraMatrixResource,
@@ -12,11 +12,7 @@ pub fn camera_view_matrix_update_system(
     mut camera_matrix_resource: ResMut<CurrentCameraMatrixResource>,
     query: Query<
         &GlobalTransform,
-        (
-            With<GlobalTransform>,
-            With<CurrentCameraMarker>,
-            With<Camera>,
-        ),
+        (With<GlobalTransform>, With<CurrentCamera>, With<Camera>),
     >,
 ) {
     for transform in &query {

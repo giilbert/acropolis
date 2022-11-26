@@ -9,6 +9,8 @@ pub struct Mesh {
     pub vertex_buffer: Buffer,
     pub index_buffer: Buffer,
     pub render_pipeline: RenderPipeline,
+    pub transformation_matrix_buffer: Buffer,
+    pub bind_group: BindGroup,
 }
 
 impl Mesh {
@@ -20,7 +22,7 @@ impl Mesh {
     ) -> Self {
         let state = &state.lock();
 
-        let bind_group_layout = state.device.create_bind_group_layout(
+        let camera_bind_group_layout = state.device.create_bind_group_layout(
             &wgpu::BindGroupLayoutDescriptor {
                 label: Some("Mesh Bind Group Layout"),
                 entries: &[wgpu::BindGroupLayoutEntry {
@@ -35,6 +37,22 @@ impl Mesh {
                 }],
             },
         );
+
+        let transformation_matrix_bind_group_layout = state
+            .device
+            .create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
+                label: Some("Mesh Bind Group Layout"),
+                entries: &[wgpu::BindGroupLayoutEntry {
+                    binding: 0,
+                    visibility: wgpu::ShaderStages::all(),
+                    count: None,
+                    ty: wgpu::BindingType::Buffer {
+                        ty: wgpu::BufferBindingType::Uniform,
+                        has_dynamic_offset: false,
+                        min_binding_size: None,
+                    },
+                }],
+            });
 
         let vertex_buffer = state.device.create_buffer_init(
             &wgpu::util::BufferInitDescriptor {
@@ -54,7 +72,10 @@ impl Mesh {
         let pipeline_layout = state.device.create_pipeline_layout(
             &wgpu::PipelineLayoutDescriptor {
                 label: Some("Mesh Render Pipeline Layout"),
-                bind_group_layouts: &[&bind_group_layout],
+                bind_group_layouts: &[
+                    &camera_bind_group_layout,
+                    &transformation_matrix_bind_group_layout,
+                ],
                 push_constant_ranges: &[],
             },
         );
@@ -96,12 +117,50 @@ impl Mesh {
             },
         );
 
+        let transformation_matrix_buffer = state.device.create_buffer_init(
+            &wgpu::util::BufferInitDescriptor {
+                label: Some("Mesh Uniform Buffer"),
+                #[rustfmt::skip]
+                contents: bytemuck::cast_slice(&[0.0f32; 32]),
+                usage: wgpu::BufferUsages::UNIFORM
+                    | wgpu::BufferUsages::COPY_DST,
+            },
+        );
+
+        let bind_group_layout = state.device.create_bind_group_layout(
+            &wgpu::BindGroupLayoutDescriptor {
+                label: Some("Mesh Bind Group Layout"),
+                entries: &[wgpu::BindGroupLayoutEntry {
+                    binding: 0,
+                    visibility: wgpu::ShaderStages::all(),
+                    count: None,
+                    ty: wgpu::BindingType::Buffer {
+                        ty: wgpu::BufferBindingType::Uniform,
+                        has_dynamic_offset: false,
+                        min_binding_size: None,
+                    },
+                }],
+            },
+        );
+
+        let bind_group =
+            state.device.create_bind_group(&wgpu::BindGroupDescriptor {
+                label: Some("Camera Bind Group"),
+                layout: &bind_group_layout,
+                entries: &[wgpu::BindGroupEntry {
+                    binding: 0,
+                    resource: transformation_matrix_buffer.as_entire_binding(),
+                }],
+            });
+
         Self {
             vertices,
             indices,
             vertex_buffer,
             index_buffer,
             render_pipeline,
+            transformation_matrix_buffer,
+            bind_group,
         }
     }
 }

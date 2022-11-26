@@ -1,6 +1,5 @@
 mod camera;
 mod mesh;
 
-pub use camera::Camera;
-pub use camera::CurrentCamera;
+pub use camera::*;
 pub use mesh::{Mesh, Vertex};

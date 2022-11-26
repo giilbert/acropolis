@@ -20,7 +20,7 @@ pub fn transform_propagate_system(
     {
         let parent_entity = match parent {
             Some(parent) => parent.0,
-            None => root.entity,
+            None => root.0,
         };
         let parent_transform = global_transform_query
             .get_component::<GlobalTransform>(parent_entity)

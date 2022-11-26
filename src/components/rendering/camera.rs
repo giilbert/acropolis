@@ -1,20 +1,24 @@
-use std::sync::Arc;
-
 use bevy_ecs::prelude::Component;
+use bytemuck::{Pod, Zeroable};
 use cgmath::{Matrix4, Rad};
 use wgpu::{util::DeviceExt, BindGroup, Buffer};
 
-use crate::lib::{
-    rendering::{State, StateInner},
-    window::WINDOW_SIZE,
-};
+use crate::lib::{rendering::StateInner, window::WINDOW_SIZE};
+
+#[rustfmt::skip]
+pub const OPENGL_TO_WGPU_MATRIX: cgmath::Matrix4<f32> = cgmath::Matrix4::new(
+    1.0, 0.0, 0.0, 0.0,
+    0.0, 1.0, 0.0, 0.0,
+    0.0, 0.0, 0.5, 0.0,
+    0.0, 0.0, 0.5, 1.0,
+);
 
 #[derive(Component)]
 pub struct Camera {
-    pub matrix: Matrix4<f32>,
+    pub projection_matrix: Matrix4<f32>,
     pub camera_data: CameraData,
     pub bind_group: BindGroup,
-    pub matrix_buffer: Buffer,
+    pub projection_matrix_buffer: Buffer,
 }
 
 #[derive(Component)]
@@ -43,12 +47,14 @@ impl Camera {
         // create perspective matrix from fov
         let (x, y) = *WINDOW_SIZE.read().unwrap();
         let aspect_ratio = x / y;
-        let matrix = cgmath::perspective(fov, aspect_ratio.into(), near, far);
+        let projection_matrix = OPENGL_TO_WGPU_MATRIX
+            * cgmath::perspective(fov, aspect_ratio.into(), near, far);
 
-        let matrix_buffer = state.device.create_buffer_init(
+        let projection_matrix_buffer = state.device.create_buffer_init(
             &wgpu::util::BufferInitDescriptor {
                 label: Some("Mesh Uniform Buffer"),
-                contents: bytemuck::cast_slice(&[0.7f32]),
+                #[rustfmt::skip]
+                contents: bytemuck::cast_slice(&[0.0f32; 64]),
                 usage: wgpu::BufferUsages::UNIFORM
                     | wgpu::BufferUsages::COPY_DST,
             },
@@ -72,16 +78,16 @@ impl Camera {
 
         let bind_group =
             state.device.create_bind_group(&wgpu::BindGroupDescriptor {
-                label: Some("Mesh Bind Group"),
+                label: Some("Camera Bind Group"),
                 layout: &bind_group_layout,
                 entries: &[wgpu::BindGroupEntry {
                     binding: 0,
-                    resource: matrix_buffer.as_entire_binding(),
+                    resource: projection_matrix_buffer.as_entire_binding(),
                 }],
             });
 
         Camera {
-            matrix,
+            projection_matrix,
             camera_data: CameraData::Perspective {
                 fov: fov.into(),
                 aspect_ratio,
@@ -89,7 +95,14 @@ impl Camera {
                 far,
             },
             bind_group,
-            matrix_buffer,
+            projection_matrix_buffer,
         }
     }
+}
+
+#[repr(C, align(16))]
+#[derive(Debug, Copy, Clone, Zeroable, Pod)]
+pub struct CameraUniform {
+    pub projection_matrix: [[f32; 4]; 4],
+    pub view_matrix: [[f32; 4]; 4],
 }
