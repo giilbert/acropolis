@@ -62,6 +62,12 @@ class Transform {
   }
 }
 
+class Input {
+  static keyDown(key) {
+    return Deno.core.ops.op_get_key_down(`"${key}"`);
+  }
+}
+
 function runOnce() {
   for (behavior of Object.values(behaviors)) {
     behavior.update();
@@ -82,10 +88,36 @@ class A extends Behavior {
   }
 
   update() {
-    this.transform.position = {
-      x: 0,
-      y: 0,
-      z: (start - Date.now()) / 500,
-    };
+    if (Input.keyDown("D")) {
+      this.transform.position = {
+        x: (this.transform.position.x += 0.01),
+        y: this.transform.position.y,
+        z: 0,
+      };
+    }
+
+    if (Input.keyDown("A")) {
+      this.transform.position = {
+        x: (this.transform.position.x -= 0.01),
+        y: this.transform.position.y,
+        z: 0,
+      };
+    }
+
+    if (Input.keyDown("W")) {
+      this.transform.position = {
+        x: this.transform.position.x,
+        y: (this.transform.position.y += 0.01),
+        z: 0,
+      };
+    }
+
+    if (Input.keyDown("S")) {
+      this.transform.position = {
+        x: this.transform.position.x,
+        y: (this.transform.position.y -= 0.01),
+        z: 0,
+      };
+    }
   }
 }

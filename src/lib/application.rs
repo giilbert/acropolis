@@ -1,11 +1,18 @@
 use crate::{
     components::{
         rendering::{Camera, CurrentCamera, Mesh, Vertex},
-        Children, DefaultBundle, GlobalTransform, Name, Parent, Transform,
+        Behavior, Children, DefaultBundle, GlobalTransform, Name, Parent,
+        Transform,
     },
-    resources::{core::Root, rendering::StateResource},
+    lib::scripting::init::init_scripting,
+    resources::{
+        core::Root,
+        rendering::StateResource,
+        scripting::{ScriptingResource, SCRIPTING_WORLD},
+    },
     systems::{
-        rendering::mesh_render_system, transform::transform_propagate_system,
+        rendering::mesh_render_system, scripting::scripting_update_system,
+        transform::transform_propagate_system,
     },
 };
 
@@ -66,8 +73,8 @@ pub struct Application {
 }
 
 fn test_system(mut query: Query<&mut Transform, With<Mesh>>) {
-    let mut transform = query.single_mut();
-    transform.position.x += 0.01;
+    // let mut transform = query.single_mut();
+    // transform.position.x += 0.01;
 }
 
 impl Application {
@@ -77,6 +84,7 @@ impl Application {
 
         let mut world = World::new();
         world.insert_non_send_resource(StateResource(window.state.clone()));
+        world.insert_non_send_resource(ScriptingResource::new());
 
         let material = Material::new(&state, SHADER).unwrap();
         const VERTICES: &[Vertex] = &[
@@ -104,19 +112,30 @@ impl Application {
 
         world.insert_resource(Root(root.clone()));
 
-        world
-            .spawn_empty()
-            .insert(Name("Mesh".into()))
-            .insert(Parent(root))
-            .insert(Children(vec![]))
-            .insert(Transform::new())
-            .insert(GlobalTransform::new())
-            .insert(Mesh::new(
-                &state,
-                &material,
-                VERTICES.to_vec(),
-                INDICES.to_vec(),
-            ));
+        for x in 0..20 {
+            for y in 0..20 {
+                let mut transform = Transform::new();
+                transform.scale = Vector3::new(0.1, 0.1, 0.1);
+
+                transform.position.x = (x as f32) / 15.0;
+                transform.position.y = (y as f32) / 15.0;
+
+                world
+                    .spawn_empty()
+                    .insert(Name("Mesh".into()))
+                    .insert(Parent(root))
+                    .insert(Children(vec![]))
+                    .insert(transform)
+                    .insert(GlobalTransform::new())
+                    .insert(Behavior::new("mesh".into(), "A".into()))
+                    .insert(Mesh::new(
+                        &state,
+                        &material,
+                        VERTICES.to_vec(),
+                        INDICES.to_vec(),
+                    ));
+            }
+        }
 
         let mut transform = Transform::new();
         transform.set_position(Vector3::new(0.0, 0.0, -4.0));
@@ -137,10 +156,16 @@ impl Application {
             ))
             .insert(CurrentCamera);
 
+        let mut startup_schedule = Schedule::default();
+        startup_schedule.add_stage(
+            "init",
+            SystemStage::parallel().with_system(init_scripting),
+        );
+
         let mut runtime_schedule = Schedule::default();
         runtime_schedule.add_stage(
             "scripting",
-            SystemStage::parallel().with_system(test_system),
+            SystemStage::parallel().with_system(scripting_update_system),
         );
         runtime_schedule.add_stage(
             "update",
@@ -151,6 +176,8 @@ impl Application {
             SystemStage::parallel().with_system(mesh_render_system),
         );
 
+        startup_schedule.run_once(&mut world);
+
         Application {
             window,
             world,
@@ -159,6 +186,10 @@ impl Application {
     }
 
     pub fn run(mut self) {
+        let mut world = Box::new(self.world);
+        unsafe {
+            SCRIPTING_WORLD = Some(world.as_mut() as *mut _);
+        }
         let state = self.window.state.clone();
 
         self.window.run_event_loop(state.clone(), move || {
@@ -183,7 +214,7 @@ impl Application {
                 frame
             };
 
-            self.runtime_schedule.run(&mut self.world);
+            self.runtime_schedule.run(&mut world);
 
             {
                 let mut state = state.lock();

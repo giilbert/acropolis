@@ -1,7 +1,10 @@
 use parking_lot::{Mutex, MutexGuard};
-use std::sync::Arc;
+use std::{
+    collections::{HashMap, HashSet},
+    sync::Arc,
+};
 
-use winit::{dpi::PhysicalSize, window::Window};
+use winit::{dpi::PhysicalSize, event::VirtualKeyCode, window::Window};
 
 #[derive(Clone)]
 pub struct State {
@@ -29,6 +32,7 @@ pub struct StateInner {
     pub window: winit::window::Window,
     pub encoder: Option<wgpu::CommandEncoder>,
     pub view: Option<wgpu::TextureView>,
+    pub keys: HashSet<VirtualKeyCode>,
 }
 
 impl StateInner {
@@ -78,6 +82,7 @@ impl StateInner {
             window,
             encoder: None,
             view: None,
+            keys: Default::default(),
         }
     }
 
@@ -88,56 +93,5 @@ impl StateInner {
             self.config.height = new_size.height;
             self.surface.configure(&self.device, &self.config);
         }
-    }
-
-    // pub fn begin_render(&mut self) -> Result<(), wgpu::SurfaceError> {
-    //     let output = self.surface.get_current_texture()?;
-    //     let view = output
-    //         .texture
-    //         .create_view(&wgpu::TextureViewDescriptor::default());
-
-    //     let mut encoder = self.device.create_command_encoder(
-    //         &wgpu::CommandEncoderDescriptor {
-    //             label: Some("Render Encoder"),
-    //         },
-    //     );
-
-    //     {
-    //         let render_pass =
-    //             encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
-    //                 label: None,
-    //                 color_attachments: &[Some(
-    //                     wgpu::RenderPassColorAttachment {
-    //                         view: &view,
-    //                         resolve_target: None,
-    //                         ops: wgpu::Operations {
-    //                             load: wgpu::LoadOp::Clear(wgpu::Color::GREEN),
-    //                             store: true,
-    //                         },
-    //                     },
-    //                 )],
-    //                 depth_stencil_attachment: None,
-    //             });
-
-    //         self.render_pass = Some(render_pass);
-    //     }
-
-    //     Ok(())
-    // }
-
-    // pub fn end_render(
-    //     &mut self,
-    //     encoder: CommandEncoder,
-    //     render_pass: RenderPass,
-    // ) -> anyhow::Result<()> {
-    //     let output = self.surface.get_current_texture()?;
-    //     self.queue.submit(std::iter::once(encoder.finish()));
-    //     output.present();
-
-    //     Ok(())
-    // }
-
-    pub fn input(&self) -> bool {
-        false
     }
 }

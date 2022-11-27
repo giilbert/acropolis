@@ -1,9 +1,11 @@
 use bevy_ecs::prelude::*;
-use deno_core::{op, Extension, JsRuntime, RuntimeOptions};
+use deno_core::{op, serde_json, Extension, JsRuntime, RuntimeOptions};
 
 use crate::{
     components::Transform, lib::scripting::scripting_api::ScriptingApi,
 };
+
+use super::rendering::StateResource;
 
 // TODO: make better & safer
 pub static mut SCRIPTING_WORLD: Option<*mut World> = None;
@@ -46,6 +48,13 @@ fn op_get_component_prop(
     Some(scripting_api?.get_property(&key))
 }
 
+#[op]
+fn op_get_key_down(key: String) -> bool {
+    let world = unsafe { &mut *SCRIPTING_WORLD.unwrap() };
+    let state = world.resource::<StateResource>().lock();
+    state.keys.contains(&serde_json::from_str(&key).unwrap())
+}
+
 pub struct ScriptingResource {
     pub runtime: JsRuntime,
 }
@@ -56,6 +65,7 @@ impl ScriptingResource {
             .ops(vec![
                 op_get_component_prop::decl(),
                 op_set_component_prop::decl(),
+                op_get_key_down::decl(),
             ])
             .build();
         let runtime = JsRuntime::new(RuntimeOptions {

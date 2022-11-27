@@ -1,3 +1,4 @@
+use deno_core::serde_json;
 use lazy_static::lazy_static;
 use std::{sync::RwLock, time::Instant};
 use winit::{
@@ -48,32 +49,50 @@ impl Window {
                     ref event,
                     window_id,
                 } if window_id == state.window.id() => {
-                    if !state.input() {
-                        // UPDATED!
-                        match event {
-                            WindowEvent::CloseRequested
-                            | WindowEvent::KeyboardInput {
-                                input:
-                                    KeyboardInput {
-                                        state: ElementState::Pressed,
-                                        virtual_keycode:
-                                            Some(VirtualKeyCode::Escape),
-                                        ..
-                                    },
-                                ..
-                            } => *control_flow = ControlFlow::Exit,
-                            WindowEvent::Resized(physical_size) => {
-                                state.resize(*physical_size);
+                    match event {
+                        WindowEvent::CloseRequested
+                        | WindowEvent::KeyboardInput {
+                            input:
+                                KeyboardInput {
+                                    state: ElementState::Pressed,
+                                    virtual_keycode:
+                                        Some(VirtualKeyCode::Escape),
+                                    ..
+                                },
+                            ..
+                        } => *control_flow = ControlFlow::Exit,
+                        WindowEvent::KeyboardInput {
+                            input:
+                                KeyboardInput {
+                                    virtual_keycode: Some(key_code),
+                                    state: key_state,
+                                    ..
+                                },
+                            ..
+                        } => {
+                            if *key_state == ElementState::Pressed {
+                                state.keys.insert(*key_code);
+                            } else {
+                                state.keys.remove(key_code);
                             }
-                            WindowEvent::ScaleFactorChanged {
-                                new_inner_size,
-                                ..
-                            } => {
-                                // new_inner_size is &&mut so w have to dereference it twice
-                                state.resize(**new_inner_size);
-                            }
-                            _ => {}
+
+                            // log::info!(
+                            //     "{} {:?}",
+                            //     serde_json::to_string(key_code).unwrap(),
+                            //     state.keys
+                            // );
                         }
+                        WindowEvent::Resized(physical_size) => {
+                            state.resize(*physical_size);
+                        }
+                        WindowEvent::ScaleFactorChanged {
+                            new_inner_size,
+                            ..
+                        } => {
+                            // new_inner_size is &&mut so w have to dereference it twice
+                            state.resize(**new_inner_size);
+                        }
+                        _ => {}
                     }
                 }
                 Event::RedrawRequested(window_id)

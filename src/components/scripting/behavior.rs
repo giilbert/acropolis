@@ -1,10 +1,5 @@
 use bevy_ecs::prelude::*;
-use deno_core::{
-    v8::{Global, Value},
-    JsRuntime,
-};
-
-use crate::resources::scripting::ScriptingResource;
+use deno_core::JsRuntime;
 
 #[derive(Component)]
 pub struct Behavior {
