@@ -1,0 +1,15 @@
+[package]
+name = "giz_bin"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+giz_core = { path = "../giz_core" }
+giz_render = { path = "../giz_render" }
+giz_scripting = { path = "../giz_scripting" }
+giz_input = { path = "../giz_input" }
+pretty_env_logger = "0.4.0"
+bevy_ecs = "0.9"
+cgmath = "0.18.0"

@@ -1,0 +1,13 @@
+[package]
+name = "giz_input"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+bevy_ecs = "0.9"
+deno_core = "0.149.0"
+giz_core = { path = "../giz_core" }
+giz_scripting = { path = "../giz_scripting" }
+giz_render = { path = "../giz_render" }
+log = "0.4.17"
+serde = { version = "1.0", features = ["derive"] }

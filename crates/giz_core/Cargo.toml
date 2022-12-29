@@ -1,0 +1,23 @@
+[package]
+name = "giz_core"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+pollster = "0.2.5"
+serde = { version = "1.0", features = ["derive"] }
+bevy_ecs = "0.9"
+deno_core = "0.149.0"
+cgmath = "0.18.0"
+bytemuck = { version = "1.11.0", features = ["derive"] }
+log = "0.4.17"
+uuid = "1.1.2"
+chrono = "0.4.20"
+lazy_static = "1.4.0"
+wgpu = "0.14.2"
+winit = { version = "0.27.3", features = ["serde"] }
+anyhow = "1.0.66"
+parking_lot = "0.12.1"
+pretty_env_logger = "0.4.0"
