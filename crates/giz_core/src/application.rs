@@ -1,4 +1,4 @@
-use crate::{systems::transform_propagate_system, Stage};
+use crate::Stage;
 use bevy_ecs::prelude::*;
 
 use crate::Plugin;
@@ -17,10 +17,7 @@ impl Application {
         let world = World::new();
         let init_schedule = Schedule::default();
         let runtime_schedule = Schedule::default()
-            .with_stage(
-                Stage::Update,
-                SystemStage::parallel().with_system(transform_propagate_system),
-            )
+            .with_stage(Stage::Update, SystemStage::parallel())
             .with_stage(Stage::Render, SystemStage::parallel())
             .with_stage(Stage::Scripting, SystemStage::parallel());
 

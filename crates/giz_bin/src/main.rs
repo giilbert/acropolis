@@ -1,11 +1,10 @@
 use bevy_ecs::prelude::World;
 use cgmath::{Deg, Vector3};
-use giz_core::{
-    components::{Children, GlobalTransform, Name, Parent, Transform},
-    resources::Root,
-    Application, DefaultBundle,
-};
+use giz_core::{components::Name, resources::Root, Application};
 use giz_input::InputPlugin;
+use giz_math::{
+    Children, DefaultBundle, GlobalTransform, MathPlugin, Parent, Transform,
+};
 use giz_render::{
     components::{Camera, CurrentCamera, Mesh, Vertex},
     Material, RenderPlugin, StateResource,
@@ -138,6 +137,7 @@ fn main() {
     let mut app = Application::new()
         .with_plugin(RenderPlugin)
         .with_plugin(ScriptingPlugin)
+        .with_plugin(MathPlugin)
         .with_plugin(InputPlugin);
 
     test(&mut app.world);

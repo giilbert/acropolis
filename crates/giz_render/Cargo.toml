@@ -17,3 +17,4 @@ bevy_ecs = "0.9"
 bytemuck = "1.12.3"
 cgmath = "0.18.0"
 anyhow = "1.0.68"
+giz_math = { path = "../giz_math" }

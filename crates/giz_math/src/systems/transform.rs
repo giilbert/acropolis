@@ -1,9 +1,7 @@
 use bevy_ecs::prelude::*;
+use giz_core::resources::Root;
 
-use crate::{
-    components::{Children, GlobalTransform, Parent, Transform},
-    resources::Root,
-};
+use crate::{Children, GlobalTransform, Parent, Transform};
 use cgmath::Matrix4;
 
 pub fn transform_propagate_system(

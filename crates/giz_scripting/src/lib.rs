@@ -1,11 +1,13 @@
 mod components;
+mod generators;
 mod init;
 mod plugin;
 mod resources;
-mod scripting_api;
+mod scriptable;
 mod systems;
 
 pub use components::*;
+pub use macros::Scriptable;
 pub use plugin::ScriptingPlugin;
 pub use resources::{ScriptingExtensions, ScriptingResource, SCRIPTING_WORLD};
-pub use scripting_api::ScriptingApi;
+pub use scriptable::Scriptable;

@@ -1,12 +1,7 @@
 use crate::State;
 use lazy_static::lazy_static;
-use std::{
-    collections::{HashMap, HashSet},
-    sync::RwLock,
-    time::Instant,
-};
+use std::{sync::RwLock, time::Instant};
 use winit::{
-    dpi::PhysicalSize,
     event::*,
     event_loop::{ControlFlow, EventLoop},
     window::WindowBuilder,

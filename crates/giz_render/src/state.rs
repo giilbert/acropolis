@@ -1,8 +1,5 @@
 use parking_lot::{Mutex, MutexGuard};
-use std::{
-    collections::{HashMap, HashSet},
-    sync::Arc,
-};
+use std::{collections::HashSet, sync::Arc};
 
 use winit::{dpi::PhysicalSize, event::VirtualKeyCode, window::Window};
 

@@ -1,9 +1,7 @@
 use bevy_ecs::prelude::*;
-use giz_core::{Application, Plugin};
+use giz_core::Plugin;
 
-use crate::{
-    resources::StateResource, systems::mesh_render_system, State, Window,
-};
+use crate::{resources::StateResource, systems::mesh_render_system, Window};
 
 pub struct RenderPlugin;
 

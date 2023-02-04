@@ -2,10 +2,10 @@ use bevy_ecs::prelude::*;
 use deno_core::{
     op, serde_json, Extension, ExtensionBuilder, JsRuntime, RuntimeOptions,
 };
-use giz_core::components::Transform;
+use giz_math::Transform;
 use serde::{Deserialize, Serialize};
 
-use crate::ScriptingApi;
+use crate::Scriptable;
 
 // TODO: make better & safer
 pub static mut SCRIPTING_WORLD: Option<*mut World> = None;
@@ -13,7 +13,7 @@ pub static mut SCRIPTING_WORLD: Option<*mut World> = None;
 unsafe fn get_scripting_api<'a>(
     entity: Entity,
     component_id: u32,
-) -> Option<&'a mut dyn ScriptingApi> {
+) -> Option<&'a mut dyn Scriptable> {
     let world = &mut *SCRIPTING_WORLD.unwrap();
 
     match component_id {
@@ -93,7 +93,7 @@ struct JsVector3 {
     z: f32,
 }
 
-impl ScriptingApi for Transform {
+impl Scriptable for Transform {
     fn set_property(&mut self, name: &str, value: String) {
         match name {
             "position" => {

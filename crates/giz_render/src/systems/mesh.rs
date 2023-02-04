@@ -1,5 +1,5 @@
 use bevy_ecs::prelude::*;
-use giz_core::components::GlobalTransform;
+use giz_math::GlobalTransform;
 
 use crate::{
     components::{Camera, CameraUniform, CurrentCamera, Mesh},
