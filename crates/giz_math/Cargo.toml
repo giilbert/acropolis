@@ -7,3 +7,4 @@ edition = "2021"
 giz_core = { path = "../giz_core" }
 bevy_ecs = "0.9"
 cgmath = "0.18.0"
+deno_core = "0.149.0"

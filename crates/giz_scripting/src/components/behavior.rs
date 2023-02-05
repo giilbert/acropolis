@@ -1,7 +1,8 @@
+use crate::Scriptable;
 use bevy_ecs::prelude::*;
 use deno_core::JsRuntime;
 
-#[derive(Component)]
+#[derive(Component, Scriptable, Default)]
 pub struct Behavior {
     pub name: String,
     pub class_name: String,

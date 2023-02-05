@@ -1,5 +1,4 @@
 mod components;
-mod generators;
 mod init;
 mod plugin;
 mod resources;

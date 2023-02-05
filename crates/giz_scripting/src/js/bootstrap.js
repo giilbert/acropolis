@@ -1,10 +1,6 @@
 // maps an entity id to a behavior
 const behaviors = {};
 
-const Component = {
-  Transform: 0,
-};
-
 class Entity {
   constructor(id) {
     this.id = id;
@@ -26,7 +22,7 @@ class Transform {
   set position(value) {
     Deno.core.ops.op_set_component_prop(
       this.entity.id,
-      Component.Transform,
+      __GIZ_COMPONENT["giz_math::components::transform::Transform"],
       "position",
       JSON.stringify(value)
     );
@@ -36,7 +32,7 @@ class Transform {
     return JSON.parse(
       Deno.core.ops.op_get_component_prop(
         this.entity.id,
-        Component.Transform,
+        __GIZ_COMPONENT["giz_math::components::transform::Transform"],
         "position"
       )
     );
@@ -45,7 +41,7 @@ class Transform {
   set scale(value) {
     Deno.core.ops.op_set_component_prop(
       this.entity.id,
-      Component.Transform,
+      __GIZ_COMPONENT["giz_math::components::transform::Transform"],
       "scale",
       JSON.stringify(value)
     );
@@ -55,7 +51,7 @@ class Transform {
     return JSON.parse(
       Deno.core.ops.op_get_component_prop(
         this.entity.id,
-        Component.Transform,
+        __GIZ_COMPONENT["giz_math::components::transform::Transform"],
         "scale"
       )
     );
