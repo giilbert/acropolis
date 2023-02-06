@@ -86,8 +86,8 @@ fn test(world: &mut World) {
 
     world.insert_resource(Root(root.clone()));
 
-    for x in 0..10 {
-        for y in 0..10 {
+    for x in 0..1 {
+        for y in 0..1 {
             let mut transform = Transform::new();
             transform.scale = Vector3::new(0.1, 0.1, 0.1);
 

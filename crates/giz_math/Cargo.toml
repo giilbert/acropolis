@@ -5,6 +5,8 @@ edition = "2021"
 
 [dependencies]
 giz_core = { path = "../giz_core" }
+giz_scripting = { path = "../giz_scripting" }
+serde = { version = "1.0", features = ["derive"] }
 bevy_ecs = "0.9"
 cgmath = "0.18.0"
 deno_core = "0.149.0"

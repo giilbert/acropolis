@@ -12,5 +12,4 @@ giz_core = { path = "../giz_core" }
 log = "0.4.17"
 serde = { version = "1.0", features = ["derive"] }
 macros = { path = "./macros" }
-giz_math = { path = "../giz_math" }
 cgmath = { version = "0.18.0", features = ["serde"] }

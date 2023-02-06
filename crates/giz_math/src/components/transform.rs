@@ -1,3 +1,5 @@
+use giz_scripting::{serde_json, Scriptable};
+use serde::{Deserialize, Serialize};
 use std::ops::Mul;
 
 use bevy_ecs::prelude::{Component, Entity};
@@ -80,5 +82,57 @@ impl GlobalTransform {
 impl Default for GlobalTransform {
     fn default() -> GlobalTransform {
         GlobalTransform::new()
+    }
+}
+
+// TODO: find a more permenant place
+#[derive(Serialize, Deserialize)]
+struct JsVector3 {
+    x: f32,
+    y: f32,
+    z: f32,
+}
+
+impl Scriptable for Transform {
+    fn set_property(&mut self, name: &str, value: String) {
+        match name {
+            "position" => {
+                let JsVector3 { x, y, z } =
+                    serde_json::from_str(&value).unwrap();
+                self.position.x = x;
+                self.position.y = y;
+                self.position.z = z;
+            }
+            "scale" => {
+                let JsVector3 { x, y, z } =
+                    serde_json::from_str(&value).unwrap();
+                self.scale.x = x;
+                self.scale.y = y;
+                self.scale.z = z;
+            }
+            _ => panic!("bad property"),
+        }
+    }
+
+    fn get_property(&self, name: &str) -> String {
+        match name {
+            "position" => {
+                let payload = JsVector3 {
+                    x: self.position.x,
+                    y: self.position.y,
+                    z: self.position.z,
+                };
+                serde_json::to_string(&payload).unwrap()
+            }
+            "scale" => {
+                let payload = JsVector3 {
+                    x: self.scale.x,
+                    y: self.scale.y,
+                    z: self.scale.z,
+                };
+                serde_json::to_string(&payload).unwrap()
+            }
+            _ => panic!("bad property"),
+        }
     }
 }

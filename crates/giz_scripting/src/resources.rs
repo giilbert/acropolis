@@ -13,20 +13,9 @@ use bevy_ecs::{
 use deno_core::{
     op, serde_json, Extension, ExtensionBuilder, JsRuntime, RuntimeOptions,
 };
-use giz_math::Transform;
 use serde::{Deserialize, Serialize};
 
 use crate::Scriptable;
-
-impl Scriptable for PhantomData<()> {
-    fn set_property(&mut self, _name: &str, _value: String) {
-        unreachable!()
-    }
-
-    fn get_property(&self, _name: &str) -> String {
-        unreachable!()
-    }
-}
 
 // TODO: make better & safer
 pub static mut SCRIPTING_WORLD: Option<*mut World> = None;
@@ -129,58 +118,6 @@ impl ScriptingResource {
     }
 }
 
-// TODO: find a more permenant place
-#[derive(Serialize, Deserialize)]
-struct JsVector3 {
-    x: f32,
-    y: f32,
-    z: f32,
-}
-
-impl Scriptable for Transform {
-    fn set_property(&mut self, name: &str, value: String) {
-        match name {
-            "position" => {
-                let JsVector3 { x, y, z } =
-                    serde_json::from_str(&value).unwrap();
-                self.position.x = x;
-                self.position.y = y;
-                self.position.z = z;
-            }
-            "scale" => {
-                let JsVector3 { x, y, z } =
-                    serde_json::from_str(&value).unwrap();
-                self.scale.x = x;
-                self.scale.y = y;
-                self.scale.z = z;
-            }
-            _ => panic!("bad property"),
-        }
-    }
-
-    fn get_property(&self, name: &str) -> String {
-        match name {
-            "position" => {
-                let payload = JsVector3 {
-                    x: self.position.x,
-                    y: self.position.y,
-                    z: self.position.z,
-                };
-                serde_json::to_string(&payload).unwrap()
-            }
-            "scale" => {
-                let payload = JsVector3 {
-                    x: self.scale.x,
-                    y: self.scale.y,
-                    z: self.scale.z,
-                };
-                serde_json::to_string(&payload).unwrap()
-            }
-            _ => panic!("bad property"),
-        }
-    }
-}
-
 #[derive(Copy, Clone)]
 pub struct ScriptingVTable(pub *const ());
 
@@ -222,6 +159,7 @@ impl ScriptingExtensions {
     }
 
     pub fn register_component<C: Component + Scriptable + Default>(&mut self) {
+        log::info!("Registered component {}", std::any::type_name::<C>());
         let type_id = TypeId::of::<C>();
 
         unsafe {

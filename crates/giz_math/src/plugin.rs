@@ -1,4 +1,7 @@
 use giz_core::{Plugin, Stage};
+use giz_scripting::ScriptingExtensions;
+
+use crate::Transform;
 
 pub struct MathPlugin;
 
@@ -8,5 +11,10 @@ impl Plugin for MathPlugin {
             Stage::Update,
             crate::systems::transform_propagate_system,
         );
+
+        let mut extensions_resource =
+            app.world.resource_mut::<ScriptingExtensions>();
+
+        extensions_resource.register_component::<Transform>();
     }
 }
