@@ -1,10 +1,4 @@
-use std::{
-    any::{Any, TypeId},
-    cell::RefCell,
-    collections::HashMap,
-    marker::PhantomData,
-    rc::Rc,
-};
+use std::{any::TypeId, cell::RefCell, collections::HashMap, rc::Rc};
 
 use bevy_ecs::{
     component::{ComponentDescriptor, ComponentId},
