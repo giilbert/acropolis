@@ -1,6 +1,7 @@
+use std::any::Any;
+
 use crate::resources::{ScriptingExtensions, ScriptingResource};
 use bevy_ecs::prelude::*;
-use giz_math::Transform;
 
 use crate::components::Behavior;
 
@@ -15,6 +16,14 @@ fn prepare_components(world: &mut World) {
         .collect::<Vec<_>>();
 
     for descriptor in descriptors {
+        if world
+            .components()
+            .get_id(descriptor.borrow().as_ref().unwrap().type_id().unwrap())
+            .is_some()
+        {
+            continue;
+        }
+
         world.init_component_with_descriptor(
             descriptor.borrow_mut().take().unwrap(),
         );
@@ -31,9 +40,6 @@ pub fn create_runtime(world: &mut World) {
         .collect::<Vec<_>>();
 
     let mut extensions_resource = world.resource_mut::<ScriptingExtensions>();
-
-    extensions_resource.register_component::<Transform>();
-    extensions_resource.register_component::<Behavior>();
 
     let extensions = extensions_resource.extensions.take().unwrap();
     let mut resource = ScriptingResource::new(extensions);
