@@ -3,7 +3,7 @@ use bytemuck::{Pod, Zeroable};
 use cgmath::{Matrix4, Rad};
 use wgpu::{util::DeviceExt, BindGroup, Buffer};
 
-use crate::{state::StateInner, window::WINDOW_SIZE};
+use crate::state::StateInner;
 
 #[rustfmt::skip]
 pub const OPENGL_TO_WGPU_MATRIX: cgmath::Matrix4<f32> = cgmath::Matrix4::new(
@@ -45,8 +45,8 @@ impl Camera {
         T: Copy + Into<Rad<f32>>,
     {
         // create perspective matrix from fov
-        let (x, y) = *WINDOW_SIZE.read().unwrap();
-        let aspect_ratio = x / y;
+        let aspect_ratio =
+            (state.size.width as f32) / (state.size.height as f32);
         let projection_matrix = OPENGL_TO_WGPU_MATRIX
             * cgmath::perspective(fov, aspect_ratio.into(), near, far);
 
@@ -97,6 +97,30 @@ impl Camera {
             bind_group,
             projection_matrix_buffer,
         }
+    }
+
+    pub fn update_projection_matrix(&mut self, state: &mut StateInner) {
+        let aspect_ratio =
+            (state.size.width as f32) / (state.size.height as f32);
+        let matrix = match &self.camera_data {
+            &CameraData::Perspective { fov, near, far, .. } => {
+                OPENGL_TO_WGPU_MATRIX
+                    * cgmath::perspective(fov, aspect_ratio.into(), near, far)
+            }
+            _ => todo!(),
+        };
+
+        if let CameraData::Perspective { fov, near, far, .. } = self.camera_data
+        {
+            self.camera_data = CameraData::Perspective {
+                fov,
+                aspect_ratio,
+                near,
+                far,
+            }
+        }
+
+        self.projection_matrix = matrix;
     }
 }
 

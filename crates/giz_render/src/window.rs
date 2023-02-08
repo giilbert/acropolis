@@ -9,11 +9,6 @@ use winit::{
 
 // use super::rendering::State;
 
-lazy_static! {
-    pub static ref WINDOW_SIZE: RwLock<(f32, f32)> =
-        RwLock::new((900.0, 600.0));
-}
-
 pub struct Window {
     event_loop: EventLoop<()>,
     pub state: State,
