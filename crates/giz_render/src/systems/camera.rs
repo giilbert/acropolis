@@ -1,22 +1,23 @@
 use bevy_ecs::prelude::*;
+use giz_math::GlobalTransform;
 
 use crate::{
-    components::{
-        rendering::{Camera, CurrentCamera},
-        GlobalTransform,
-    },
-    resources::rendering::CurrentCameraMatrixResource,
+    components::{Camera, CurrentCamera},
+    StateResource,
 };
 
 pub fn camera_view_matrix_update_system(
-    mut camera_matrix_resource: ResMut<CurrentCameraMatrixResource>,
-    query: Query<
-        &GlobalTransform,
-        (With<GlobalTransform>, With<CurrentCamera>, With<Camera>),
-    >,
+    mut query: Query<&mut Camera, With<CurrentCamera>>,
+    state_resource: Res<StateResource>,
 ) {
-    for transform in &query {
-        camera_matrix_resource.view_matrix = transform.matrix;
+    if !state_resource.is_changed() {
+        return;
+    }
+
+    let mut state = state_resource.lock();
+
+    for mut camera in &mut query {
+        camera.update_projection_matrix(&mut *state);
     }
 }
 

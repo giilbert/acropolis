@@ -1,7 +1,11 @@
 use bevy_ecs::prelude::*;
 use giz_core::Plugin;
 
-use crate::{resources::StateResource, systems::mesh_render_system, Window};
+use crate::{
+    resources::StateResource,
+    systems::{camera_view_matrix_update_system, mesh_render_system},
+    Window,
+};
 
 pub struct RenderPlugin;
 
@@ -9,7 +13,9 @@ impl Plugin for RenderPlugin {
     fn build(&mut self, app: &mut giz_core::Application) {
         app.runtime_schedule.add_stage(
             "render",
-            SystemStage::parallel().with_system(mesh_render_system),
+            SystemStage::parallel()
+                .with_system(mesh_render_system)
+                .with_system(camera_view_matrix_update_system),
         );
 
         let window = pollster::block_on(Window::new());
@@ -23,6 +29,8 @@ impl Plugin for RenderPlugin {
             window.run_event_loop(move || {
                 let frame = {
                     let mut state = state.lock();
+
+                    app.world.resource_mut::<StateResource>().set_changed();
 
                     let frame = state
                         .surface
