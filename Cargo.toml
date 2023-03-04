@@ -6,6 +6,7 @@ members = [
   "crates/giz_render",
   "crates/giz_scripting",
   "crates/giz_input",
+  "crates/giz_loader",
   "crates/giz_scripting/macros",
   "crates/giz_math"
 ]

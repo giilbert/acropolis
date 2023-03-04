@@ -1,11 +1,10 @@
 use bevy_ecs::prelude::*;
-use giz_core::resources::Root;
 
-use crate::{Children, GlobalTransform, Parent, Transform};
+use crate::{Children, GlobalTransform, Parent, Root, Transform};
 use cgmath::Matrix4;
 
 pub fn transform_propagate_system(
-    root: Res<Root>,
+    root: Query<Entity, With<Root>>,
     mut changed_local_transform_query: Query<
         (&Transform, Entity, &Children, Option<&Parent>),
         Changed<Transform>,
@@ -18,7 +17,7 @@ pub fn transform_propagate_system(
     {
         let parent_entity = match parent {
             Some(parent) => parent.0,
-            None => root.0,
+            None => root.single(),
         };
         let parent_transform = global_transform_query
             .get_component::<GlobalTransform>(parent_entity)

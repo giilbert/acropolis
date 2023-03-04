@@ -1,0 +1,5 @@
+{
+  "name": "test-material",
+  "type": "material",
+  "file": "test-material.wgsl"
+}

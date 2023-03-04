@@ -20,6 +20,8 @@ impl Material {
 
         Ok(Self { module })
     }
+
+    // pub fn load() -> anyhow::Result<Self> {}
 }
 
 impl Drop for Material {

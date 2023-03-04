@@ -1,5 +1,13 @@
-use crate::{utils::Material, State};
-use bevy_ecs::prelude::Component;
+use std::{
+    any::Any,
+    collections::HashMap,
+    sync::{Arc, Mutex},
+};
+
+use crate::{utils::Material, State, StateResource};
+use bevy_ecs::{prelude::Component, world::World};
+use deno_core::serde_json::{self, Value};
+use serde::Deserialize;
 use wgpu::{util::DeviceExt, BindGroup, Buffer, RenderPipeline};
 
 #[derive(Component, Debug)]
@@ -13,8 +21,23 @@ pub struct Mesh {
     pub bind_group: BindGroup,
 }
 
+#[derive(Deserialize)]
+struct MeshData {
+    pub material: String,
+    pub geometry: GeometryData,
+}
+
+#[derive(Deserialize)]
+#[serde(tag = "type")]
+enum GeometryData {
+    RawGeometry {
+        vertices: Vec<Vertex>,
+        indices: Vec<u32>,
+    },
+}
+
 impl Mesh {
-    pub fn new(
+    pub fn from_raw_geometry(
         state: &State,
         material: &Material,
         vertices: Vec<Vertex>,
@@ -163,9 +186,35 @@ impl Mesh {
             bind_group,
         }
     }
+
+    pub fn from_json(
+        assets: &HashMap<String, Arc<Mutex<Option<Box<dyn Any>>>>>,
+        world: &mut World,
+        value: Value,
+    ) -> Self {
+        let data = serde_json::from_value::<MeshData>(value).unwrap();
+        let geometry = data.geometry;
+        let material = assets
+            .get(&data.material)
+            .unwrap()
+            .lock()
+            .unwrap()
+            .take()
+            .unwrap();
+        let material = material.downcast::<Material>().unwrap();
+
+        match geometry {
+            GeometryData::RawGeometry { vertices, indices } => {
+                let state = world.resource_mut::<StateResource>().clone();
+                Self::from_raw_geometry(&state, &material, vertices, indices)
+            }
+        }
+    }
 }
 
-#[derive(bytemuck::Zeroable, bytemuck::Pod, Copy, Clone, Debug)]
+#[derive(
+    bytemuck::Zeroable, bytemuck::Pod, Copy, Clone, Debug, Deserialize,
+)]
 #[repr(C)]
 pub struct Vertex {
     pub position: [f32; 3],

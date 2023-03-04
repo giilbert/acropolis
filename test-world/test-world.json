@@ -1,0 +1,46 @@
+{
+  "assets": ["test-material.json"],
+  "entities": [
+    {
+      "id": 0,
+      "Transform": {
+        "position": [0, 0, 0],
+        "rotation": [0, 0, 0, 1],
+        "scale": [0.1, 0.1, 0.1]
+      },
+      "Parent": null,
+      "Children": [],
+      "Mesh": {
+        "geometry": {
+          "type": "RawGeometry",
+          "vertices": [
+            { "position": [0.5, 0.5, 0.0] },
+            { "position": [0.5, -0.5, 0.0] },
+            { "position": [-0.5, -0.5, 0.0] },
+            { "position": [-0.5, 0.5, 0.0] }
+          ],
+          "indices": [0, 2, 1, 0, 3, 2]
+        },
+        "material": "test-material"
+      }
+    },
+
+    {
+      "id": 1,
+      "Transform": {
+        "position": [0, 0, -4],
+        "rotation": [0, 0, 0, 1],
+        "scale": [1, 1, 1]
+      },
+      "Parent": null,
+      "Children": [],
+      "CurrentCamera": true,
+      "Camera": {
+        "type": "Perspective",
+        "fov": 50,
+        "near": 0.1,
+        "far": 1000.0
+      }
+    }
+  ]
+}

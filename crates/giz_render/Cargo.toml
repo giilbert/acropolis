@@ -18,3 +18,5 @@ bytemuck = "1.12.3"
 cgmath = "0.18.0"
 anyhow = "1.0.68"
 giz_math = { path = "../giz_math" }
+deno_core = "0.149.0"
+serde = { version = "1.0.152", features = ["derive"] }

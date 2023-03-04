@@ -1,9 +1,11 @@
-use bevy_ecs::prelude::Component;
+use bevy_ecs::{prelude::Component, world::World};
 use bytemuck::{Pod, Zeroable};
-use cgmath::{Matrix4, Rad};
+use cgmath::{Deg, Matrix4, Rad};
+use deno_core::serde_json::{self, Value};
+use serde::Deserialize;
 use wgpu::{util::DeviceExt, BindGroup, Buffer};
 
-use crate::{state::StateInner, window::WINDOW_SIZE};
+use crate::{state::StateInner, window::WINDOW_SIZE, StateResource};
 
 #[rustfmt::skip]
 pub const OPENGL_TO_WGPU_MATRIX: cgmath::Matrix4<f32> = cgmath::Matrix4::new(
@@ -24,9 +26,12 @@ pub struct Camera {
 #[derive(Component)]
 pub struct CurrentCamera;
 
+#[derive(Deserialize)]
+#[serde(tag = "type")]
 pub enum CameraData {
     Perspective {
-        fov: Rad<f32>,
+        fov: Deg<f32>,
+        #[serde(skip)]
         aspect_ratio: f32,
         near: f32,
         far: f32,
@@ -89,13 +94,27 @@ impl Camera {
         Camera {
             projection_matrix,
             camera_data: CameraData::Perspective {
-                fov: fov.into(),
+                fov: fov.into().into(),
                 aspect_ratio,
                 near,
                 far,
             },
             bind_group,
             projection_matrix_buffer,
+        }
+    }
+
+    pub fn from_json(world: &mut World, value: Value) -> Self {
+        let state_resource = world.get_resource::<StateResource>().unwrap();
+        let state = state_resource.0.lock();
+
+        let camera_data: CameraData = serde_json::from_value(value).unwrap();
+
+        match camera_data {
+            CameraData::Perspective { fov, near, far, .. } => {
+                Self::new_perspective(&state, fov, near, far)
+            }
+            CameraData::Orthographic {} => todo!(),
         }
     }
 }

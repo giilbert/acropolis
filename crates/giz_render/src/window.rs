@@ -2,6 +2,7 @@ use crate::State;
 use lazy_static::lazy_static;
 use std::{sync::RwLock, time::Instant};
 use winit::{
+    dpi::Size,
     event::*,
     event_loop::{ControlFlow, EventLoop},
     window::WindowBuilder,
@@ -22,7 +23,14 @@ pub struct Window {
 impl Window {
     pub async fn new() -> Window {
         let event_loop = EventLoop::new();
-        let window = WindowBuilder::new().build(&event_loop).unwrap();
+        let window = WindowBuilder::new()
+            .with_visible(false)
+            .with_inner_size(Size::Logical(winit::dpi::LogicalSize {
+                width: 900.0,
+                height: 600.0,
+            }))
+            .build(&event_loop)
+            .unwrap();
         let state = State::new(window).await;
 
         Self { event_loop, state }
@@ -31,6 +39,8 @@ impl Window {
     pub fn run_event_loop(self, mut update: impl FnMut() + 'static) {
         // every 2 seconds at 60fps
         const PROFILE_NUM_FRAMES: i32 = 2 * 60;
+
+        self.state.lock().window.set_visible(true);
 
         let mut frames = 0;
         let mut last_updated = Instant::now();

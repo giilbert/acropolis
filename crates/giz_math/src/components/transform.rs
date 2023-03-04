@@ -2,7 +2,10 @@ use giz_scripting::{serde_json, Scriptable};
 use serde::{Deserialize, Serialize};
 use std::ops::Mul;
 
-use bevy_ecs::prelude::{Component, Entity};
+use bevy_ecs::{
+    prelude::{Component, Entity},
+    world::World,
+};
 use cgmath::{Matrix4, Quaternion, SquareMatrix, Vector3, Zero};
 
 #[derive(Component)]
@@ -10,6 +13,13 @@ pub struct Transform {
     pub position: Vector3<f32>,
     pub rotation: Quaternion<f32>,
     pub scale: Vector3<f32>,
+}
+
+#[derive(Deserialize)]
+struct TransformData {
+    pub position: [f32; 3],
+    pub rotation: [f32; 4],
+    pub scale: [f32; 3],
 }
 
 #[derive(Component)]
@@ -54,6 +64,17 @@ impl Transform {
     ) -> Matrix4<f32> {
         let local_matrix = self.generate_matrix();
         return local_matrix * parent_matrix;
+    }
+
+    pub fn from_json(
+        world: &mut World,
+        value: deno_core::serde_json::Value,
+    ) -> Self {
+        let data: TransformData = serde_json::from_value(value).unwrap();
+        let mut transform = Transform::new();
+        transform.set_position(Vector3::from(data.position));
+
+        transform
     }
 }
 
