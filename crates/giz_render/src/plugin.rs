@@ -1,10 +1,12 @@
 use bevy_ecs::prelude::*;
 use giz_core::Plugin;
+use giz_loader::Registry;
 
 use crate::{
+    components::{Camera, CurrentCamera, Mesh},
     resources::StateResource,
     systems::{camera_view_matrix_update_system, mesh_render_system},
-    Window,
+    Material, Window,
 };
 
 pub struct RenderPlugin;
@@ -22,6 +24,52 @@ impl Plugin for RenderPlugin {
 
         app.world
             .insert_resource(StateResource(window.state.clone()));
+
+        app.world.resource_scope::<Registry, _>(|_, mut registry| {
+            registry.register_asset(
+                "Material",
+                &|_ctx, world, _value, bytes| {
+                    let state = world.resource_mut::<StateResource>();
+                    let material =
+                        Material::new(&*state, String::from_utf8_lossy(bytes))?;
+                    Ok(Box::new(material))
+                },
+            );
+
+            registry.register_component(
+                "Mesh",
+                &|ctx, world, entity, value| {
+                    let state = world.resource_mut::<StateResource>().clone();
+                    let state = state.lock();
+
+                    let mut entity = world.entity_mut(entity);
+                    entity.insert(Mesh::load(ctx, &state, value));
+
+                    Ok(())
+                },
+            );
+
+            registry.register_component(
+                "Camera",
+                &|_ctx, world, entity, value| {
+                    let state = world.resource_mut::<StateResource>().clone();
+                    let state = state.lock();
+
+                    let mut entity = world.entity_mut(entity);
+                    entity.insert(Camera::from_json(&state, value));
+
+                    Ok(())
+                },
+            );
+
+            registry.register_component(
+                "CurrentCamera",
+                &|_, world, entity, _| {
+                    world.entity_mut(entity).insert(CurrentCamera);
+                    Ok(())
+                },
+            )
+        });
 
         app.runner = Box::new(move |mut app| {
             let state = window.state.clone();

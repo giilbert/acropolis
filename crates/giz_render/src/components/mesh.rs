@@ -4,9 +4,10 @@ use std::{
     sync::{Arc, Mutex},
 };
 
-use crate::{utils::Material, State, StateResource};
+use crate::{utils::Material, State, StateInner, StateResource};
 use bevy_ecs::{prelude::Component, world::World};
 use deno_core::serde_json::{self, Value};
+use giz_loader::Context;
 use serde::Deserialize;
 use wgpu::{util::DeviceExt, BindGroup, Buffer, RenderPipeline};
 
@@ -38,13 +39,11 @@ enum GeometryData {
 
 impl Mesh {
     pub fn from_raw_geometry(
-        state: &State,
+        state: &StateInner,
         material: &Material,
         vertices: Vec<Vertex>,
         indices: Vec<u32>,
     ) -> Self {
-        let state = &state.lock();
-
         let camera_bind_group_layout = state.device.create_bind_group_layout(
             &wgpu::BindGroupLayoutDescriptor {
                 label: Some("Mesh Bind Group Layout"),
@@ -187,14 +186,16 @@ impl Mesh {
         }
     }
 
-    pub fn from_json(
-        assets: &HashMap<String, Arc<Mutex<Option<Box<dyn Any>>>>>,
-        world: &mut World,
+    pub fn load(
+        context: &Context,
+        // assets: &HashMap<String, Arc<Mutex<Option<Box<dyn Any>>>>>,
+        state: &StateInner,
         value: Value,
     ) -> Self {
         let data = serde_json::from_value::<MeshData>(value).unwrap();
         let geometry = data.geometry;
-        let material = assets
+        let material = context
+            .assets
             .get(&data.material)
             .unwrap()
             .lock()
@@ -205,8 +206,7 @@ impl Mesh {
 
         match geometry {
             GeometryData::RawGeometry { vertices, indices } => {
-                let state = world.resource_mut::<StateResource>().clone();
-                Self::from_raw_geometry(&state, &material, vertices, indices)
+                Self::from_raw_geometry(state, &material, vertices, indices)
             }
         }
     }

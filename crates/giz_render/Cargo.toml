@@ -10,6 +10,7 @@ parking_lot = "0.12.1"
 wgpu = "0.14.2"
 winit = "0.27.5"
 giz_core = { path = "../giz_core" }
+giz_loader = { path = "../giz_loader" }
 log = "0.4.17"
 lazy_static = "1.4.0"
 pollster = "0.2.5"

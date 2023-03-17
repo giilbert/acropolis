@@ -6,7 +6,10 @@ use std::{
 
 use bevy_ecs::prelude::Entity;
 
-pub struct Context {
+use crate::registry::Registry;
+
+pub struct Context<'a> {
     pub assets: HashMap<String, Arc<Mutex<Option<Box<dyn Any>>>>>,
-    pub ids: HashMap<u64, Entity>,
+    pub entity_id_map: HashMap<u64, Entity>,
+    pub registry: &'a Registry,
 }

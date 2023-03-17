@@ -103,10 +103,7 @@ impl Camera {
         }
     }
 
-    pub fn from_json(world: &mut World, value: Value) -> Self {
-        let state_resource = world.get_resource::<StateResource>().unwrap();
-        let state = state_resource.0.lock();
-
+    pub fn from_json(state: &StateInner, value: Value) -> Self {
         let camera_data: CameraData = serde_json::from_value(value).unwrap();
 
         match camera_data {

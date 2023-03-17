@@ -2,6 +2,7 @@ use std::path::PathBuf;
 
 use giz_core::Application;
 use giz_input::InputPlugin;
+use giz_loader::LoaderPlugin;
 use giz_math::MathPlugin;
 use giz_render::RenderPlugin;
 use giz_scripting::ScriptingPlugin;
@@ -10,6 +11,7 @@ fn main() {
     pretty_env_logger::init();
 
     let mut app = Application::new()
+        .with_plugin(LoaderPlugin)
         .with_plugin(RenderPlugin)
         .with_plugin(ScriptingPlugin)
         .with_plugin(MathPlugin)
