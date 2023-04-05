@@ -1,5 +1,6 @@
 use bevy_ecs::schedule::SystemStage;
 use giz_core::{Plugin, Stage};
+use giz_loader::Registry;
 
 use crate::{
     init::{create_runtime, init_scripting},
@@ -25,5 +26,12 @@ impl Plugin for ScriptingPlugin {
             .stage(Stage::Scripting, |stage: &mut SystemStage| {
                 stage.add_system(scripting_update_system)
             });
+
+        app.world.resource_scope::<Registry, _>(|_, mut registry| {
+            registry
+                .register_component("behaviors", &|_, world, entity, value| {
+                    Ok(())
+                });
+        });
     }
 }

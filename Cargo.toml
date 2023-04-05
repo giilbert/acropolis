@@ -8,5 +8,6 @@ members = [
   "crates/giz_input",
   "crates/giz_loader",
   "crates/giz_scripting/macros",
-  "crates/giz_math"
+  "crates/giz_math",
+  "crates/giz_build"
 ]

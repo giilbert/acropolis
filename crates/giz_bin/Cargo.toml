@@ -6,6 +6,7 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+giz_build = { path = "../giz_build" }
 giz_core = { path = "../giz_core" }
 giz_render = { path = "../giz_render" }
 giz_scripting = { path = "../giz_scripting" }

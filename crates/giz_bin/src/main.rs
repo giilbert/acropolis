@@ -1,5 +1,4 @@
-use std::path::PathBuf;
-
+use giz_build::BuildParameters;
 use giz_core::Application;
 use giz_input::InputPlugin;
 use giz_loader::LoaderPlugin;
@@ -9,6 +8,15 @@ use giz_scripting::ScriptingPlugin;
 
 fn main() {
     pretty_env_logger::init();
+
+    let now = std::time::Instant::now();
+    let out = giz_build::build(BuildParameters {
+        base_path: "test-world".into(),
+        behavior_paths: vec!["src/rotate.js".into()],
+    });
+
+    println!("{}", out.code);
+    println!("bundling took: {}ms", now.elapsed().as_millis());
 
     let mut app = Application::new()
         .with_plugin(LoaderPlugin)
@@ -23,5 +31,5 @@ fn main() {
     giz_loader::load_from_file(&mut app, test_world, "test-world.json")
         .unwrap();
 
-    app.run();
+    // app.run();
 }

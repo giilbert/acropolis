@@ -13,3 +13,4 @@ log = "0.4.17"
 serde = { version = "1.0", features = ["derive"] }
 macros = { path = "./macros" }
 cgmath = { version = "0.18.0", features = ["serde"] }
+giz_loader = { path = "../giz_loader" }

@@ -27,6 +27,12 @@
 
     {
       "id": 1,
+      "behaviors": [
+        {
+          "src": "src/rotate.js",
+          "params": {}
+        }
+      ],
       "Transform": {
         "position": [0, 0, -4],
         "rotation": [0, 0, 0, 1],
