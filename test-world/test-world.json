@@ -1,5 +1,6 @@
 {
   "assets": ["test-material.json"],
+  "scriptBundle": "output.js",
   "entities": [
     {
       "id": 0,
@@ -22,19 +23,19 @@
           "indices": [0, 2, 1, 0, 3, 2]
         },
         "material": "test-material"
-      }
+      },
+      "behaviors": [
+        {
+          "src": "src/move.ts",
+          "params": {}
+        }
+      ]
     },
 
     {
       "id": 1,
-      "behaviors": [
-        {
-          "src": "src/rotate.js",
-          "params": {}
-        }
-      ],
       "Transform": {
-        "position": [0, 0, -4],
+        "position": [0, 0, -10],
         "rotation": [0, 0, 0, 1],
         "scale": [1, 1, 1]
       },

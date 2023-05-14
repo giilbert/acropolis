@@ -9,6 +9,7 @@ mod resource;
 pub use context::Context;
 pub use plugin::LoaderPlugin;
 pub use registry::Registry;
+pub use resource::LoaderContextResource;
 
 use asset::Asset;
 use bevy_ecs::world::World;
@@ -29,6 +30,12 @@ pub fn load_from_file(
 ) -> anyhow::Result<()> {
     let data: WorldData =
         serde_json::from_reader(File::open(base_path.join(path_to_world))?)?;
+
+    application
+        .world
+        .resource_scope::<LoaderContextResource, _>(|_world, mut context| {
+            context.root_path = base_path.clone();
+        });
 
     application
         .world

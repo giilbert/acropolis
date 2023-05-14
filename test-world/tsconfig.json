@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@giz/*": ["./.giz/std/@giz/*"]
+    }
+  },
+  "include": ["./src/**/*"]
+}

@@ -1,4 +1,3 @@
-use giz_build::BuildParameters;
 use giz_core::Application;
 use giz_input::InputPlugin;
 use giz_loader::LoaderPlugin;
@@ -10,12 +9,13 @@ fn main() {
     pretty_env_logger::init();
 
     let now = std::time::Instant::now();
-    let out = giz_build::build(BuildParameters {
-        base_path: "test-world".into(),
-        behavior_paths: vec!["src/rotate.js".into()],
-    });
 
-    println!("{}", out.code);
+    giz_build::create_dot_giz("test-world".into());
+    let out = giz_build::build(giz_build::BuildParameters {
+        project_root: "test-world".into(),
+        behavior_paths: vec!["src/move.ts".into()],
+    });
+    // write to bundle.js
     println!("bundling took: {}ms", now.elapsed().as_millis());
 
     let mut app = Application::new()
@@ -27,9 +27,8 @@ fn main() {
 
     let mut test_world = std::env::current_dir().unwrap();
     test_world.push("test-world");
-    // get the cwd
     giz_loader::load_from_file(&mut app, test_world, "test-world.json")
         .unwrap();
 
-    // app.run();
+    app.run();
 }

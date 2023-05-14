@@ -7,7 +7,7 @@ pub fn transform_propagate_system(
     root: Query<Entity, With<Root>>,
     mut changed_local_transform_query: Query<
         (&Transform, Entity, &Children, Option<&Parent>),
-        Changed<Transform>,
+        (Changed<Transform>, Without<Root>),
     >,
     mut global_transform_query: Query<(&mut GlobalTransform, &Transform)>,
     children_query: Query<&Children>,
@@ -24,6 +24,11 @@ pub fn transform_propagate_system(
             .expect(
                 "every entity requires a parent transform component. not found",
             );
+
+        if parent_entity == entity {
+            panic!("parent and entity are the same");
+        }
+
         let matrix = transform_component
             .generate_matrix_parent(&parent_transform.matrix);
 
@@ -39,7 +44,7 @@ pub fn transform_propagate_system(
             &children_query,
             children,
             &matrix,
-        )
+        );
     }
 }
 

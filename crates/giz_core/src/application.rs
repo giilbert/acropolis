@@ -17,9 +17,9 @@ impl Application {
         let world = World::new();
         let init_schedule = Schedule::default();
         let runtime_schedule = Schedule::default()
+            .with_stage(Stage::Scripting, SystemStage::parallel())
             .with_stage(Stage::Update, SystemStage::parallel())
-            .with_stage(Stage::Render, SystemStage::parallel())
-            .with_stage(Stage::Scripting, SystemStage::parallel());
+            .with_stage(Stage::Render, SystemStage::parallel());
 
         Application {
             world: Box::new(world),

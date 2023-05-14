@@ -83,6 +83,7 @@ impl Plugin for MathPlugin {
                                 )
                                 .single_mut(world);
                             root_entity_children.0.push(entity);
+
                             world
                                 .entity_mut(entity)
                                 .insert(Parent(root_entity_id));

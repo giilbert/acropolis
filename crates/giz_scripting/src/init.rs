@@ -5,8 +5,6 @@ use bevy_ecs::prelude::*;
 
 use crate::components::Behavior;
 
-const BOOTSTRAP_SOURCE: &str = include_str!("js/bootstrap.js");
-
 fn prepare_components(world: &mut World) {
     let descriptors = world
         .resource::<ScriptingExtensions>()
@@ -80,15 +78,22 @@ pub fn create_runtime(world: &mut World) {
 }
 
 pub fn init_scripting(
+    loader_context: Res<giz_loader::LoaderContextResource>,
     mut scripting: NonSendMut<ScriptingResource>,
     mut query: Query<(&mut Behavior, Entity)>,
 ) {
+    use std::fs;
+
+    let bundle_source =
+        fs::read_to_string(loader_context.root_path.join(".giz/out.js"))
+            .expect("error reading bundle");
+
     let runtime = &mut scripting.runtime;
     runtime
-        .execute_script("giz-bootstrap", BOOTSTRAP_SOURCE)
+        .execute_script("<giz-bundle>", &bundle_source)
         .expect("scripting failed to initialize");
 
     for (mut behavior, entity) in &mut query {
-        behavior.run(runtime, entity);
+        behavior.run_create_script(runtime, entity);
     }
 }

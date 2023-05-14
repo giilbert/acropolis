@@ -1,11 +1,16 @@
+use std::path::PathBuf;
+
 use giz_core::{components::Name, Application, Plugin};
 
-use crate::registry::Registry;
+use crate::{registry::Registry, resource::LoaderContextResource};
 
 pub struct LoaderPlugin;
 
 impl Plugin for LoaderPlugin {
     fn build(&mut self, app: &mut Application) {
+        app.world.insert_resource(LoaderContextResource {
+            root_path: PathBuf::new(),
+        });
         app.world.insert_resource(Registry::new());
 
         app.world.resource_scope::<Registry, _>(|_, mut registry| {

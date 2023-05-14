@@ -1,33 +1,42 @@
+use std::sync::atomic::{AtomicUsize, Ordering};
+
 use crate::Scriptable;
 use bevy_ecs::prelude::*;
 use deno_core::JsRuntime;
 
+static BEHAVIOR_ID: AtomicUsize = AtomicUsize::new(0);
+
 #[derive(Component, Scriptable, Default)]
 pub struct Behavior {
-    pub name: String,
-    pub class_name: String,
+    paths: Vec<String>,
 }
 
 unsafe impl Send for Behavior {}
 unsafe impl Sync for Behavior {}
 
 impl Behavior {
-    pub fn new(name: String, class_name: String) -> Behavior {
-        Behavior { name, class_name }
+    pub fn new(paths: Vec<String>) -> Behavior {
+        Behavior { paths }
     }
 
-    pub fn run(&mut self, runtime: &mut JsRuntime, entity: Entity) {
-        runtime
-            .execute_script(
-                &self.name,
-                &format!(
-                    "{{ let a = new {}(new Entity({})); behaviors[{}] = a; }}",
-                    self.class_name,
-                    // TODO: make more unique
-                    entity.index(),
-                    entity.index()
-                ),
-            )
-            .expect("Error during script execution");
+    pub fn run_create_script(
+        &mut self,
+        runtime: &mut JsRuntime,
+        entity: Entity,
+    ) {
+        for path in &self.paths {
+            runtime
+                .execute_script(
+                    path,
+                    &format!(
+                        "__giz__.createBehavior('{}', '{}', '{}');",
+                        // "{{ let a = new {}(new Entity({})); behaviors[{}] = a; }}",
+                        &path,
+                        entity.index(),
+                        BEHAVIOR_ID.fetch_add(1, Ordering::Relaxed),
+                    ),
+                )
+                .expect("Error during script execution");
+        }
     }
 }

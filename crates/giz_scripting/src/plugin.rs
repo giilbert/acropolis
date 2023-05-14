@@ -6,6 +6,7 @@ use crate::{
     init::{create_runtime, init_scripting},
     resources::{ScriptingExtensions, SCRIPTING_WORLD},
     systems::scripting_update_system,
+    Behavior,
 };
 
 pub struct ScriptingPlugin;
@@ -28,10 +29,24 @@ impl Plugin for ScriptingPlugin {
             });
 
         app.world.resource_scope::<Registry, _>(|_, mut registry| {
-            registry
-                .register_component("behaviors", &|_, world, entity, value| {
+            registry.register_component(
+                "behaviors",
+                &|_ctx, world, entity, value| {
+                    let paths = value
+                        .as_array()
+                        .unwrap()
+                        .iter()
+                        .map(|v| {
+                            v.get("src").unwrap().as_str().unwrap().to_string()
+                        })
+                        .collect::<Vec<_>>();
+
+                    let mut entity = world.entity_mut(entity);
+                    entity.insert(Behavior::new(paths));
+
                     Ok(())
-                });
+                },
+            );
         });
     }
 }
