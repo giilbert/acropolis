@@ -1,0 +1,23 @@
+[package]
+name = "acropolis_render"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+parking_lot = "0.12.1"
+wgpu = "0.14.2"
+winit = "0.27.5"
+acropolis_core = { path = "../acropolis_core" }
+acropolis_loader = { path = "../acropolis_loader" }
+log = "0.4.17"
+lazy_static = "1.4.0"
+pollster = "0.2.5"
+bevy_ecs = "0.9"
+bytemuck = "1.12.3"
+cgmath = "0.18.0"
+anyhow = "1.0.68"
+acropolis_math = { path = "../acropolis_math" }
+deno_core = "0.149.0"
+serde = { version = "1.0.152", features = ["derive"] }

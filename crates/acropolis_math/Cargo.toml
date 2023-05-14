@@ -1,0 +1,13 @@
+[package]
+name = "acropolis_math"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+acropolis_core = { path = "../acropolis_core" }
+acropolis_loader = { path = "../acropolis_loader" }
+acropolis_scripting = { path = "../acropolis_scripting" }
+serde = { version = "1.0", features = ["derive"] }
+bevy_ecs = "0.9"
+cgmath = "0.18.0"
+deno_core = "0.149.0"

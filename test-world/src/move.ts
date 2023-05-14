@@ -1,5 +1,5 @@
-import { Behavior, Entity } from "@giz/core";
-import { keyDown } from "@giz/input";
+import { Behavior, Entity } from "@acropolis/core";
+import { keyDown } from "@acropolis/input";
 
 class A extends Behavior {
   constructor(entity: Entity) {

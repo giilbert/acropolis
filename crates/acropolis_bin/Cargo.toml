@@ -1,0 +1,18 @@
+[package]
+name = "acropolis"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+acropolis_build = { path = "../acropolis_build" }
+acropolis_core = { path = "../acropolis_core" }
+acropolis_render = { path = "../acropolis_render" }
+acropolis_scripting = { path = "../acropolis_scripting" }
+acropolis_input = { path = "../acropolis_input" }
+acropolis_loader = { path = "../acropolis_loader" }
+acropolis_math = { path = "../acropolis_math" }
+pretty_env_logger = "0.4.0"
+bevy_ecs = "0.9"
+cgmath = "0.18.0"

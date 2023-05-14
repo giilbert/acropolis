@@ -1,0 +1,13 @@
+[package]
+name = "acropolis_input"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+bevy_ecs = "0.9"
+deno_core = "0.149.0"
+acropolis_core = { path = "../acropolis_core" }
+acropolis_scripting = { path = "../acropolis_scripting" }
+acropolis_render = { path = "../acropolis_render" }
+log = "0.4.17"
+serde = { version = "1.0", features = ["derive"] }

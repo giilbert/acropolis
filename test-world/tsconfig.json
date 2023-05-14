@@ -2,7 +2,7 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@giz/*": ["./.giz/std/@giz/*"]
+      "@acropolis/*": ["./.acropolis/std/@acropolis/*"]
     }
   },
   "include": ["./src/**/*"]

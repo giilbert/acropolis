@@ -1,0 +1,4 @@
+{
+  "name": "@acropolis/core",
+  "main": "./index.ts"
+}

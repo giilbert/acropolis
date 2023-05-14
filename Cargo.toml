@@ -1,13 +1,13 @@
 [workspace]
 resolver = "2"
 members = [
-  "crates/giz_core",
-  "crates/giz_bin",
-  "crates/giz_render",
-  "crates/giz_scripting",
-  "crates/giz_input",
-  "crates/giz_loader",
-  "crates/giz_scripting/macros",
-  "crates/giz_math",
-  "crates/giz_build"
+  "crates/acropolis_core",
+  "crates/acropolis_bin",
+  "crates/acropolis_render",
+  "crates/acropolis_scripting",
+  "crates/acropolis_input",
+  "crates/acropolis_loader",
+  "crates/acropolis_scripting/macros",
+  "crates/acropolis_math",
+  "crates/acropolis_bin"
 ]
