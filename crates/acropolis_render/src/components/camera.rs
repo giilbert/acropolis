@@ -1,8 +1,8 @@
 use crate::{state::StateInner, StateResource};
+use acropolis_scripting::serde_json::{self, Value};
 use bevy_ecs::{prelude::Component, world::World};
 use bytemuck::{Pod, Zeroable};
 use cgmath::{Deg, Matrix4, Rad};
-use deno_core::serde_json::{self, Value};
 use serde::Deserialize;
 use wgpu::{util::DeviceExt, BindGroup, Buffer};
 

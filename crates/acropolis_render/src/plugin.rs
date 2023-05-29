@@ -1,6 +1,6 @@
-use bevy_ecs::prelude::*;
 use acropolis_core::Plugin;
 use acropolis_loader::Registry;
+use bevy_ecs::prelude::*;
 
 use crate::{
     components::{Camera, CurrentCamera, Mesh},
@@ -23,7 +23,7 @@ impl Plugin for RenderPlugin {
         let window = pollster::block_on(Window::new());
 
         app.world
-            .insert_resource(StateResource(window.state.clone()));
+            .insert_non_send_resource(StateResource(window.state.clone()));
 
         app.world.resource_scope::<Registry, _>(|_, mut registry| {
             registry.register_asset(

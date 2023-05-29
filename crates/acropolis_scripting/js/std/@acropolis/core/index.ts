@@ -1,7 +1,7 @@
 export class Entity {
-  id: string;
+  id: number;
 
-  constructor(id: string) {
+  constructor(id: number) {
     this.id = id;
   }
 }

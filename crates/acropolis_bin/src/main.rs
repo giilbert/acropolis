@@ -15,6 +15,7 @@ fn main() {
         project_root: "test-world".into(),
         behavior_paths: vec!["src/move.ts".into()],
     });
+    acropolis_build::pack_project("test-world".into());
     // write to bundle.js
     println!("bundling took: {}ms", now.elapsed().as_millis());
 

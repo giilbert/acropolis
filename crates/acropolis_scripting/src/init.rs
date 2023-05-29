@@ -1,9 +1,14 @@
-use std::any::Any;
-
 use crate::resources::{ScriptingExtensions, ScriptingResource};
 use bevy_ecs::prelude::*;
+use wasm_bindgen::prelude::*;
 
 use crate::components::Behavior;
+
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(js_namespace = __ACROPOLIS__)]
+    fn set_component_ids(ids: String);
+}
 
 fn prepare_components(world: &mut World) {
     let descriptors = world
@@ -39,8 +44,15 @@ pub fn create_runtime(world: &mut World) {
 
     let mut extensions_resource = world.resource_mut::<ScriptingExtensions>();
 
-    let extensions = extensions_resource.extensions.take().unwrap();
-    let mut resource = ScriptingResource::new(extensions);
+    let mut resource;
+    cfg_if::cfg_if! {
+        if #[cfg(target_arch = "wasm32")] {
+            resource = ScriptingResource::new_wasm();
+        } else {
+            let extensions = extensions_resource.extensions.take().unwrap();
+            resource = ScriptingResource::new_deno(extensions);
+        }
+    };
 
     let ScriptingExtensions {
         ref registered_components,
@@ -57,20 +69,31 @@ pub fn create_runtime(world: &mut World) {
         }
     }
 
+    let count = world.components().len();
     let component_id_enum_stuff = format!(
-        "const __ACROPOLIS_COMPONENT={{{}}};",
+        "{{{}}}",
         world
             .components()
             .iter()
             .map(|c| (c.id().index(), c.name()))
-            .map(|(i, name)| format!("\"{}\":{},", name, i))
+            .map(|(i, name)| if i != count - 1 {
+                format!("\"{}\":{},", name, i)
+            } else {
+                format!("\"{}\":{}", name, i)
+            })
             .collect::<String>()
     );
 
-    resource
-        .runtime
-        .execute_script("acropolis-component-ids", &component_id_enum_stuff)
-        .unwrap();
+    cfg_if::cfg_if! {
+        if #[cfg(target_arch = "wasm32")] {
+            set_component_ids(component_id_enum_stuff.clone());
+        } else {
+            resource
+                .runtime
+                .execute_script("acropolis-component-ids", &format!("const __ACROPOLIS_COMPONENT={};", component_id_enum_stuff))
+                .unwrap();
+        }
+    };
 
     log::info!("{}", component_id_enum_stuff);
 
@@ -79,21 +102,29 @@ pub fn create_runtime(world: &mut World) {
 
 pub fn init_scripting(
     loader_context: Res<acropolis_loader::LoaderContextResource>,
-    mut scripting: NonSendMut<ScriptingResource>,
+    mut scripting: ResMut<ScriptingResource>,
     mut query: Query<(&mut Behavior, Entity)>,
 ) {
-    use std::fs;
+    cfg_if::cfg_if! {
+        if #[cfg(not(target_arch = "wasm32"))] {
+            use std::fs;
 
-    let bundle_source =
-        fs::read_to_string(loader_context.root_path.join(".acropolis/out.js"))
-            .expect("error reading bundle");
+            let bundle_source =
+                fs::read_to_string(loader_context.root_path.join(".acropolis/out.js"))
+                .expect("error reading bundle");
 
-    let runtime = &mut scripting.runtime;
-    runtime
-        .execute_script("<acropolis-bundle>", &bundle_source)
-        .expect("scripting failed to initialize");
+            let runtime = &mut scripting.runtime;
+            runtime
+                .execute_script("<acropolis-bundle>", &bundle_source)
+                .expect("scripting failed to initialize");
 
-    for (mut behavior, entity) in &mut query {
-        behavior.run_create_script(runtime, entity);
+            for (mut behavior, entity) in &mut query {
+                behavior.run_create_script_deno(runtime, entity);
+            }
+        } else {
+            for (mut behavior, entity) in &mut query {
+                behavior.run_create_script_wasm(entity);
+            }
+        }
     }
 }

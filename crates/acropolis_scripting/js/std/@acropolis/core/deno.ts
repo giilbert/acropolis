@@ -7,12 +7,22 @@ export function setComponentProperty(
   value: any
 ) {
   // @ts-ignore
-  Deno.core.ops.op_set_component_prop(
-    entity.id,
-    componentId,
-    key,
-    JSON.stringify(value)
-  );
+  if (typeof Deno === "undefined") {
+    __ACROPOLIS__.set_component_prop(
+      entity.id,
+      componentId,
+      key,
+      JSON.stringify(value)
+    );
+  } else {
+    // @ts-ignore
+    Deno.core.ops.op_set_component_prop(
+      entity.id,
+      componentId,
+      key,
+      JSON.stringify(value)
+    );
+  }
 }
 
 export function getComponentProperty(
@@ -20,8 +30,15 @@ export function getComponentProperty(
   componentId: number,
   key: string
 ) {
-  return JSON.parse(
-    // @ts-ignore
-    Deno.core.ops.op_get_component_prop(entity.id, componentId, key)
-  );
+  // @ts-ignore
+  if (typeof Deno === "undefined") {
+    const d = __ACROPOLIS__.get_component_prop(entity.id, componentId, key);
+    console.log(d);
+    return JSON.parse(d);
+  } else {
+    return JSON.parse(
+      // @ts-ignore
+      Deno.core.ops.op_get_component_prop(entity.id, componentId, key)
+    );
+  }
 }

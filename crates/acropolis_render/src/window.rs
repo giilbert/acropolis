@@ -37,10 +37,10 @@ impl Window {
 
         self.state.lock().window.set_visible(true);
 
-        let mut frames = 0;
-        let mut last_updated = Instant::now();
+        // let mut frames = 0;
+        // let mut last_updated = Instant::now();
 
-        let mut mspf_acc = 0;
+        // let mut mspf_acc = 0;
 
         self.event_loop.run(move |event, _, control_flow| {
             let mut state = self.state.lock();
@@ -99,25 +99,25 @@ impl Window {
                 Event::RedrawRequested(window_id)
                     if window_id == state.window.id() =>
                 {
-                    let elapsed = last_updated.elapsed().as_millis();
-                    last_updated = Instant::now();
+                    // let elapsed = last_updated.elapsed().as_millis();
+                    // last_updated = Instant::now();
 
                     drop(state);
                     update();
 
-                    mspf_acc += elapsed;
-                    frames += 1;
+                    // mspf_acc += elapsed;
+                    // frames += 1;
 
-                    if frames == PROFILE_NUM_FRAMES {
-                        log::info!(
-                            "mspf avg: {:.03}ms ({} frames)",
-                            mspf_acc as f32 / PROFILE_NUM_FRAMES as f32,
-                            PROFILE_NUM_FRAMES
-                        );
+                    // if frames == PROFILE_NUM_FRAMES {
+                    //     log::info!(
+                    //         "mspf avg: {:.03}ms ({} frames)",
+                    //         mspf_acc as f32 / PROFILE_NUM_FRAMES as f32,
+                    //         PROFILE_NUM_FRAMES
+                    //     );
 
-                        frames = 0;
-                        mspf_acc = 0;
-                    }
+                    //     frames = 0;
+                    //     mspf_acc = 0;
+                    // }
                 }
                 Event::RedrawEventsCleared => {
                     // RedrawRequested will only trigger once, unless we manually

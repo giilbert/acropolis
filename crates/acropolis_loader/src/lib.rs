@@ -1,4 +1,7 @@
-use std::{collections::HashMap, fs::File, path::PathBuf};
+use std::{
+    collections::HashMap,
+    path::{Path, PathBuf},
+};
 
 mod asset;
 mod context;
@@ -11,16 +14,35 @@ pub use plugin::LoaderPlugin;
 pub use registry::Registry;
 pub use resource::LoaderContextResource;
 
+use acropolis_core::Application;
 use asset::Asset;
 use bevy_ecs::world::World;
-use acropolis_core::Application;
 use serde::Deserialize;
 use serde_json::Value;
+use wasm_bindgen::prelude::*;
 
 #[derive(Deserialize)]
 struct WorldData {
     pub assets: Vec<String>,
     pub entities: Vec<HashMap<String, Value>>,
+}
+
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(js_namespace = __ACROPOLIS__)]
+    fn js_read_file(path: &str) -> Option<Vec<u8>>;
+}
+
+pub fn read_file(path: &Path) -> anyhow::Result<Vec<u8>> {
+    cfg_if::cfg_if! {
+        if #[cfg(target_arch = "wasm32")] {
+            Ok(
+                js_read_file(path.to_str().unwrap()).ok_or_else(|| anyhow::anyhow!("Not found"))?
+            )
+        } else {
+            Ok(std::fs::read(path)?)
+        }
+    }
 }
 
 pub fn load_from_file(
@@ -29,7 +51,7 @@ pub fn load_from_file(
     path_to_world: &str,
 ) -> anyhow::Result<()> {
     let data: WorldData =
-        serde_json::from_reader(File::open(base_path.join(path_to_world))?)?;
+        serde_json::from_slice(&read_file(&base_path.join(path_to_world))?)?;
 
     application
         .world

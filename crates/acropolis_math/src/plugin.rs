@@ -1,7 +1,7 @@
-use bevy_ecs::{prelude::Entity, query::With};
 use acropolis_core::{Plugin, Stage};
 use acropolis_loader::Registry;
 use acropolis_scripting::ScriptingExtensions;
+use bevy_ecs::{prelude::Entity, query::With};
 
 use crate::{Children, GlobalTransform, Parent, Root, Transform};
 
@@ -49,7 +49,7 @@ impl Plugin for MathPlugin {
                 "Children",
                 &|ctx, world, entity, value| {
                     let value: Vec<u64> =
-                        deno_core::serde_json::from_value(value)?;
+                        acropolis_scripting::serde_json::from_value(value)?;
                     let children = value
                         .iter()
                         .map(|child| ctx.entity_id_map[&child])
@@ -65,7 +65,7 @@ impl Plugin for MathPlugin {
                 "Parent",
                 &|ctx, world, entity, value| {
                     let value: Option<u64> =
-                        deno_core::serde_json::from_value(value)?;
+                        acropolis_scripting::serde_json::from_value(value)?;
 
                     match value {
                         Some(parent_id) => {

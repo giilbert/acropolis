@@ -10,4 +10,9 @@ acropolis_scripting = { path = "../acropolis_scripting" }
 serde = { version = "1.0", features = ["derive"] }
 bevy_ecs = "0.9"
 cgmath = "0.18.0"
+
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
 deno_core = "0.149.0"
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+wasm-bindgen = "0.2.86"

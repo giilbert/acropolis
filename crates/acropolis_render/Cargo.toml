@@ -7,10 +7,11 @@ edition = "2021"
 
 [dependencies]
 parking_lot = "0.12.1"
-wgpu = "0.14.2"
+wgpu = { version = "0.16.0", features = ["webgl"] }
 winit = "0.27.5"
 acropolis_core = { path = "../acropolis_core" }
 acropolis_loader = { path = "../acropolis_loader" }
+acropolis_scripting = { path = "../acropolis_scripting" }
 log = "0.4.17"
 lazy_static = "1.4.0"
 pollster = "0.2.5"
@@ -19,5 +20,10 @@ bytemuck = "1.12.3"
 cgmath = "0.18.0"
 anyhow = "1.0.68"
 acropolis_math = { path = "../acropolis_math" }
-deno_core = "0.149.0"
 serde = { version = "1.0.152", features = ["derive"] }
+
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+deno_core = "0.149.0"
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+wasm-bindgen = "0.2.86"

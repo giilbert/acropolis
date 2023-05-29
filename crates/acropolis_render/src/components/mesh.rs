@@ -5,9 +5,9 @@ use std::{
 };
 
 use crate::{utils::Material, State, StateInner, StateResource};
-use bevy_ecs::{prelude::Component, world::World};
-use deno_core::serde_json::{self, Value};
 use acropolis_loader::Context;
+use acropolis_scripting::serde_json::{self, Value};
+use bevy_ecs::{prelude::Component, world::World};
 use serde::Deserialize;
 use wgpu::{util::DeviceExt, BindGroup, Buffer, RenderPipeline};
 

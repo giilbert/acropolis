@@ -11,3 +11,6 @@ members = [
   "crates/acropolis_math",
   "crates/acropolis_bin"
 ]
+exclude = [
+  "web"
+]

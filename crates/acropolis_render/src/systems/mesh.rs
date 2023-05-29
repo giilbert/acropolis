@@ -1,5 +1,5 @@
-use bevy_ecs::prelude::*;
 use acropolis_math::GlobalTransform;
+use bevy_ecs::prelude::*;
 
 use crate::{
     components::{Camera, CameraUniform, CurrentCamera, Mesh},
@@ -37,7 +37,15 @@ pub fn mesh_render_system(
             color_attachments: &[Some(wgpu::RenderPassColorAttachment {
                 view,
                 resolve_target: None,
-                ops: wgpu::Operations::default(),
+                ops: wgpu::Operations {
+                    load: wgpu::LoadOp::Clear(wgpu::Color {
+                        r: 0.025,
+                        g: 0.01,
+                        b: 0.025,
+                        a: 1.0,
+                    }),
+                    store: true,
+                },
             })],
             depth_stencil_attachment: None,
         });

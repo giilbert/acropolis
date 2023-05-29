@@ -47,3 +47,53 @@ fn create_files_js(files: &[PathBuf]) -> String {
 
     imports + &export
 }
+
+#[cfg(not(target_arch = "wasm32"))]
+pub fn pack_project(base_path: PathBuf) {
+    use std::{ffi::OsStr, fs::File, io::BufReader};
+    use walkdir::WalkDir;
+    use zip::write::{FileOptions, ZipWriter};
+
+    let mut zip = ZipWriter::new(File::create("web/test-project.zip").unwrap());
+
+    for entry in WalkDir::new(base_path.clone()) {
+        if let Ok(entry) = entry {
+            let directory_name = entry
+                .path()
+                .strip_prefix(&base_path)
+                .unwrap()
+                .iter()
+                .next()
+                .unwrap_or(OsStr::new(""))
+                .to_string_lossy();
+
+            if directory_name == ".acropolis"
+                || directory_name == "node_modules"
+            {
+                continue;
+            }
+
+            if entry.file_type().is_file() {
+                // add the file to the zip archive
+                zip.start_file(
+                    entry
+                        .path()
+                        .strip_prefix(&base_path)
+                        .unwrap()
+                        .to_string_lossy(),
+                    FileOptions::default(),
+                )
+                .unwrap();
+
+                let buffer = File::open(entry.path()).unwrap();
+                std::io::copy(&mut BufReader::new(buffer), &mut zip).unwrap();
+            }
+        }
+    }
+
+    zip.start_file("bundle.js", FileOptions::default()).unwrap();
+    let buffer = File::open(base_path.join(".acropolis/out.js")).unwrap();
+    std::io::copy(&mut BufReader::new(buffer), &mut zip).unwrap();
+
+    zip.finish().unwrap();
+}

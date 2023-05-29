@@ -68,7 +68,7 @@ impl Transform {
 
     pub fn from_json(
         world: &mut World,
-        value: deno_core::serde_json::Value,
+        value: acropolis_scripting::serde_json::Value,
     ) -> Self {
         let data: TransformData = serde_json::from_value(value).unwrap();
         let mut transform = Transform::new();

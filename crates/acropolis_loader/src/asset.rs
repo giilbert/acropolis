@@ -1,12 +1,11 @@
 use std::{
     any::Any,
-    fs,
     path::PathBuf,
     sync::{Arc, Mutex},
 };
 
-use bevy_ecs::world::World;
 use acropolis_core::Application;
+use bevy_ecs::world::World;
 use serde::Deserialize;
 use serde_json::Value;
 
@@ -44,8 +43,8 @@ impl Asset {
     ) -> anyhow::Result<Self> {
         let path = base_path.join(metadata_path);
         let metadata: AssetMetadata =
-            serde_json::from_reader(fs::File::open(&path)?)?;
-        let data = fs::read(base_path.join(&metadata.file))?;
+            serde_json::from_slice(&crate::read_file(&path)?)?;
+        let data = crate::read_file(&base_path.join(&metadata.file))?;
 
         Ok(Self {
             deserialized: Arc::new(Mutex::new(Some(

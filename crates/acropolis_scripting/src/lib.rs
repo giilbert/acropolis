@@ -11,4 +11,5 @@ pub use plugin::ScriptingPlugin;
 pub use resources::{ScriptingExtensions, ScriptingResource, SCRIPTING_WORLD};
 pub use scriptable::Scriptable;
 
-pub use deno_core::{serde, serde_json};
+pub use macros::*;
+pub use serde_json;

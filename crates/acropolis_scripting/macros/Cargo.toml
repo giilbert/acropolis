@@ -10,3 +10,4 @@ proc-macro = true
 syn = { version = "1.0.107", features = ["full"] }
 quote = "1.0.23"
 proc-macro2 = "1.0.51"
+cfg-if = "1.0.0"

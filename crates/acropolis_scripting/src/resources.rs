@@ -6,10 +6,6 @@ use bevy_ecs::{
     component::{ComponentDescriptor, ComponentId},
     prelude::*,
 };
-use deno_core::{
-    op, serde_json, Extension, ExtensionBuilder, JsRuntime, RuntimeOptions,
-};
-use serde::{Deserialize, Serialize};
 
 use crate::Scriptable;
 
@@ -50,8 +46,8 @@ unsafe fn get_scripting_api<'a>(
     Some(&mut *o)
 }
 
-#[op]
-fn op_set_component_prop(
+#[macros::glued_function]
+pub fn op_set_component_prop(
     entity_id: u32,
     component_id: usize,
     key: String,
@@ -65,8 +61,8 @@ fn op_set_component_prop(
     }
 }
 
-#[op]
-fn op_get_component_prop(
+#[macros::glued_function]
+pub fn op_get_component_prop(
     entity_id: u32,
     component_id: usize,
     key: String,
@@ -86,14 +82,17 @@ fn op_get_component_prop(
 
 #[derive(Resource)]
 pub struct ScriptingResource {
-    pub runtime: JsRuntime,
+    #[cfg(not(target_arch = "wasm32"))]
+    pub runtime: deno_core::JsRuntime,
 }
 
 unsafe impl Send for ScriptingResource {}
 unsafe impl Sync for ScriptingResource {}
 
 impl ScriptingResource {
-    pub fn new(mut more_extensions: Vec<Extension>) -> Self {
+    #[cfg(not(target_arch = "wasm32"))]
+    pub fn new_deno(mut more_extensions: Vec<deno_core::Extension>) -> Self {
+        use deno_core::{Extension, JsRuntime, RuntimeOptions};
         let extension = Extension::builder()
             .ops(vec![
                 op_get_component_prop::decl(),
@@ -111,6 +110,11 @@ impl ScriptingResource {
         });
 
         Self { runtime }
+    }
+
+    #[cfg(target_arch = "wasm32")]
+    pub fn new_wasm() -> Self {
+        Self {}
     }
 }
 
@@ -133,6 +137,7 @@ pub struct ScriptingExtensions {
         (ScriptingVTable, Rc<RefCell<Option<ComponentDescriptor>>>),
     >,
     pub components: HashMap<ComponentId, ScriptingVTable>,
+    #[cfg(not(target_arch = "wasm32"))]
     pub extensions: Option<Vec<deno_core::Extension>>,
 }
 
@@ -141,13 +146,18 @@ impl Default for ScriptingExtensions {
         Self {
             registered_components: HashMap::new(),
             components: HashMap::new(),
+            #[cfg(not(target_arch = "wasm32"))]
             extensions: Some(vec![]),
         }
     }
 }
 
 impl ScriptingExtensions {
-    pub fn add_extension(&mut self, extension_builder: &mut ExtensionBuilder) {
+    #[cfg(not(target_arch = "wasm32"))]
+    pub fn add_extension(
+        &mut self,
+        extension_builder: &mut deno_core::ExtensionBuilder,
+    ) {
         self.extensions
             .as_mut()
             .expect("attempting to add extension after initialization")
