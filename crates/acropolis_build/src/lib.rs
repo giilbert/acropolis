@@ -17,8 +17,6 @@ pub fn build(parameters: BuildParameters) -> BuildOutput {
     let files_js = create_files_js(&parameters.behavior_paths);
     fs::write(files_js_path, &files_js).unwrap();
 
-    println!("{}", files_js);
-
     // spawn node build.mjs
     let mut build_command = std::process::Command::new("node");
     let mut child = build_command

@@ -48,7 +48,7 @@ pub fn read_file(path: &Path) -> anyhow::Result<Vec<u8>> {
 pub fn load_from_file(
     application: &mut Application,
     base_path: PathBuf,
-    path_to_world: &str,
+    path_to_world: PathBuf,
 ) -> anyhow::Result<()> {
     let data: WorldData =
         serde_json::from_slice(&read_file(&base_path.join(path_to_world))?)?;
