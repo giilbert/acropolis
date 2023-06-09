@@ -1,7 +1,6 @@
 {
   "assets": ["test-material.json"],
-  "scriptBundle": "output.js",
-  "entities": [
+  "scriptBundle": "output.js", "entities": [
     {
       "id": 0,
       "Transform": {
@@ -33,7 +32,7 @@
     },
 
     {
-      "id": 1,
+      "id": 2,
       "Transform": {
         "position": [0, 0, -10],
         "rotation": [0, 0, 0, 1],

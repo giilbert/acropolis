@@ -3,6 +3,12 @@ use bevy_ecs::prelude::*;
 use crate::{Children, GlobalTransform, Parent, Root, Transform};
 use cgmath::Matrix4;
 
+pub fn test_system(mut query: Query<(&mut Transform)>) {
+    for mut transform in &mut query {
+        transform.position.x += 0.001;
+    }
+}
+
 pub fn transform_propagate_system(
     root: Query<Entity, With<Root>>,
     mut changed_local_transform_query: Query<

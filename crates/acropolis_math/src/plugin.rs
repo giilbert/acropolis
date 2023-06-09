@@ -13,6 +13,8 @@ impl Plugin for MathPlugin {
             Stage::Update,
             crate::systems::transform_propagate_system,
         );
+        app.runtime_schedule
+            .add_system_to_stage(Stage::Update, crate::systems::test_system);
 
         app.world.resource_scope::<ScriptingExtensions, _>(
             |_, mut extensions_resource| {

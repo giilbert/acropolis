@@ -10,7 +10,7 @@ extern "C" {
 }
 
 pub fn scripting_update_system(world: &mut World) {
-    // let now = std::time::Instant::now();
+    let now = std::time::Instant::now();
 
     let mut scripting_resource =
         world.non_send_resource_mut::<ScriptingResource>();
@@ -29,6 +29,6 @@ pub fn scripting_update_system(world: &mut World) {
         }
     }
 
-    // let elapsed = now.elapsed();
-    // log::trace!("scripting update: {:?}", elapsed);
+    let elapsed = now.elapsed();
+    log::trace!("scripting update: {:?}", elapsed);
 }
