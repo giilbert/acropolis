@@ -50,6 +50,7 @@ pub fn command() {
         })
         .collect::<Vec<_>>();
 
+    acropolis_build::create_dot_acropolis(".".into());
     acropolis_build::build(acropolis_build::BuildParameters {
         project_root: ".".into(),
         behavior_paths,

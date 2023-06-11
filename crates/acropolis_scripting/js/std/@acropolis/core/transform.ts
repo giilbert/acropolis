@@ -1,5 +1,5 @@
 import { Entity } from ".";
-import { getComponentProperty } from "./deno";
+import { getComponentVector3Property } from "./deno";
 import { Vector3 } from "./math/vector3";
 
 const transformComponentId =
@@ -17,10 +17,10 @@ export class Transform {
   static withEntity(entity: Entity): Transform {
     const newTransform = new Transform();
     newTransform.entity = entity;
-    const { x, y, z } = getComponentProperty(
+    const { x, y, z } = getComponentVector3Property(
       entity,
       transformComponentId,
-      "position"
+      0
     );
     newTransform.position = Vector3.withEntity(
       x,
@@ -28,7 +28,7 @@ export class Transform {
       z,
       transformComponentId,
       entity,
-      "position"
+      0
     );
     return newTransform;
   }

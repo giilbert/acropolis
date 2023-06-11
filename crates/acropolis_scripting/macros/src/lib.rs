@@ -17,12 +17,21 @@ pub fn scriptable(input: TokenStream) -> TokenStream {
 #[proc_macro_attribute]
 pub fn glued_function(attr: TokenStream, item: TokenStream) -> TokenStream {
     let item: TokenStream2 = item.into();
-    let _attr: TokenStream2 = attr.into();
+    let attr: TokenStream2 = attr.into();
+    let is_fast = attr.to_string().contains("fast");
 
-    let tokens = quote! {
-        #[cfg_attr(target_arch = "wasm32", wasm_bindgen::prelude::wasm_bindgen)]
-        #[cfg_attr(not(target_arch = "wasm32"), deno_core::op)]
-        #item
+    let tokens = if is_fast {
+        quote! {
+            #[cfg_attr(target_arch = "wasm32", wasm_bindgen::prelude::wasm_bindgen)]
+            #[cfg_attr(not(target_arch = "wasm32"), deno_core::op(fast))]
+            #item
+        }
+    } else {
+        quote! {
+            #[cfg_attr(target_arch = "wasm32", wasm_bindgen::prelude::wasm_bindgen)]
+            #[cfg_attr(not(target_arch = "wasm32"), deno_core::op)]
+            #item
+        }
     };
 
     return tokens.into();

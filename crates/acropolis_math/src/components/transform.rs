@@ -10,8 +10,12 @@ use cgmath::{Matrix4, Quaternion, SquareMatrix, Vector3, Zero};
 
 #[derive(Component)]
 pub struct Transform {
+    // TODO: write macros for these bindings
+    // 0
     pub position: Vector3<f32>,
+    // 1
     pub rotation: Quaternion<f32>,
+    // 2
     pub scale: Vector3<f32>,
 }
 
@@ -115,45 +119,27 @@ struct JsVector3 {
 }
 
 impl Scriptable for Transform {
-    fn set_property(&mut self, name: &str, value: String) {
-        match name {
-            "position" => {
-                let JsVector3 { x, y, z } =
-                    serde_json::from_str(&value).unwrap();
-                self.position.x = x;
-                self.position.y = y;
-                self.position.z = z;
-            }
-            "scale" => {
-                let JsVector3 { x, y, z } =
-                    serde_json::from_str(&value).unwrap();
-                self.scale.x = x;
-                self.scale.y = y;
-                self.scale.z = z;
-            }
-            _ => panic!("bad property"),
+    fn set_property_vec3(&mut self, property: u32, x: f64, y: f64, z: f64) {
+        match property {
+            0 => self.position = Vector3::new(x as f32, y as f32, z as f32),
+            2 => self.scale = Vector3::new(x as f32, y as f32, z as f32),
+            _ => panic!("Invalid property"),
         }
     }
 
-    fn get_property(&self, name: &str) -> String {
-        match name {
-            "position" => {
-                let payload = JsVector3 {
-                    x: self.position.x,
-                    y: self.position.y,
-                    z: self.position.z,
-                };
-                serde_json::to_string(&payload).unwrap()
-            }
-            "scale" => {
-                let payload = JsVector3 {
-                    x: self.scale.x,
-                    y: self.scale.y,
-                    z: self.scale.z,
-                };
-                serde_json::to_string(&payload).unwrap()
-            }
-            _ => panic!("bad property"),
+    fn get_property_vec3(&self, property: u32) -> (f64, f64, f64) {
+        match property {
+            0 => (
+                self.position.x as f64,
+                self.position.y as f64,
+                self.position.z as f64,
+            ),
+            2 => (
+                self.scale.x as f64,
+                self.scale.y as f64,
+                self.scale.z as f64,
+            ),
+            _ => panic!("Invalid property"),
         }
     }
 }

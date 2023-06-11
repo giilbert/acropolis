@@ -1,5 +1,5 @@
 import { Entity } from "..";
-import { setComponentProperty } from "../deno";
+import { setComponentProperty, setComponentVector3Property } from "../deno";
 
 export class Vector3 {
   private _x: number;
@@ -8,7 +8,7 @@ export class Vector3 {
 
   private component: number | undefined;
   private entity: Entity | undefined;
-  private property: string | undefined;
+  private property: number | undefined;
 
   constructor(x: number, y: number, z: number) {
     this._x = x;
@@ -22,7 +22,7 @@ export class Vector3 {
     z: number,
     component: number,
     entity: Entity,
-    property: string
+    property: number
   ): Vector3 {
     const newVector = new Vector3(x, y, z);
     newVector.entity = entity;
@@ -59,10 +59,11 @@ export class Vector3 {
   }
 
   private updateEntityPosition() {
-    setComponentProperty(this.entity!, this.component!, this.property!, {
-      x: this.x,
-      y: this.y,
-      z: this.z,
-    });
+    setComponentVector3Property(
+      this.entity!,
+      this.component!,
+      this.property!,
+      this
+    );
   }
 }
