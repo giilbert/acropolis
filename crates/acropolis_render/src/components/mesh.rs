@@ -1,13 +1,7 @@
-use std::{
-    any::Any,
-    collections::HashMap,
-    sync::{Arc, Mutex},
-};
-
-use crate::{utils::Material, State, StateInner, StateResource};
+use crate::{Material, StateInner};
 use acropolis_loader::Context;
 use acropolis_scripting::serde_json::{self, Value};
-use bevy_ecs::{prelude::Component, world::World};
+use bevy_ecs::prelude::Component;
 use serde::Deserialize;
 use wgpu::{util::DeviceExt, BindGroup, Buffer, RenderPipeline};
 

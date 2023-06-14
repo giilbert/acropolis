@@ -1,7 +1,6 @@
 mod impl_scriptable;
 
 use impl_scriptable::impl_scriptable;
-use proc_macro2::{Ident, Span};
 use quote::quote;
 
 use proc_macro::TokenStream;

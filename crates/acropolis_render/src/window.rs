@@ -1,6 +1,4 @@
 use crate::State;
-use lazy_static::lazy_static;
-use std::{sync::RwLock, time::Instant};
 use winit::{
     dpi::Size,
     event::*,
@@ -33,7 +31,7 @@ impl Window {
 
     pub fn run_event_loop(self, mut update: impl FnMut() + 'static) {
         // every 2 seconds at 60fps
-        const PROFILE_NUM_FRAMES: i32 = 2 * 60;
+        const _PROFILE_NUM_FRAMES: i32 = 2 * 60;
 
         self.state.lock().window.set_visible(true);
 

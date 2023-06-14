@@ -30,5 +30,5 @@ pub fn scripting_update_system(world: &mut World) {
     }
 
     let elapsed = now.elapsed();
-    log::info!("scripting update: {:?}", elapsed);
+    log::trace!("scripting update: {:?}", elapsed);
 }

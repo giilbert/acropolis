@@ -50,6 +50,14 @@ impl Transform {
         self.position = translation;
     }
 
+    pub fn set_rotation(&mut self, rotation: Quaternion<f32>) {
+        self.rotation = rotation;
+    }
+
+    pub fn set_scale(&mut self, scale: Vector3<f32>) {
+        self.scale = scale;
+    }
+
     pub fn generate_matrix(&self) -> Matrix4<f32> {
         let matrix = Matrix4::from_translation(self.position)
             .mul(Matrix4::from_nonuniform_scale(
@@ -71,12 +79,14 @@ impl Transform {
     }
 
     pub fn from_json(
-        world: &mut World,
+        _world: &mut World,
         value: acropolis_scripting::serde_json::Value,
     ) -> Self {
         let data: TransformData = serde_json::from_value(value).unwrap();
         let mut transform = Transform::new();
         transform.set_position(Vector3::from(data.position));
+        transform.set_rotation(Quaternion::from(data.rotation));
+        transform.set_scale(Vector3::from(data.scale));
 
         transform
     }

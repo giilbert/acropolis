@@ -1,10 +1,6 @@
 use std::{any::Any, collections::HashMap};
 
-use bevy_ecs::{
-    prelude::Entity,
-    system::Resource,
-    world::{EntityMut, World},
-};
+use bevy_ecs::{prelude::Entity, system::Resource, world::World};
 use serde_json::Value;
 
 use crate::{asset::AssetMetadata, context::Context};

@@ -1,4 +1,4 @@
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 
 use acropolis_core::Application;
 use acropolis_input::InputPlugin;

@@ -4,7 +4,6 @@ use std::{
     sync::{Arc, Mutex},
 };
 
-use acropolis_core::Application;
 use bevy_ecs::world::World;
 use serde::Deserialize;
 use serde_json::Value;

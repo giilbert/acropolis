@@ -1,6 +1,6 @@
-use crate::{state::StateInner, StateResource};
+use crate::state::StateInner;
 use acropolis_scripting::serde_json::{self, Value};
-use bevy_ecs::{prelude::Component, world::World};
+use bevy_ecs::prelude::Component;
 use bytemuck::{Pod, Zeroable};
 use cgmath::{Deg, Matrix4, Rad};
 use serde::Deserialize;

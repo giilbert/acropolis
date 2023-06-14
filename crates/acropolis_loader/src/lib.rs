@@ -16,7 +16,6 @@ pub use resource::LoaderContextResource;
 
 use acropolis_core::Application;
 use asset::Asset;
-use bevy_ecs::world::World;
 use serde::Deserialize;
 use serde_json::Value;
 use wasm_bindgen::prelude::*;

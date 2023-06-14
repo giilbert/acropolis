@@ -1,15 +1,7 @@
 mod run;
 
-use colored::Colorize;
-use std::path::PathBuf;
-
-use acropolis_core::Application;
-use acropolis_input::InputPlugin;
-use acropolis_loader::LoaderPlugin;
-use acropolis_math::MathPlugin;
-use acropolis_render::RenderPlugin;
-use acropolis_scripting::ScriptingPlugin;
 use clap::Parser;
+use colored::Colorize;
 
 // acropolis -> run the project
 // acropolis build -> build the project

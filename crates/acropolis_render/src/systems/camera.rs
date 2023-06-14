@@ -1,4 +1,3 @@
-use acropolis_math::GlobalTransform;
 use bevy_ecs::prelude::*;
 
 use crate::{
