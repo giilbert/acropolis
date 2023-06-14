@@ -8,7 +8,9 @@ class A extends Behavior {
 
   update() {
     if (keyDown("D")) {
-      this.transform.position.x += 0.01;
+      for (let i = 0; i < 10000; i++) {
+        this.transform.position.x += 0.000001;
+      }
     }
 
     if (keyDown("A")) {

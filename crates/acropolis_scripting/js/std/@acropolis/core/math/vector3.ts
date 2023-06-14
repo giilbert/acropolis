@@ -1,5 +1,8 @@
 import { Entity } from "..";
-import { setComponentProperty, setComponentVector3Property } from "../deno";
+import {
+  getComponentVector3Property,
+  setComponentVector3Property,
+} from "../deno";
 
 export class Vector3 {
   private _x: number;
@@ -37,7 +40,14 @@ export class Vector3 {
   }
 
   get x(): number {
-    return this._x;
+    if (!this.entity) return this._x;
+    const { x } = getComponentVector3Property(
+      this.entity!,
+      this.component!,
+      this.property!
+    );
+    this._x = x;
+    return x;
   }
 
   set y(y: number) {
@@ -46,7 +56,14 @@ export class Vector3 {
   }
 
   get y(): number {
-    return this._y;
+    if (!this.entity) return this._y;
+    const { y } = getComponentVector3Property(
+      this.entity!,
+      this.component!,
+      this.property!
+    );
+    this._y = y;
+    return y;
   }
 
   set z(z: number) {
@@ -55,7 +72,14 @@ export class Vector3 {
   }
 
   get z(): number {
-    return this._z;
+    if (!this.entity) return this._z;
+    const { z } = getComponentVector3Property(
+      this.entity!,
+      this.component!,
+      this.property!
+    );
+    this._z = z;
+    return z;
   }
 
   private updateEntityPosition() {
@@ -63,7 +87,9 @@ export class Vector3 {
       this.entity!,
       this.component!,
       this.property!,
-      this
+      this._x,
+      this._y,
+      this._z
     );
   }
 }

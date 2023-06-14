@@ -66,7 +66,9 @@ export function setComponentVector3Property(
   entity: Entity,
   componentId: number,
   key: number,
-  value: Vector3
+  x: number,
+  y: number,
+  z: number
 ) {
   // @ts-ignore
   if (typeof Deno === "undefined") {
@@ -77,9 +79,9 @@ export function setComponentVector3Property(
       entity.id,
       componentId,
       key,
-      value.x,
-      value.y,
-      value.z
+      x,
+      y,
+      z
     );
   }
 }
