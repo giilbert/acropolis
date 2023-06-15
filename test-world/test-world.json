@@ -1,12 +1,12 @@
 {
-  "assets": ["test-material.json"],
+  "assets": ["material.json", "image.json"],
   "scriptBundle": "output.js", "entities": [
     {
       "id": 0,
       "Transform": {
         "position": [0, 0, 0],
         "rotation": [0, 0, 0, 1],
-        "scale": [1, 1, 1]
+        "scale": [4.02, 3, 1]
       },
       "Parent": null,
       "Children": [],
@@ -14,14 +14,14 @@
         "geometry": {
           "type": "RawGeometry",
           "vertices": [
-            { "position": [0.5, 0.5, 0.0] },
-            { "position": [0.5, -0.5, 0.0] },
-            { "position": [-0.5, -0.5, 0.0] },
-            { "position": [-0.5, 0.5, 0.0] }
+            { "position": [0.5, 0.5, 0.0], "uv": [1, 0] },
+            { "position": [0.5, -0.5, 0.0], "uv": [1, 1] },
+            { "position": [-0.5, -0.5, 0.0], "uv": [0, 1] },
+            { "position": [-0.5, 0.5, 0.0], "uv": [0, 0] }
           ],
           "indices": [0, 2, 1, 0, 3, 2]
         },
-        "material": "test-material"
+        "material": "material"
       },
       "behaviors": [
         {

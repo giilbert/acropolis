@@ -9,13 +9,13 @@ mod plugin;
 mod registry;
 mod resource;
 
+pub use asset::Asset;
 pub use context::Context;
 pub use plugin::LoaderPlugin;
 pub use registry::Registry;
 pub use resource::LoaderContextResource;
 
 use acropolis_core::Application;
-use asset::Asset;
 use serde::Deserialize;
 use serde_json::Value;
 use wasm_bindgen::prelude::*;
@@ -67,16 +67,12 @@ pub fn load_from_file(
                 registry: registry.as_ref(),
             };
 
-            let assets = data
-                .assets
-                .iter()
-                .map(|path| Asset::load(&mut context, world, &base_path, path))
-                .collect::<anyhow::Result<Vec<Asset>>>()?;
+            let mut assets_map: HashMap<String, Asset> = HashMap::new();
 
-            let assets_map = assets
-                .iter()
-                .map(|asset| (asset.name.clone(), asset.deserialized.clone()))
-                .collect::<HashMap<_, _>>();
+            for path in data.assets.iter() {
+                let asset = Asset::load(&mut context, world, &base_path, path)?;
+                assets_map.insert(asset.name.clone(), asset);
+            }
 
             context.assets = assets_map;
 

@@ -55,7 +55,9 @@ pub fn mesh_render_system(
     for (mesh, transform) in &mesh_query {
         render_pass.set_pipeline(&mesh.render_pipeline);
 
-        render_pass.set_bind_group(1, &mesh.bind_group, &[]);
+        render_pass.set_bind_group(1, &mesh.mesh_bind_group, &[]);
+        render_pass.set_bind_group(2, &mesh.texture_bind_group, &[]);
+
         let transformation_matrix: [[f32; 4]; 4] = transform.matrix.into();
         state.queue.write_buffer(
             &mesh.transformation_matrix_buffer,

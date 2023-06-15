@@ -19,6 +19,8 @@ pub struct AssetMetadata {
     #[serde(rename = "type")]
     pub asset_type: String,
     pub name: String,
+    #[serde(rename = "dependsOn", default = "Vec::new")]
+    pub depends_on: Vec<String>,
     #[serde(flatten)]
     pub rest: Value,
 }
@@ -45,6 +47,18 @@ impl Asset {
             serde_json::from_slice(&crate::read_file(&path)?)?;
         let data = crate::read_file(&base_path.join(&metadata.file))?;
 
+        for dependency in metadata.depends_on.iter() {
+            if context.assets.contains_key(dependency) {
+                continue;
+            }
+
+            let dependent_asset =
+                Self::load(context, world, base_path, dependency)?;
+            context
+                .assets
+                .insert(dependent_asset.name.clone(), dependent_asset);
+        }
+
         Ok(Self {
             deserialized: Arc::new(Mutex::new(Some(
                 context
@@ -57,5 +71,20 @@ impl Asset {
             asset_type: metadata.asset_type,
             metadata: metadata.rest,
         })
+    }
+
+    pub fn is<T: Any>(&self) -> bool {
+        let deserialized = self.deserialized.lock().unwrap();
+        deserialized.is_some() && deserialized.as_ref().unwrap().is::<T>()
+    }
+
+    pub fn take_owned<T: Any>(&self) -> Option<T> {
+        let mut deserialized = self.deserialized.lock().ok()?;
+        let deserialized = deserialized.take()?;
+        Some(*deserialized.downcast::<T>().ok()?)
+    }
+
+    pub fn take_cloned<T: Any + Clone>(&self) -> Option<T> {
+        self.take_owned::<T>().map(|x| x.clone())
     }
 }

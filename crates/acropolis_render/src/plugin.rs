@@ -3,6 +3,7 @@ use acropolis_loader::Registry;
 use bevy_ecs::prelude::*;
 
 use crate::{
+    assets::Texture,
     components::{Camera, CurrentCamera, Mesh},
     resources::StateResource,
     systems::{camera_view_matrix_update_system, mesh_render_system},
@@ -26,13 +27,22 @@ impl Plugin for RenderPlugin {
             .insert_non_send_resource(StateResource(window.state.clone()));
 
         app.world.resource_scope::<Registry, _>(|_, mut registry| {
+            registry.register_asset("Material", &|ctx, world, value, bytes| {
+                let state = world.resource_mut::<StateResource>();
+                let material = Material::load(
+                    &*state,
+                    String::from_utf8_lossy(bytes),
+                    ctx,
+                    value,
+                )?;
+                Ok(Box::new(material))
+            });
+
             registry.register_asset(
-                "Material",
+                "Texture",
                 &|_ctx, world, _value, bytes| {
                     let state = world.resource_mut::<StateResource>();
-                    let material =
-                        Material::new(&*state, String::from_utf8_lossy(bytes))?;
-                    Ok(Box::new(material))
+                    Ok(Box::new(Texture::new(&*state, bytes)))
                 },
             );
 

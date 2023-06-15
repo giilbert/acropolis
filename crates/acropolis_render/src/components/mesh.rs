@@ -3,6 +3,7 @@ use acropolis_loader::Context;
 use acropolis_scripting::serde_json::{self, Value};
 use bevy_ecs::prelude::Component;
 use serde::Deserialize;
+use std::{mem, sync::Arc};
 use wgpu::{util::DeviceExt, BindGroup, Buffer, RenderPipeline};
 
 #[derive(Component, Debug)]
@@ -13,7 +14,8 @@ pub struct Mesh {
     pub index_buffer: Buffer,
     pub render_pipeline: RenderPipeline,
     pub transformation_matrix_buffer: Buffer,
-    pub bind_group: BindGroup,
+    pub mesh_bind_group: BindGroup,
+    pub texture_bind_group: Arc<BindGroup>,
 }
 
 #[derive(Deserialize)]
@@ -40,7 +42,7 @@ impl Mesh {
     ) -> Self {
         let camera_bind_group_layout = state.device.create_bind_group_layout(
             &wgpu::BindGroupLayoutDescriptor {
-                label: Some("Mesh Bind Group Layout"),
+                label: Some("Camera Bind Group Layout"),
                 entries: &[wgpu::BindGroupLayoutEntry {
                     binding: 0,
                     visibility: wgpu::ShaderStages::all(),
@@ -57,7 +59,7 @@ impl Mesh {
         let transformation_matrix_bind_group_layout = state
             .device
             .create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
-                label: Some("Mesh Bind Group Layout"),
+                label: Some("Transformation Bind Group Layout"),
                 entries: &[wgpu::BindGroupLayoutEntry {
                     binding: 0,
                     visibility: wgpu::ShaderStages::all(),
@@ -91,6 +93,8 @@ impl Mesh {
                 bind_group_layouts: &[
                     &camera_bind_group_layout,
                     &transformation_matrix_bind_group_layout,
+                    // LATER: add texture bind group layout
+                    &material.texture.bind_group_layout,
                 ],
                 push_constant_ranges: &[],
             },
@@ -146,22 +150,25 @@ impl Mesh {
         let bind_group_layout = state.device.create_bind_group_layout(
             &wgpu::BindGroupLayoutDescriptor {
                 label: Some("Mesh Bind Group Layout"),
-                entries: &[wgpu::BindGroupLayoutEntry {
-                    binding: 0,
-                    visibility: wgpu::ShaderStages::all(),
-                    count: None,
-                    ty: wgpu::BindingType::Buffer {
-                        ty: wgpu::BufferBindingType::Uniform,
-                        has_dynamic_offset: false,
-                        min_binding_size: None,
+                entries: &[
+                    // Transformations
+                    wgpu::BindGroupLayoutEntry {
+                        binding: 0,
+                        visibility: wgpu::ShaderStages::all(),
+                        count: None,
+                        ty: wgpu::BindingType::Buffer {
+                            ty: wgpu::BufferBindingType::Uniform,
+                            has_dynamic_offset: false,
+                            min_binding_size: None,
+                        },
                     },
-                }],
+                ],
             },
         );
 
-        let bind_group =
+        let mesh_bind_group =
             state.device.create_bind_group(&wgpu::BindGroupDescriptor {
-                label: Some("Camera Bind Group"),
+                label: Some("Mesh Bind Group"),
                 layout: &bind_group_layout,
                 entries: &[wgpu::BindGroupEntry {
                     binding: 0,
@@ -176,7 +183,8 @@ impl Mesh {
             index_buffer,
             render_pipeline,
             transformation_matrix_buffer,
-            bind_group,
+            mesh_bind_group,
+            texture_bind_group: material.texture.bind_group.clone(),
         }
     }
 
@@ -188,15 +196,13 @@ impl Mesh {
     ) -> Self {
         let data = serde_json::from_value::<MeshData>(value).unwrap();
         let geometry = data.geometry;
+
         let material = context
             .assets
             .get(&data.material)
             .unwrap()
-            .lock()
-            .unwrap()
-            .take()
+            .take_owned()
             .unwrap();
-        let material = material.downcast::<Material>().unwrap();
 
         match geometry {
             GeometryData::RawGeometry { vertices, indices } => {
@@ -212,6 +218,8 @@ impl Mesh {
 #[repr(C)]
 pub struct Vertex {
     pub position: [f32; 3],
+    #[serde(default)]
+    pub uv: [f32; 2],
 }
 
 impl Vertex {
@@ -219,11 +227,18 @@ impl Vertex {
         wgpu::VertexBufferLayout {
             array_stride: std::mem::size_of::<Vertex>() as wgpu::BufferAddress,
             step_mode: wgpu::VertexStepMode::Vertex,
-            attributes: &[wgpu::VertexAttribute {
-                offset: 0,
-                shader_location: 0,
-                format: wgpu::VertexFormat::Float32x3,
-            }],
+            attributes: &[
+                wgpu::VertexAttribute {
+                    offset: 0,
+                    shader_location: 0,
+                    format: wgpu::VertexFormat::Float32x3,
+                },
+                wgpu::VertexAttribute {
+                    offset: mem::size_of::<[f32; 3]>() as wgpu::BufferAddress,
+                    shader_location: 1,
+                    format: wgpu::VertexFormat::Float32x2,
+                },
+            ],
         }
     }
 }

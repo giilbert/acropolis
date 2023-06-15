@@ -1,0 +1,7 @@
+{
+  "name": "material",
+  "type": "Material",
+  "file": "material.wgsl",
+  "dependsOn": ["image.json"],
+  "texture": "image"
+}
