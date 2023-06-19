@@ -11,7 +11,7 @@ acropolis_core = { path = "../acropolis_core" }
 log = "0.4.17"
 serde = { version = "1.0", features = ["derive"] }
 macros = { path = "./macros" }
-cgmath = { version = "0.18.0", features = ["serde"] }
+nalgebra = { version = "0.32.2", features = ["serde-serialize"] }
 acropolis_loader = { path = "../acropolis_loader" }
 acropolis_build = { path = "../acropolis_build" }
 proc-macro2 = "1.0.58"

@@ -1,18 +1,24 @@
+use std::f32::consts::PI;
+
 use crate::state::StateInner;
 use acropolis_scripting::serde_json::{self, Value};
 use bevy_ecs::prelude::Component;
 use bytemuck::{Pod, Zeroable};
-use cgmath::{Deg, Matrix4, Rad};
+use nalgebra::Matrix4;
 use serde::Deserialize;
 use wgpu::{util::DeviceExt, BindGroup, Buffer};
 
 #[rustfmt::skip]
-pub const OPENGL_TO_WGPU_MATRIX: cgmath::Matrix4<f32> = cgmath::Matrix4::new(
+pub const OPENGL_TO_WGPU_MATRIX: Matrix4<f32> = Matrix4::new(
     1.0, 0.0, 0.0, 0.0,
     0.0, 1.0, 0.0, 0.0,
     0.0, 0.0, 0.5, 0.0,
     0.0, 0.0, 0.5, 1.0,
 );
+
+fn deg_to_rad(deg: f32) -> f32 {
+    deg * PI / 180.0
+}
 
 #[derive(Component)]
 pub struct Camera {
@@ -29,7 +35,8 @@ pub struct CurrentCamera;
 #[serde(tag = "type")]
 pub enum CameraData {
     Perspective {
-        fov: Deg<f32>,
+        // radians
+        fov: f32,
         #[serde(skip)]
         aspect_ratio: f32,
         near: f32,
@@ -39,20 +46,17 @@ pub enum CameraData {
 }
 
 impl Camera {
-    pub fn new_perspective<T>(
+    pub fn new_perspective(
         state: &StateInner,
-        fov: T,
+        fov: f32,
         near: f32,
         far: f32,
-    ) -> Camera
-    where
-        T: Copy + Into<Rad<f32>>,
-    {
+    ) -> Camera {
         // create perspective matrix from fov
         let aspect_ratio =
             (state.size.width as f32) / (state.size.height as f32);
         let projection_matrix = OPENGL_TO_WGPU_MATRIX
-            * cgmath::perspective(fov, aspect_ratio.into(), near, far);
+            * Matrix4::new_perspective(aspect_ratio.into(), fov, near, far);
 
         let projection_matrix_buffer = state.device.create_buffer_init(
             &wgpu::util::BufferInitDescriptor {
@@ -93,7 +97,7 @@ impl Camera {
         Camera {
             projection_matrix,
             camera_data: CameraData::Perspective {
-                fov: fov.into().into(),
+                fov,
                 aspect_ratio,
                 near,
                 far,
@@ -108,7 +112,7 @@ impl Camera {
 
         match camera_data {
             CameraData::Perspective { fov, near, far, .. } => {
-                Self::new_perspective(&state, fov, near, far)
+                Self::new_perspective(&state, deg_to_rad(fov), near, far)
             }
             CameraData::Orthographic {} => todo!(),
         }
@@ -120,7 +124,12 @@ impl Camera {
         let matrix = match &self.camera_data {
             &CameraData::Perspective { fov, near, far, .. } => {
                 OPENGL_TO_WGPU_MATRIX
-                    * cgmath::perspective(fov, aspect_ratio.into(), near, far)
+                    * Matrix4::new_perspective(
+                        aspect_ratio.into(),
+                        fov,
+                        near,
+                        far,
+                    )
             }
             _ => todo!(),
         };

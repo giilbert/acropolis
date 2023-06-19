@@ -17,7 +17,7 @@ lazy_static = "1.4.0"
 pollster = "0.2.5"
 bevy_ecs = "0.9"
 bytemuck = "1.12.3"
-cgmath = "0.18.0"
+nalgebra = "0.32.2"
 anyhow = "1.0.68"
 acropolis_math = { path = "../acropolis_math" }
 serde = { version = "1.0.152", features = ["derive"] }

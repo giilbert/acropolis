@@ -8,7 +8,7 @@ edition = "2021"
 [dependencies]
 serde = { version = "1.0", features = ["derive"] }
 bevy_ecs = "0.9"
-cgmath = "0.18.0"
+nalgebra = "0.32.2"
 bytemuck = { version = "1.11.0", features = ["derive"] }
 log = "0.4.17"
 lazy_static = "1.4.0"

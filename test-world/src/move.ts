@@ -1,28 +1,26 @@
 import { Behavior, Entity } from "@acropolis/core";
 import { keyDown } from "@acropolis/input";
 
-class A extends Behavior {
+class Move extends Behavior {
+  lastPressed: number;
+
   constructor(entity: Entity) {
     super(entity);
+    this.lastPressed = Date.now();
   }
 
   update() {
-    if (keyDown("D")) {
-      this.transform.position.x += 0.01;
-    }
+    const cooldownOver = Date.now() - this.lastPressed > 250;
 
-    if (keyDown("A")) {
-      this.transform.position.x -= 0.01;
-    }
+    if (!cooldownOver) return;
 
-    if (keyDown("W")) {
-      this.transform.position.y += 0.01;
-    }
+    if (keyDown("D")) this.transform.position.x += 1;
+    if (keyDown("A")) this.transform.position.x -= 1;
+    if (keyDown("W")) this.transform.position.y += 1;
+    if (keyDown("S")) this.transform.position.y -= 1;
 
-    if (keyDown("S")) {
-      this.transform.position.y -= 0.01;
-    }
+    this.lastPressed = Date.now();
   }
 }
 
-export default A;
+export default Move;

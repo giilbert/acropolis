@@ -6,7 +6,7 @@
       "Transform": {
         "position": [0, 0, 0],
         "rotation": [0, 0, 0, 1],
-        "scale": [4.02, 3, 1]
+        "scale": [1, 1, 1]
       },
       "Parent": null,
       "Children": [],
@@ -71,7 +71,13 @@
         "fov": 50,
         "near": 0.1,
         "far": 1000.0
-      }
+      },
+      "behaviors": [
+        {
+          "src": "src/camera.ts",
+          "params": {}
+        }
+      ]
     }
   ]
 }

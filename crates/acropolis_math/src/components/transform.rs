@@ -1,4 +1,7 @@
 use acropolis_scripting::{serde_json, Scriptable};
+use nalgebra::{
+    Isometry3, Matrix4, Quaternion, Translation3, UnitQuaternion, Vector3,
+};
 use serde::{Deserialize, Serialize};
 use std::ops::Mul;
 
@@ -6,15 +9,14 @@ use bevy_ecs::{
     prelude::{Component, Entity},
     world::World,
 };
-use cgmath::{Matrix4, Quaternion, SquareMatrix, Vector3, Zero};
 
 #[derive(Component)]
 pub struct Transform {
     // TODO: write macros for these bindings
     // 0
-    pub position: Vector3<f32>,
+    pub position: Translation3<f32>,
     // 1
-    pub rotation: Quaternion<f32>,
+    pub rotation: UnitQuaternion<f32>,
     // 2
     pub scale: Vector3<f32>,
 }
@@ -40,17 +42,17 @@ pub struct Children(pub Vec<Entity>);
 impl Transform {
     pub fn new() -> Transform {
         Transform {
-            position: Vector3::zero(),
-            rotation: Quaternion::zero(),
+            position: Translation3::new(0.0, 0.0, 0.0),
+            rotation: UnitQuaternion::identity(),
             scale: Vector3::new(1.0, 1.0, 1.0),
         }
     }
 
-    pub fn set_position(&mut self, translation: Vector3<f32>) {
+    pub fn set_position(&mut self, translation: Translation3<f32>) {
         self.position = translation;
     }
 
-    pub fn set_rotation(&mut self, rotation: Quaternion<f32>) {
+    pub fn set_rotation(&mut self, rotation: UnitQuaternion<f32>) {
         self.rotation = rotation;
     }
 
@@ -59,13 +61,10 @@ impl Transform {
     }
 
     pub fn generate_matrix(&self) -> Matrix4<f32> {
-        let matrix = Matrix4::from_translation(self.position)
-            .mul(Matrix4::from_nonuniform_scale(
-                self.scale.x,
-                self.scale.y,
-                self.scale.z,
-            ))
-            .mul(Matrix4::from(self.rotation));
+        let matrix = Matrix4::new_translation(&self.position.vector)
+            * Isometry3::from_parts(Translation3::identity(), self.rotation)
+                .to_matrix()
+            * Matrix4::new_nonuniform_scaling(&self.scale);
 
         return matrix;
     }
@@ -84,8 +83,10 @@ impl Transform {
     ) -> Self {
         let data: TransformData = serde_json::from_value(value).unwrap();
         let mut transform = Transform::new();
-        transform.set_position(Vector3::from(data.position));
-        transform.set_rotation(Quaternion::from(data.rotation));
+        transform.set_position(Translation3::from(data.position));
+        transform.set_rotation(UnitQuaternion::from_quaternion(
+            Quaternion::from(data.rotation),
+        ));
         transform.set_scale(Vector3::from(data.scale));
 
         transform
@@ -131,7 +132,9 @@ struct JsVector3 {
 impl Scriptable for Transform {
     fn set_property_vec3(&mut self, property: u32, x: f64, y: f64, z: f64) {
         match property {
-            0 => self.position = Vector3::new(x as f32, y as f32, z as f32),
+            0 => {
+                self.position = Translation3::new(x as f32, y as f32, z as f32)
+            }
             2 => self.scale = Vector3::new(x as f32, y as f32, z as f32),
             _ => panic!("Invalid property"),
         }
