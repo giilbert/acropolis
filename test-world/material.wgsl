@@ -31,9 +31,9 @@ fn vs_main(
   var out: VertexOutput;
 
   out.clip_position =
-    model_matrix
-    * camera_matrices.projection_matrix
+    camera_matrices.projection_matrix
     * camera_matrices.view_matrix
+    * model_matrix
     * vec4<f32>(model.position, 1.0);
 
   out.uv = model.uv;
