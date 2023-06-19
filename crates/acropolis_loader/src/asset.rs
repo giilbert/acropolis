@@ -32,7 +32,7 @@ pub struct Asset {
     pub metadata_path: String,
     pub metadata: Value,
     pub data: Arc<Vec<u8>>,
-    pub deserialized: Arc<Mutex<Option<Box<dyn Any>>>>,
+    pub deserialized: Arc<Mutex<Option<Arc<dyn Any + Send + Sync + 'static>>>>,
 }
 
 impl Asset {
@@ -78,13 +78,16 @@ impl Asset {
         deserialized.is_some() && deserialized.as_ref().unwrap().is::<T>()
     }
 
-    pub fn take_owned<T: Any>(&self) -> Option<T> {
+    pub fn take_owned<T: Any + Send + Sync>(&self) -> Option<T> {
         let mut deserialized = self.deserialized.lock().ok()?;
         let deserialized = deserialized.take()?;
-        Some(*deserialized.downcast::<T>().ok()?)
+        let a = deserialized.downcast::<T>().ok()?;
+        Arc::try_unwrap(a).ok()
     }
 
-    pub fn take_cloned<T: Any + Clone>(&self) -> Option<T> {
-        self.take_owned::<T>().map(|x| x.clone())
+    pub fn get_ref<T: Any + Send + Sync>(&self) -> Option<Arc<T>> {
+        let deserialized = self.deserialized.lock().ok()?;
+        let deserialized = deserialized.as_ref()?.clone();
+        deserialized.downcast::<T>().ok()
     }
 }

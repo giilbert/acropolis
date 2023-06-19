@@ -4,9 +4,9 @@ use crate::{Children, GlobalTransform, Parent, Root, Transform};
 use cgmath::Matrix4;
 
 pub fn test_system(mut query: Query<&mut Transform>) {
-    for mut transform in &mut query {
-        transform.position.x += 0.001;
-    }
+    // for mut transform in &mut query {
+    //     transform.position.x += 0.001;
+    // }
 }
 
 pub fn transform_propagate_system(

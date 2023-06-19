@@ -201,7 +201,7 @@ impl Mesh {
             .assets
             .get(&data.material)
             .unwrap()
-            .take_owned()
+            .get_ref()
             .unwrap();
 
         match geometry {

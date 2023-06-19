@@ -1,4 +1,4 @@
-use std::borrow::Cow;
+use std::{borrow::Cow, sync::Arc};
 
 use crate::State;
 use acropolis_loader::Context;
@@ -14,7 +14,7 @@ pub struct MaterialData {
 
 pub struct Material {
     pub module: ShaderModule,
-    pub texture: Texture,
+    pub texture: Arc<Texture>,
 }
 
 impl Material {
@@ -43,7 +43,7 @@ impl Material {
                     data.texture
                 )
             })?
-            .take_owned::<Texture>()
+            .get_ref::<Texture>()
             .ok_or_else(|| {
                 anyhow::anyhow!("Texture {} is not a texture", data.texture)
             })?;

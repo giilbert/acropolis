@@ -1,4 +1,4 @@
-use std::{any::Any, collections::HashMap};
+use std::{any::Any, collections::HashMap, sync::Arc};
 
 use bevy_ecs::{prelude::Entity, system::Resource, world::World};
 use serde_json::Value;
@@ -16,7 +16,7 @@ pub type AssetLoaderFunction = &'static (dyn Fn(
     &mut World,
     &Value,
     &[u8],
-) -> anyhow::Result<Box<dyn Any>>
+) -> anyhow::Result<Box<dyn Any + Send + Sync + 'static>>
               + Send
               + Sync);
 
@@ -103,7 +103,7 @@ impl Registry {
         world: &mut World,
         metadata: &AssetMetadata,
         data: &[u8],
-    ) -> anyhow::Result<Box<dyn Any>> {
+    ) -> anyhow::Result<Arc<dyn Any + Send + Sync + 'static>> {
         let function = self
             .asset_functions
             .get(&metadata.asset_type)
@@ -113,7 +113,7 @@ impl Registry {
                     metadata.asset_type
                 )
             })?;
-        function(context, world, &metadata.rest, data)
+        Ok(Arc::from(function(context, world, &metadata.rest, data)?))
     }
 
     pub fn load_component(
