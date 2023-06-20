@@ -16,6 +16,7 @@ impl Plugin for LoaderPlugin {
         app.world.resource_scope::<Registry, _>(|_, mut registry| {
             registry.register_component(
                 "Name",
+                &[],
                 &|_ctx, world, entity, value| {
                     let name = Name(
                         value

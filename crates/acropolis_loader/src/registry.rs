@@ -30,9 +30,14 @@ pub type InitFunction = &'static (dyn Fn(&mut Context, &mut World) -> anyhow::Re
               + Send
               + Sync);
 
+struct ComponentLoaderEntry {
+    pub dependent_components: &'static [&'static str],
+    pub function: ComponentLoaderFunction,
+}
+
 #[derive(Resource)]
 pub struct Registry {
-    component_functions: HashMap<String, ComponentLoaderFunction>,
+    component_functions: HashMap<String, ComponentLoaderEntry>,
     asset_functions: HashMap<String, AssetLoaderFunction>,
     entity_create_functions: Vec<EntityCreateFunction>,
     init_functions: Vec<InitFunction>,
@@ -51,9 +56,16 @@ impl Registry {
     pub fn register_component(
         &mut self,
         name: &str,
+        dependent_components: &'static [&'static str],
         function: ComponentLoaderFunction,
     ) {
-        self.component_functions.insert(name.to_string(), function);
+        self.component_functions.insert(
+            name.to_string(),
+            ComponentLoaderEntry {
+                dependent_components,
+                function,
+            },
+        );
     }
 
     pub fn register_asset(
@@ -123,8 +135,9 @@ impl Registry {
         entity: Entity,
         component: &str,
         data: Value,
+        get_component_data: &impl Fn(&str) -> Option<Value>,
     ) -> anyhow::Result<()> {
-        let function =
+        let entry =
             self.component_functions.get(component).ok_or_else(|| {
                 anyhow::anyhow!(
                     "No loader functions found for component: {}",
@@ -132,6 +145,26 @@ impl Registry {
                 )
             })?;
 
-        function(context, world, entity, data)
+        for dependent_component in entry.dependent_components {
+            let dependent_component_data =
+                get_component_data(dependent_component).ok_or_else(|| {
+                    anyhow::anyhow!(
+                        "Dependent component {} not found for component {}",
+                        dependent_component,
+                        component
+                    )
+                })?;
+
+            self.load_component(
+                context,
+                world,
+                entity,
+                dependent_component,
+                dependent_component_data,
+                get_component_data,
+            )?;
+        }
+
+        (entry.function)(context, world, entity, data)
     }
 }

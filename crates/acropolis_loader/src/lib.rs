@@ -100,6 +100,7 @@ pub fn load_from_file(
                         entity,
                         component,
                         data.clone(),
+                        &|name| entity_definition.get(name).cloned(),
                     )?;
                 }
             }

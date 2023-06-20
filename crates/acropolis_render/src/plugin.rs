@@ -48,6 +48,7 @@ impl Plugin for RenderPlugin {
 
             registry.register_component(
                 "Mesh",
+                &[],
                 &|ctx, world, entity, value| {
                     let state = world.resource_mut::<StateResource>().clone();
                     let state = state.lock();
@@ -61,6 +62,7 @@ impl Plugin for RenderPlugin {
 
             registry.register_component(
                 "Camera",
+                &[],
                 &|_ctx, world, entity, value| {
                     let state = world.resource_mut::<StateResource>().clone();
                     let state = state.lock();
@@ -74,6 +76,7 @@ impl Plugin for RenderPlugin {
 
             registry.register_component(
                 "CurrentCamera",
+                &[],
                 &|_, world, entity, _| {
                     world.entity_mut(entity).insert(CurrentCamera);
                     Ok(())

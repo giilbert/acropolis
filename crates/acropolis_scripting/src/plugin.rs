@@ -1,6 +1,6 @@
-use bevy_ecs::schedule::SystemStage;
 use acropolis_core::{Plugin, Stage};
 use acropolis_loader::Registry;
+use bevy_ecs::schedule::SystemStage;
 
 use crate::{
     init::{create_runtime, init_scripting},
@@ -31,6 +31,7 @@ impl Plugin for ScriptingPlugin {
         app.world.resource_scope::<Registry, _>(|_, mut registry| {
             registry.register_component(
                 "behaviors",
+                &[],
                 &|_ctx, world, entity, value| {
                     let paths = value
                         .as_array()

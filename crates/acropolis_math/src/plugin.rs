@@ -36,6 +36,7 @@ impl Plugin for MathPlugin {
 
             registry.register_component(
                 "Transform",
+                &[],
                 &|_, world, entity, value| {
                     let transform = Transform::from_json(world, value);
                     let global_transform = GlobalTransform::new();
@@ -49,6 +50,7 @@ impl Plugin for MathPlugin {
 
             registry.register_component(
                 "Children",
+                &[],
                 &|ctx, world, entity, value| {
                     let value: Vec<u64> =
                         acropolis_scripting::serde_json::from_value(value)?;
@@ -65,6 +67,7 @@ impl Plugin for MathPlugin {
 
             registry.register_component(
                 "Parent",
+                &[],
                 &|ctx, world, entity, value| {
                     let value: Option<u64> =
                         acropolis_scripting::serde_json::from_value(value)?;
