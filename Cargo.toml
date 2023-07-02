@@ -9,7 +9,8 @@ members = [
   "crates/acropolis_loader",
   "crates/acropolis_scripting/macros",
   "crates/acropolis_math",
-  "crates/acropolis_bin"
+  "crates/acropolis_bin",
+  "crates/acropolis_physics"
 ]
 exclude = [
   "web"

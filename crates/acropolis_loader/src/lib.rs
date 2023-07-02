@@ -89,19 +89,25 @@ pub fn load_from_file(
                     entity,
                 );
 
+                let mut loaded: Vec<&str> = vec![];
                 for (component, data) in entity_definition.iter() {
                     if component == "id" {
                         continue;
                     }
 
-                    registry.load_component(
-                        &mut context,
-                        world,
-                        entity,
-                        component,
-                        data.clone(),
-                        &|name| entity_definition.get(name).cloned(),
-                    )?;
+                    if !loaded.contains(&component.as_str()) {
+                        registry.load_component(
+                            &mut context,
+                            world,
+                            entity,
+                            component,
+                            data.clone(),
+                            &|name| entity_definition.get(name).cloned(),
+                            &mut loaded,
+                        )?;
+                    }
+
+                    loaded.push(component);
                 }
             }
 

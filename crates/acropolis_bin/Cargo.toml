@@ -13,6 +13,7 @@ acropolis_scripting = { path = "../acropolis_scripting" }
 acropolis_input = { path = "../acropolis_input" }
 acropolis_loader = { path = "../acropolis_loader" }
 acropolis_math = { path = "../acropolis_math" }
+acropolis_physics = { path = "../acropolis_physics" }
 pretty_env_logger = "0.4.0"
 bevy_ecs = "0.9"
 nalgebra = "0.32.2"

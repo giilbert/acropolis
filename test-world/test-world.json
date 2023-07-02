@@ -4,9 +4,9 @@
     {
       "id": 0,
       "Transform": {
-        "position": [0, 0, 0],
+        "position": [0, 3, 0],
         "rotation": [0, 0, 0, 1],
-        "scale": [1, 1, 1]
+        "scale": [2, 1, 1]
       },
       "Parent": null,
       "Children": [],
@@ -23,6 +23,13 @@
         },
         "material": "material"
       },
+      "Collider2D": {
+        "shape": {
+          "type": "Rectangle",
+          "halfExtents": [1, 0.5]
+        }
+      },
+      "RigidBody2D": {},
       "behaviors": [
         {
           "src": "src/move.ts",
@@ -34,9 +41,9 @@
     {
       "id": 1,
       "Transform": {
-        "position": [0, 0, 0],
+        "position": [0, -5, 0],
         "rotation": [0, 0, 0, 1],
-        "scale": [4.02, 3, 1]
+        "scale": [16, 1, 1]
       },
       "Parent": null,
       "Children": [],
@@ -52,6 +59,12 @@
           "indices": [0, 2, 1, 0, 3, 2]
         },
         "material": "material"
+      },
+      "Collider2D": {
+        "shape": {
+          "type": "Rectangle",
+          "halfExtents": [8.0, 0.5]
+        }
       },
       "behaviors": []
     },

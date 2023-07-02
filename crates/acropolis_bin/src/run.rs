@@ -4,6 +4,7 @@ use acropolis_core::Application;
 use acropolis_input::InputPlugin;
 use acropolis_loader::LoaderPlugin;
 use acropolis_math::MathPlugin;
+use acropolis_physics::PhysicsPlugin;
 use acropolis_render::RenderPlugin;
 use acropolis_scripting::ScriptingPlugin;
 use walkdir::DirEntry;
@@ -61,6 +62,7 @@ pub fn command() {
         .with_plugin(RenderPlugin)
         .with_plugin(ScriptingPlugin)
         .with_plugin(MathPlugin)
+        .with_plugin(PhysicsPlugin)
         .with_plugin(InputPlugin);
 
     let acropolis_json: AcropolisJson = serde_json::from_reader(

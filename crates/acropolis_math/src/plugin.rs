@@ -1,7 +1,7 @@
 use acropolis_core::{Plugin, Stage};
 use acropolis_loader::Registry;
 use acropolis_scripting::ScriptingExtensions;
-use bevy_ecs::{prelude::Entity, query::With};
+use bevy_ecs::prelude::*;
 
 use crate::{Children, GlobalTransform, Parent, Root, Transform};
 
@@ -11,7 +11,8 @@ impl Plugin for MathPlugin {
     fn build(&mut self, app: &mut acropolis_core::Application) {
         app.runtime_schedule.add_system_to_stage(
             Stage::Update,
-            crate::systems::transform_propagate_system,
+            crate::systems::transform_propagate_system
+                .label("transform_propagate"),
         );
         app.runtime_schedule
             .add_system_to_stage(Stage::Update, crate::systems::test_system);

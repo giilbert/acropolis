@@ -136,6 +136,7 @@ impl Registry {
         component: &str,
         data: Value,
         get_component_data: &impl Fn(&str) -> Option<Value>,
+        loaded_components: &mut Vec<&str>,
     ) -> anyhow::Result<()> {
         let entry =
             self.component_functions.get(component).ok_or_else(|| {
@@ -155,6 +156,13 @@ impl Registry {
                     )
                 })?;
 
+            if loaded_components.contains(dependent_component) {
+                continue;
+            }
+
+            loaded_components.push(*dependent_component);
+
+            // if the component does not exist, load it
             self.load_component(
                 context,
                 world,
@@ -162,6 +170,7 @@ impl Registry {
                 dependent_component,
                 dependent_component_data,
                 get_component_data,
+                loaded_components,
             )?;
         }
 

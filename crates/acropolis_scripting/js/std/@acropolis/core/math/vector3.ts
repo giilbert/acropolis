@@ -41,12 +41,14 @@ export class Vector3 {
 
   get x(): number {
     if (!this.entity) return this._x;
-    const { x } = getComponentVector3Property(
+    const { x, y, z } = getComponentVector3Property(
       this.entity!,
       this.component!,
       this.property!
     );
     this._x = x;
+    this._y = y;
+    this._z = z;
     return x;
   }
 
@@ -57,12 +59,14 @@ export class Vector3 {
 
   get y(): number {
     if (!this.entity) return this._y;
-    const { y } = getComponentVector3Property(
+    const { x, y, z } = getComponentVector3Property(
       this.entity!,
       this.component!,
       this.property!
     );
+    this._x = x;
     this._y = y;
+    this._z = z;
     return y;
   }
 
@@ -73,11 +77,13 @@ export class Vector3 {
 
   get z(): number {
     if (!this.entity) return this._z;
-    const { z } = getComponentVector3Property(
+    const { x, y, z } = getComponentVector3Property(
       this.entity!,
       this.component!,
       this.property!
     );
+    this._x = x;
+    this._y = y;
     this._z = z;
     return z;
   }
