@@ -1,6 +1,7 @@
 // extremely cursed shit here
 
-use std::{any::TypeId, cell::RefCell, collections::HashMap, rc::Rc};
+use hashbrown::HashMap;
+use std::{any::TypeId, cell::RefCell, rc::Rc};
 
 use bevy_ecs::{
     component::{ComponentDescriptor, ComponentId},

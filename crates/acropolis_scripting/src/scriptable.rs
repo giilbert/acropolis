@@ -27,8 +27,6 @@ pub unsafe fn get_scripting_api<'a>(
     entity: Entity,
     component_id: ComponentId,
 ) -> Option<&'a mut dyn Scriptable> {
-    let start = std::time::Instant::now();
-
     let world = &mut *SCRIPTING_WORLD.unwrap();
     let addr = {
         let mut component = world.get_mut_by_id(entity, component_id).unwrap();
@@ -41,7 +39,7 @@ pub unsafe fn get_scripting_api<'a>(
     let o = extensions
         .components
         .get(&component_id)
-        .unwrap()
+        .expect("component not scriptable")
         .scriptable_from_thin_ptr(addr);
 
     Some(&mut *o)
