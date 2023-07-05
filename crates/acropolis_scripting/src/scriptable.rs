@@ -26,6 +26,27 @@ pub trait Scriptable {
 pub unsafe fn get_scripting_api<'a>(
     entity: Entity,
     component_id: ComponentId,
+) -> Option<&'a dyn Scriptable> {
+    let world = &mut *SCRIPTING_WORLD.unwrap();
+    let addr = {
+        let component = world.get_mut_by_id(entity, component_id).unwrap();
+        component.into_inner().as_ptr() as *const ()
+    };
+
+    let extensions = world.resource::<ScriptingExtensions>();
+
+    let o = extensions
+        .components
+        .get(&component_id)
+        .expect("component not scriptable")
+        .scriptable_from_thin_ptr(addr);
+
+    Some(o)
+}
+
+pub unsafe fn get_scripting_api_mut<'a>(
+    entity: Entity,
+    component_id: ComponentId,
 ) -> Option<&'a mut dyn Scriptable> {
     let world = &mut *SCRIPTING_WORLD.unwrap();
     let addr = {
@@ -42,5 +63,5 @@ pub unsafe fn get_scripting_api<'a>(
         .expect("component not scriptable")
         .scriptable_from_thin_ptr(addr);
 
-    Some(&mut *o)
+    Some(o)
 }

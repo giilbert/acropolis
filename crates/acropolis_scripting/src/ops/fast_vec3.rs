@@ -1,6 +1,6 @@
 use bevy_ecs::{component::ComponentId, prelude::Entity};
 
-use crate::scriptable::get_scripting_api;
+use crate::scriptable::{get_scripting_api, get_scripting_api_mut};
 
 #[macros::glued_function]
 pub fn op_set_component_vec3_prop(
@@ -13,7 +13,7 @@ pub fn op_set_component_vec3_prop(
 ) {
     let entity = Entity::from_raw(entity_id);
     if let Some(scripting_api) =
-        unsafe { get_scripting_api(entity, ComponentId::new(component_id)) }
+        unsafe { get_scripting_api_mut(entity, ComponentId::new(component_id)) }
     {
         scripting_api.set_property_vec3(key, x, y, z);
     }
