@@ -85,3 +85,23 @@ export function setComponentVector3Property(
     );
   }
 }
+
+export function callComponentMethod(
+  entity: Entity,
+  componentId: number,
+  key: number,
+  passArgs: any[]
+) {
+  // @ts-ignore
+  if (typeof Deno === "undefined") {
+    throw new Error("TODO: implement setComponentVector3Property for the web");
+  } else {
+    // @ts-ignore
+    Deno.core.ops.op_call_component_method_mut(
+      entity.id,
+      componentId,
+      key,
+      passArgs
+    );
+  }
+}

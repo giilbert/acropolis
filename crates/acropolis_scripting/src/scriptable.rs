@@ -2,6 +2,7 @@ use bevy_ecs::{
     component::ComponentId,
     prelude::{DetectChanges, Entity},
 };
+use deno_core::{serde_v8, v8};
 
 use crate::{ScriptingExtensions, SCRIPTING_WORLD};
 
@@ -20,6 +21,16 @@ pub trait Scriptable {
 
     fn get_property_vec3(&self, property: u32) -> (f64, f64, f64) {
         unimplemented!("get_property_vec3 {property}")
+    }
+
+    #[allow(unused_variables)]
+    fn call_component_method_mut(
+        &mut self,
+        property: u32,
+        handle_scope: &mut v8::HandleScope,
+        arguments: v8::Local<v8::Value>,
+    ) {
+        unimplemented!("call_component_method_mut {property}");
     }
 }
 

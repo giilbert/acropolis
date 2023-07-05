@@ -1,10 +1,10 @@
 use acropolis_scripting::{serde_json, Scriptable};
 use nalgebra::{
-    Isometry2, Isometry3, Matrix4, Quaternion, Rotation, Translation2,
-    Translation3, UnitQuaternion, Vector2, Vector3,
+    Isometry2, Isometry3, Matrix4, Quaternion, Translation3, UnitQuaternion,
+    Vector2, Vector3,
 };
 use serde::{Deserialize, Serialize};
-use std::{f32::consts::PI, ops::Mul};
+use std::f32::consts::PI;
 
 use bevy_ecs::{
     prelude::{Component, Entity},

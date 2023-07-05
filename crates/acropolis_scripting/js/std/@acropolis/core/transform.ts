@@ -1,5 +1,5 @@
 import { Entity } from ".";
-import { getComponentVector3Property } from "./deno";
+import { callComponentMethod, getComponentVector3Property } from "./deno";
 import { Vector3 } from "./math/vector3";
 
 const transformComponentId =

@@ -1,5 +1,6 @@
 import { Entity } from "..";
 import {
+  callComponentMethod,
   getComponentVector3Property,
   setComponentVector3Property,
 } from "../deno";
@@ -89,6 +90,8 @@ export class Vector3 {
   }
 
   private updateEntityPosition() {
+    callComponentMethod(this.entity!, this.component!, 0, [3, 1]);
+
     setComponentVector3Property(
       this.entity!,
       this.component!,
