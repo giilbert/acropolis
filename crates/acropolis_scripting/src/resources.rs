@@ -12,103 +12,6 @@ use crate::Scriptable;
 // TODO: make better & safer
 pub static mut SCRIPTING_WORLD: Option<*mut World> = None;
 
-unsafe fn get_scripting_api<'a>(
-    entity: Entity,
-    component_id: ComponentId,
-) -> Option<&'a mut dyn Scriptable> {
-    let world = &mut *SCRIPTING_WORLD.unwrap();
-    let addr = {
-        let mut component = world.get_mut_by_id(entity, component_id).unwrap();
-        component.set_changed();
-        component.into_inner().as_ptr() as *const ()
-    };
-    let extensions = world.resource::<ScriptingExtensions>();
-
-    let o = extensions
-        .components
-        .get(&component_id)
-        .unwrap()
-        .scriptable_from_thin_ptr(addr);
-
-    // let boxed: Box<dyn Scriptable> = Box::new(PhantomData);
-    // assert_eq!(
-    //     std::mem::size_of_val(&boxed),
-    //     std::mem::size_of::<usize>() * 2
-    // );
-    // let (_, vtable) =
-    //     std::mem::transmute_copy::<Box<_>, (*const u8, *const usize)>(&boxed);
-
-    // let o = std::mem::transmute::<_, *mut dyn Scriptable>((
-    //     addr as usize,
-    //     vtable as usize,
-    // ));
-
-    Some(&mut *o)
-}
-
-#[macros::glued_function]
-pub fn op_set_component_prop(
-    entity_id: u32,
-    component_id: usize,
-    key: String,
-    value: String,
-) {
-    let entity = Entity::from_raw(entity_id);
-    if let Some(scripting_api) =
-        unsafe { get_scripting_api(entity, ComponentId::new(component_id)) }
-    {
-        scripting_api.set_property(&key, value);
-    }
-}
-
-#[macros::glued_function]
-pub fn op_get_component_prop(
-    entity_id: u32,
-    component_id: usize,
-    key: String,
-) -> Option<String> {
-    let entity = Entity::from_raw(entity_id);
-    let scripting_api =
-        unsafe { get_scripting_api(entity, ComponentId::new(component_id)) };
-    Some(scripting_api?.get_property(&key))
-}
-
-#[macros::glued_function]
-pub fn op_set_component_vec3_prop(
-    entity_id: u32,
-    component_id: usize,
-    key: u32,
-    x: f64,
-    y: f64,
-    z: f64,
-) {
-    let entity = Entity::from_raw(entity_id);
-    if let Some(scripting_api) =
-        unsafe { get_scripting_api(entity, ComponentId::new(component_id)) }
-    {
-        scripting_api.set_property_vec3(key, x, y, z);
-    }
-}
-
-#[macros::glued_function]
-pub fn op_get_component_vec3_prop(
-    entity_id: u32,
-    component_id: usize,
-    key: u32,
-) -> Option<(f64, f64, f64)> {
-    let entity = Entity::from_raw(entity_id);
-    let scripting_api =
-        unsafe { get_scripting_api(entity, ComponentId::new(component_id)) };
-    Some(scripting_api?.get_property_vec3(key))
-}
-
-// #[op]
-// fn op_get_key_down(key: String) -> bool {
-//     let world = unsafe { &mut *SCRIPTING_WORLD.unwrap() };
-//     let state = world.resource::<StateResource>().lock();
-//     state.keys.contains(&serde_json::from_str(&key).unwrap())
-// }
-
 #[derive(Resource)]
 pub struct ScriptingResource {
     #[cfg(not(target_arch = "wasm32"))]
@@ -123,13 +26,7 @@ impl ScriptingResource {
     pub fn new_deno(mut more_extensions: Vec<deno_core::Extension>) -> Self {
         use deno_core::{Extension, JsRuntime, RuntimeOptions};
         let extension = Extension::builder()
-            .ops(vec![
-                op_get_component_prop::decl(),
-                op_set_component_prop::decl(),
-                op_get_component_vec3_prop::decl(),
-                op_set_component_vec3_prop::decl(),
-                // op_get_key_down::decl(),
-            ])
+            .ops(crate::ops::deno_get_all_props())
             .build();
 
         let mut extensions = vec![extension];

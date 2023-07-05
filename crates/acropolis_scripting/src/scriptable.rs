@@ -1,3 +1,10 @@
+use bevy_ecs::{
+    component::ComponentId,
+    prelude::{DetectChanges, Entity},
+};
+
+use crate::{ScriptingExtensions, SCRIPTING_WORLD};
+
 pub trait Scriptable {
     fn set_property(&mut self, name: &str, value: String) {
         unimplemented!("set_property {name}: {value}")
@@ -14,4 +21,28 @@ pub trait Scriptable {
     fn get_property_vec3(&self, property: u32) -> (f64, f64, f64) {
         unimplemented!("get_property_vec3 {property}")
     }
+}
+
+pub unsafe fn get_scripting_api<'a>(
+    entity: Entity,
+    component_id: ComponentId,
+) -> Option<&'a mut dyn Scriptable> {
+    let start = std::time::Instant::now();
+
+    let world = &mut *SCRIPTING_WORLD.unwrap();
+    let addr = {
+        let mut component = world.get_mut_by_id(entity, component_id).unwrap();
+        component.set_changed();
+        component.into_inner().as_ptr() as *const ()
+    };
+
+    let extensions = world.resource::<ScriptingExtensions>();
+
+    let o = extensions
+        .components
+        .get(&component_id)
+        .unwrap()
+        .scriptable_from_thin_ptr(addr);
+
+    Some(&mut *o)
 }

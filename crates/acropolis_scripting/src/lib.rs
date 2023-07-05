@@ -1,5 +1,6 @@
 mod components;
 mod init;
+mod ops;
 mod plugin;
 mod resources;
 mod scriptable;
