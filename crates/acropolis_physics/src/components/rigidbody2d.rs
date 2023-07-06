@@ -11,6 +11,7 @@ use crate::resources::{PhysicsInner, PhysicsResource};
 pub struct RigidBody2D {
     pub rigidbody_handle: RigidBodyHandle,
     pub collider_handle: ColliderHandle,
+    physics_resource: Option<PhysicsResource>,
 }
 
 impl RigidBody2D {
@@ -19,21 +20,24 @@ impl RigidBody2D {
         value: Value,
         collider: &mut Collider2D,
     ) -> Self {
-        let mut physics_resource = physics_resource.lock();
+        let mut physics_resource_inner = physics_resource.lock();
 
         let rigidbody = RigidBodyBuilder::dynamic()
             .translation(vector![0.0, 2.0])
             .build();
 
         let rigidbody_handle =
-            physics_resource.rigid_body_set.insert(rigidbody);
+            physics_resource_inner.rigid_body_set.insert(rigidbody);
 
         let collider_handle = collider
-            .attach_rigidbody2d(&mut *physics_resource, rigidbody_handle);
+            .attach_rigidbody2d(&mut *physics_resource_inner, rigidbody_handle);
+
+        drop(physics_resource_inner);
 
         Self {
             rigidbody_handle,
             collider_handle,
+            physics_resource: Some(physics_resource),
         }
     }
 
@@ -63,9 +67,8 @@ impl Scriptable for RigidBody2D {
         method_id: u32,
         handle_scope: &mut deno_core::v8::HandleScope,
         arguments: deno_core::v8::Local<deno_core::v8::Value>,
-        world: &mut World,
     ) {
-        let mut physics = world.resource::<PhysicsResource>().lock();
+        let mut physics = self.physics_resource.as_ref().unwrap().lock();
 
         match method_id {
             0 => {

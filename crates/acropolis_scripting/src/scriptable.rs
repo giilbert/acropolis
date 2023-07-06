@@ -30,7 +30,6 @@ pub trait Scriptable {
         method_id: u32,
         handle_scope: &mut v8::HandleScope,
         arguments: v8::Local<v8::Value>,
-        world: &mut World,
     ) {
         unimplemented!("call_component_method_mut {method_id}");
     }
