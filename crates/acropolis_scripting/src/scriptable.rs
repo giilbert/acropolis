@@ -1,6 +1,7 @@
 use bevy_ecs::{
     component::ComponentId,
     prelude::{DetectChanges, Entity},
+    world::World,
 };
 use deno_core::{serde_v8, v8};
 
@@ -26,11 +27,12 @@ pub trait Scriptable {
     #[allow(unused_variables)]
     fn call_component_method_mut(
         &mut self,
-        property: u32,
+        method_id: u32,
         handle_scope: &mut v8::HandleScope,
         arguments: v8::Local<v8::Value>,
+        world: &mut World,
     ) {
-        unimplemented!("call_component_method_mut {property}");
+        unimplemented!("call_component_method_mut {method_id}");
     }
 }
 
@@ -54,6 +56,8 @@ pub unsafe fn get_scripting_api<'a>(
 
     Some(o)
 }
+
+//  INFO  acropolis_scripting::init                   > {"acropolis_loader::resource::LoaderContextResource":0,"acropolis_loader::registry::Registry":1,"acropolis_render::resources::StateResource":2,"acropolis_scripting::resources::ScriptingExtensions":3,"acropolis_physics::resources::PhysicsResource":4,"acropolis_math::components::root::Root":5,"acropolis_math::components::transform::Transform":6,"acropolis_math::components::transform::GlobalTransform":7,"acropolis_math::components::transform::Children":8,"acropolis_render::components::mesh::Mesh":9,"acropolis_physics::components::collider2d::Collider2D":10,"acropolis_math::components::transform::Parent":11,"acropolis_physics::components::rigidbody2d::RigidBody2D":12,"acropolis_scripting::components::behavior::Behavior":13,"acropolis_render::components::camera::Camera":14,"acropolis_render::components::camera::CurrentCamera":15,"acropolis_scripting::resources::ScriptingResource":16}
 
 pub unsafe fn get_scripting_api_mut<'a>(
     entity: Entity,

@@ -3,6 +3,7 @@ mod resources;
 mod systems;
 
 use acropolis_core::{Application, Plugin, Stage};
+use acropolis_scripting::ScriptingExtensions;
 use bevy_ecs::prelude::*;
 use components::{collider2d::Collider2D, rigidbody2d::RigidBody2D};
 
@@ -32,6 +33,12 @@ impl Plugin for PhysicsPlugin {
                         .after("tick")
                         .after("transform_propagate"),
                 ),
+        );
+
+        app.world.resource_scope::<ScriptingExtensions, _>(
+            |_, mut extensions_resource| {
+                extensions_resource.register_component::<RigidBody2D>();
+            },
         );
 
         app.world.resource_scope::<acropolis_loader::Registry, _>(

@@ -1,18 +1,17 @@
-import { Behavior, Entity } from "@acropolis/core";
+import { Behavior, Entity, Vector2 } from "@acropolis/core";
 import { keyDown } from "@acropolis/input";
-
-const speed = 0.1;
+import { RigidBody2D } from "@acropolis/physics";
 
 class Move extends Behavior {
+  rigidbody: RigidBody2D;
+
   constructor(entity: Entity) {
     super(entity);
+    this.rigidbody = entity.get(RigidBody2D);
   }
 
   update() {
-    if (keyDown("D")) this.transform.position.x += speed;
-    if (keyDown("A")) this.transform.position.x -= speed;
-    if (keyDown("W")) this.transform.position.y += speed;
-    if (keyDown("S")) this.transform.position.y -= speed;
+    if (keyDown("W")) this.rigidbody.applyImpulse(new Vector2(0, 1));
   }
 }
 

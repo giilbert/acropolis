@@ -1,12 +1,13 @@
-use acropolis_scripting::serde_json::Value;
+use acropolis_scripting::{serde_json::Value, Scriptable};
 use bevy_ecs::prelude::*;
-use nalgebra::{Isometry2, Matrix4, Vector3};
+use deno_core::serde_v8;
+use nalgebra::{Matrix4, Vector2, Vector3};
 use rapier2d::prelude::*;
 
 use super::collider2d::Collider2D;
 use crate::resources::{PhysicsInner, PhysicsResource};
 
-#[derive(Component)]
+#[derive(Component, Default)]
 pub struct RigidBody2D {
     pub rigidbody_handle: RigidBodyHandle,
     pub collider_handle: ColliderHandle,
@@ -53,5 +54,41 @@ impl RigidBody2D {
             translation.y,
             0.0,
         )) * Matrix4::from_euler_angles(0.0, 0.0, rotation)
+    }
+}
+
+impl Scriptable for RigidBody2D {
+    fn call_component_method_mut(
+        &mut self,
+        method_id: u32,
+        handle_scope: &mut deno_core::v8::HandleScope,
+        arguments: deno_core::v8::Local<deno_core::v8::Value>,
+        world: &mut World,
+    ) {
+        let mut physics = world.resource::<PhysicsResource>().lock();
+
+        match method_id {
+            0 => {
+                let (f_x, f_y): (f32, f32) =
+                    serde_v8::from_v8(handle_scope, arguments)
+                        .expect("error deserializing");
+                let rb = physics
+                    .rigid_body_set
+                    .get_mut(self.rigidbody_handle)
+                    .expect("rigidbody handle not found.");
+                rb.add_force(Vector2::new(f_x, f_y), true);
+            }
+            1 => {
+                let (f_x, f_y): (f32, f32) =
+                    serde_v8::from_v8(handle_scope, arguments)
+                        .expect("error deserializing");
+                let rb = physics
+                    .rigid_body_set
+                    .get_mut(self.rigidbody_handle)
+                    .expect("rigidbody handle not found.");
+                rb.apply_impulse(Vector2::new(f_x, f_y), true);
+            }
+            _ => panic!("Unknown method id"),
+        }
     }
 }

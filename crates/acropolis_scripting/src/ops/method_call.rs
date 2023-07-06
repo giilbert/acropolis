@@ -11,7 +11,9 @@ pub fn op_call_component_method_mut(
     key: u32,
     arguments: deno_core::serde_v8::Value,
 ) {
+    let world = unsafe { &mut *crate::SCRIPTING_WORLD.unwrap() };
     let entity = Entity::from_raw(entity_id);
+
     if let Some(scripting_api) =
         unsafe { get_scripting_api_mut(entity, ComponentId::new(component_id)) }
     {
@@ -19,6 +21,7 @@ pub fn op_call_component_method_mut(
             key,
             handle_scope,
             arguments.v8_value,
+            world,
         );
     }
 }
