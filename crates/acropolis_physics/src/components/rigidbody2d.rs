@@ -7,11 +7,11 @@ use rapier2d::prelude::*;
 use super::collider2d::Collider2D;
 use crate::resources::{PhysicsInner, PhysicsResource};
 
-#[derive(Component, Default)]
+#[derive(Component)]
 pub struct RigidBody2D {
     pub rigidbody_handle: RigidBodyHandle,
     pub collider_handle: ColliderHandle,
-    physics_resource: Option<PhysicsResource>,
+    physics_resource: PhysicsResource,
 }
 
 impl RigidBody2D {
@@ -37,7 +37,7 @@ impl RigidBody2D {
         Self {
             rigidbody_handle,
             collider_handle,
-            physics_resource: Some(physics_resource),
+            physics_resource,
         }
     }
 
@@ -68,7 +68,7 @@ impl Scriptable for RigidBody2D {
         handle_scope: &mut deno_core::v8::HandleScope,
         arguments: deno_core::v8::Local<deno_core::v8::Value>,
     ) {
-        let mut physics = self.physics_resource.as_ref().unwrap().lock();
+        let mut physics = self.physics_resource.lock();
 
         match method_id {
             0 => {

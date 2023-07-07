@@ -12,6 +12,7 @@ class Move extends Behavior {
 
   update() {
     if (keyDown("W")) this.rigidbody.applyImpulse(new Vector2(0, 1));
+    if (keyDown("S")) this.rigidbody.applyImpulse(new Vector2(0, -1));
   }
 }
 

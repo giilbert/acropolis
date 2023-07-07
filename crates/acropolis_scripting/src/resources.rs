@@ -1,7 +1,7 @@
 // extremely cursed shit here
 
 use hashbrown::HashMap;
-use std::{any::TypeId, cell::RefCell, rc::Rc};
+use std::{any::TypeId, cell::RefCell, mem::MaybeUninit, rc::Rc};
 
 use bevy_ecs::{
     component::{ComponentDescriptor, ComponentId},
@@ -93,14 +93,20 @@ impl ScriptingExtensions {
             .push(extension_builder.build());
     }
 
-    pub fn register_component<C: Component + Scriptable + Default>(&mut self) {
+    pub fn register_component<C: Component + Scriptable>(&mut self) {
         log::info!("Registered component {}", std::any::type_name::<C>());
         let type_id = TypeId::of::<C>();
 
         unsafe {
-            let b: Box<dyn Scriptable> = Box::new(C::default());
+            // just using this box to get the vtable
+            let c: C = MaybeUninit::zeroed().assume_init();
+            let b: Box<dyn Scriptable> = Box::new(c);
+
             let (_, vtable) =
                 std::mem::transmute_copy::<Box<_>, (*const u8, *const ())>(&b);
+
+            // prevent the box from being dropped, since it contains all zeros
+            Box::leak(b);
 
             self.registered_components.insert(
                 type_id,
