@@ -23,6 +23,7 @@ pub fn build(parameters: BuildParameters) -> BuildOutput {
         .env("NODE_PATH", "std")
         .args(&[
             "entry.ts",
+            "--log-level=silent",
             "--bundle",
             "--outfile=out.js",
             "--target=chrome58",
