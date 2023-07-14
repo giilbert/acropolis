@@ -1,7 +1,7 @@
 mod create;
 
 pub use create::{create_dot_acropolis, install_esbuild};
-use std::{fs, path::PathBuf};
+use std::{fs, path::PathBuf, process::ExitStatus};
 
 pub struct BuildParameters {
     pub project_root: PathBuf,
@@ -23,7 +23,6 @@ pub fn build(parameters: BuildParameters) -> BuildOutput {
         .env("NODE_PATH", "std")
         .args(&[
             "entry.ts",
-            "--log-level=silent",
             "--bundle",
             "--outfile=out.js",
             "--target=chrome58",
@@ -32,7 +31,20 @@ pub fn build(parameters: BuildParameters) -> BuildOutput {
         .spawn()
         .unwrap();
 
-    child.wait().unwrap();
+    let terminal_width = termion::terminal_size().map(|(w, _)| w).unwrap_or(40);
+    let divider = std::iter::repeat("-")
+        .take(terminal_width as usize)
+        .collect::<String>();
+
+    println!("esbuild output:");
+    println!("{}", divider);
+    let exit_status = child.wait().unwrap();
+    println!("{}", divider);
+
+    if !exit_status.success() {
+        println!("esbuild failed: exiting with status 1");
+        std::process::exit(1);
+    }
 
     BuildOutput {}
 }

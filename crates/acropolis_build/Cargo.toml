@@ -8,6 +8,7 @@ edition = "2021"
 [dependencies]
 include_dir = "0.7.3"
 cfg-if = "1.0.0"
+termion = "2.0.1"
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
 zip = "0.6.6"
