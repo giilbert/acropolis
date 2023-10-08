@@ -30,6 +30,10 @@ pub type InitFunction = &'static (dyn Fn(&mut Context, &mut World) -> anyhow::Re
               + Send
               + Sync);
 
+pub type AfterLoadFunction = &'static (dyn Fn(&mut Context, &mut World) -> anyhow::Result<()>
+              + Send
+              + Sync);
+
 struct ComponentLoaderEntry {
     pub dependent_components: &'static [&'static str],
     pub function: ComponentLoaderFunction,
@@ -41,6 +45,7 @@ pub struct Registry {
     asset_functions: HashMap<String, AssetLoaderFunction>,
     entity_create_functions: Vec<EntityCreateFunction>,
     init_functions: Vec<InitFunction>,
+    after_load_functions: Vec<AfterLoadFunction>,
 }
 
 impl Registry {
@@ -50,6 +55,7 @@ impl Registry {
             asset_functions: HashMap::new(),
             entity_create_functions: Vec::new(),
             init_functions: Vec::new(),
+            after_load_functions: Vec::new(),
         }
     }
 
@@ -84,6 +90,10 @@ impl Registry {
         self.init_functions.push(function);
     }
 
+    pub fn register_after_load(&mut self, function: AfterLoadFunction) {
+        self.after_load_functions.push(function);
+    }
+
     pub fn init_world(
         &self,
         context: &mut Context,
@@ -104,6 +114,18 @@ impl Registry {
     ) -> anyhow::Result<()> {
         for function in &self.entity_create_functions {
             function(context, world, entity)?;
+        }
+
+        Ok(())
+    }
+
+    pub fn after_load(
+        &self,
+        context: &mut Context,
+        world: &mut World,
+    ) -> anyhow::Result<()> {
+        for function in &self.after_load_functions {
+            function(context, world)?;
         }
 
         Ok(())

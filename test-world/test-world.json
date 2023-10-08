@@ -6,10 +6,9 @@
       "Transform": {
         "position": [0, 3, 0],
         "rotation": [0, 0, 0, 1],
-        "scale": [2, 1, 1]
+        "scale": [1, 1, 1]
       },
       "Parent": null,
-      "Children": [],
       "Mesh": {
         "geometry": {
           "type": "RawGeometry",
@@ -26,7 +25,7 @@
       "Collider2D": {
         "shape": {
           "type": "Rectangle",
-          "halfExtents": [1, 0.5]
+          "halfExtents": [0.5, 0.5]
         }
       },
       "RigidBody2D": {},
@@ -46,7 +45,6 @@
         "scale": [16, 1, 1]
       },
       "Parent": null,
-      "Children": [],
       "Mesh": {
         "geometry": {
           "type": "RawGeometry",
@@ -76,18 +74,82 @@
         "rotation": [0, 0, 0, 1],
         "scale": [1, 1, 1]
       },
-      "Parent": null,
-      "Children": [],
+      "Parent": 0,
       "CurrentCamera": true,
       "Camera": {
         "type": "Perspective",
-        "fov": 50,
+        "fov": 70,
         "near": 0.1,
         "far": 1000.0
       },
       "behaviors": [
         {
           "src": "src/camera.ts",
+          "params": {}
+        }
+      ]
+    },
+
+    {
+      "id": 3,
+      "Transform": {
+        "position": [3, -2, 0],
+        "rotation": [0, 0, 0, 1],
+        "scale": [4, 0.2, 1]
+      },
+      "Parent": null,
+      "Mesh": {
+        "geometry": {
+          "type": "RawGeometry",
+          "vertices": [
+            { "position": [0.5, 0.5, 0.0], "uv": [1, 0] },
+            { "position": [0.5, -0.5, 0.0], "uv": [1, 1] },
+            { "position": [-0.5, -0.5, 0.0], "uv": [0, 1] },
+            { "position": [-0.5, 0.5, 0.0], "uv": [0, 0] }
+          ],
+          "indices": [0, 2, 1, 0, 3, 2]
+        },
+        "material": "material"
+      },
+      "Collider2D": {
+        "shape": {
+          "type": "Rectangle",
+          "halfExtents": [2.0, 0.1]
+        }
+      },
+      "behaviors": []
+    },
+
+    {
+      "id": 4,
+      "Transform": {
+        "position": [0, 3, 0],
+        "rotation": [0, 0, 0, 1],
+        "scale": [8, 0.2, 1]
+      },
+      "Parent": null,
+      "Mesh": {
+        "geometry": {
+          "type": "RawGeometry",
+          "vertices": [
+            { "position": [0.5, 0.5, 0.0], "uv": [1, 0] },
+            { "position": [0.5, -0.5, 0.0], "uv": [1, 1] },
+            { "position": [-0.5, -0.5, 0.0], "uv": [0, 1] },
+            { "position": [-0.5, 0.5, 0.0], "uv": [0, 0] }
+          ],
+          "indices": [0, 2, 1, 0, 3, 2]
+        },
+        "material": "material"
+      },
+      "Collider2D": {
+        "shape": {
+          "type": "Rectangle",
+          "halfExtents": [4.0, 0.1]
+        }
+      },
+      "behaviors": [
+        {
+          "src": "src/platform.ts",
           "params": {}
         }
       ]

@@ -1,7 +1,7 @@
 use acropolis_core::{Plugin, Stage};
 use acropolis_loader::Registry;
 use acropolis_scripting::ScriptingExtensions;
-use bevy_ecs::prelude::*;
+use bevy_ecs::{prelude::*, system::EntityCommands, world::EntityMut};
 
 use crate::{Children, GlobalTransform, Parent, Root, Transform};
 
@@ -50,23 +50,6 @@ impl Plugin for MathPlugin {
             );
 
             registry.register_component(
-                "Children",
-                &[],
-                &|ctx, world, entity, value| {
-                    let value: Vec<u64> =
-                        acropolis_scripting::serde_json::from_value(value)?;
-                    let children = value
-                        .iter()
-                        .map(|child| ctx.entity_id_map[&child])
-                        .collect::<Vec<_>>();
-
-                    world.entity_mut(entity).insert(Children(children));
-
-                    Ok(())
-                },
-            );
-
-            registry.register_component(
                 "Parent",
                 &[],
                 &|ctx, world, entity, value| {
@@ -75,12 +58,30 @@ impl Plugin for MathPlugin {
 
                     match value {
                         Some(parent_id) => {
+                            println!("some -> adding to {}", parent_id);
+
                             let parent_entity = ctx.entity_id_map[&parent_id];
                             world
                                 .entity_mut(entity)
                                 .insert(Parent(parent_entity));
+
+                            let mut parent_entity =
+                                world.get_entity_mut(parent_entity).unwrap();
+                            let mut children =
+                                parent_entity.get_mut::<Children>();
+
+                            match children.as_mut() {
+                                Some(children) => {
+                                    children.0.push(entity);
+                                }
+                                None => {
+                                    parent_entity
+                                        .insert(Children(vec![entity]));
+                                }
+                            }
                         }
                         None => {
+                            println!("none -> adding to root");
                             let (
                                 (mut root_entity_children, root_entity_id),
                                 ..,
@@ -99,6 +100,8 @@ impl Plugin for MathPlugin {
                     Ok(())
                 },
             );
+
+            registry.register_after_load(&|context, world| Ok(()));
         });
     }
 }

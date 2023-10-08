@@ -11,8 +11,8 @@ class Move extends Behavior {
   }
 
   update() {
-    const a = 10;
-
+    if (keyDown("A")) this.rigidbody.applyImpulse(new Vector2(-1, 0));
+    if (keyDown("D")) this.rigidbody.applyImpulse(new Vector2(1, 0));
     if (keyDown("W")) this.rigidbody.applyImpulse(new Vector2(0, 1));
     if (keyDown("S")) this.rigidbody.applyImpulse(new Vector2(0, -1));
   }

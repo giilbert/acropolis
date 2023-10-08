@@ -24,6 +24,7 @@ impl RigidBody2D {
 
         let rigidbody = RigidBodyBuilder::dynamic()
             .translation(vector![0.0, 2.0])
+            .lock_rotations()
             .build();
 
         let rigidbody_handle =

@@ -12,7 +12,7 @@ pub fn test_system(mut query: Query<&mut Transform>) {
 pub fn transform_propagate_system(
     root: Query<Entity, With<Root>>,
     mut changed_local_transform_query: Query<
-        (&Transform, Entity, &Children, Option<&Parent>),
+        (&Transform, Entity, Option<&Children>, Option<&Parent>),
         (Changed<Transform>, Without<Root>),
     >,
     mut global_transform_query: Query<(&mut GlobalTransform, &Transform)>,
@@ -45,12 +45,14 @@ pub fn transform_propagate_system(
             global_transform.matrix = matrix;
         }
 
-        propagate_children_recursive(
-            &mut global_transform_query,
-            &children_query,
-            children,
-            &matrix,
-        );
+        if let Some(children) = children {
+            propagate_children_recursive(
+                &mut global_transform_query,
+                &children_query,
+                children,
+                &matrix,
+            );
+        }
     }
 }
 
@@ -79,15 +81,15 @@ fn propagate_children_recursive(
             matrix
         };
 
-        let children = children_query
-            .get(*child)
-            .expect("every entity requires a children component. not found");
+        let children = children_query.get(*child);
 
-        propagate_children_recursive(
-            global_transform_query,
-            children_query,
-            children,
-            &global_matrix,
-        )
+        if let Ok(children) = children {
+            propagate_children_recursive(
+                global_transform_query,
+                children_query,
+                children,
+                &global_matrix,
+            );
+        }
     }
 }

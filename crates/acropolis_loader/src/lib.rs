@@ -111,6 +111,10 @@ pub fn load_from_file(
                 }
             }
 
+            registry
+                .after_load(&mut context, world)
+                .expect("after_load failed");
+
             Ok::<_, anyhow::Error>(())
         })?;
 
